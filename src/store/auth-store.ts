@@ -1,0 +1,41 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+interface User {
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    roles: string[];
+    patient_id?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+}
+
+interface AuthState {
+    token: string | null;
+    refreshToken: string | null;
+    user: User | null;
+    setAuth: (token: string, refreshToken: string, user: User) => void;
+    clearAuth: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set) => ({
+            token: null,
+            refreshToken: null,
+            user: null,
+
+            setAuth: (token, refreshToken, user) =>
+                set({ token, refreshToken, user }),
+
+            clearAuth: () =>
+                set({ token: null, refreshToken: null, user: null }),
+        }),
+        {
+            name: "auth-storage",
+        }
+    )
+);
