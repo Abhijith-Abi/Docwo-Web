@@ -27,7 +27,7 @@ export default function PatientNavBar() {
                             href={item.href}
                             className={cn(
                                 "text-sm font-bold px-2 py-1 transition-colors duration-200",
-                                item.name === "Home"
+                                isActive
                                     ? "bg-green-700 text-white rounded-sm"
                                     : "text-gray-700 hover:text-green-700",
                             )}
