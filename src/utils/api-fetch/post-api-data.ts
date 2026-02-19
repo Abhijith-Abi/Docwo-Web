@@ -9,46 +9,16 @@ export default async function postApiData(path: string, bodyData: any) {
 
     await refreshTokenIfNeeded(accessToken || "", refreshToken || "");
 
-    const formData = new FormData();
-
-    const appendFormData = (data: any, parentKey = "") => {
-        if (Array.isArray(data)) {
-            data.forEach((val, index) => {
-                appendFormData(val, `${parentKey}[${index}]`);
-            });
-        } else if (
-            data &&
-            typeof data === "object" &&
-            !(data instanceof File)
-        ) {
-            Object.keys(data).forEach((key) => {
-                const value = data[key];
-                if (value === "" || value === null || value === undefined)
-                    return;
-
-                const fullKey = parentKey ? `${parentKey}${key}` : key;
-                if (typeof value === "object" && !(value instanceof File)) {
-                    appendFormData(value, fullKey);
-                } else {
-                    formData.append(fullKey, value);
-                }
-            });
-        } else {
-            formData.append(parentKey, data);
-        }
-    };
-
-    appendFormData(bodyData);
-
     let headers = new Headers();
     if (accessToken) {
         headers.append("Authorization", `Bearer ${accessToken}`);
     }
+    headers.append("Content-Type", "application/json");
 
     try {
         const response = await fetch(`${baseUrl}${path}`, {
             method: "POST",
-            body: formData,
+            body: JSON.stringify(bodyData),
             headers: headers,
         });
 

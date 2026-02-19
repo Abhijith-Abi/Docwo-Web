@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ModalProvider } from "@/context/modal-store";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -28,7 +29,10 @@ export default function RootLayout({
                 suppressHydrationWarning
             >
                 <QueryProvider>
-                    <ModalProvider>{children}</ModalProvider>
+                    <ModalProvider>
+                        {children}
+                        <Toaster />
+                    </ModalProvider>
                 </QueryProvider>
             </body>
         </html>

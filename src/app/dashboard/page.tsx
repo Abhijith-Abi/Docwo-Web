@@ -10,22 +10,24 @@ export default function Page() {
 
     const isAdmin = user?.roles?.includes("admin") ?? false;
     const isStaff = user?.roles?.includes("staff") ?? false;
+    const isPatient = user?.roles?.includes("patient") ?? false;
 
     useEffect(() => {
         if (isAdmin) {
             router.replace("/dashboard/admin-portal");
         } else if (isStaff) {
             router.replace("/dashboard/staff-portal");
+        } else if (isPatient) {
+            router.replace("/dashboard/patient-portal");
         }
-    }, [isAdmin, isStaff, router]);
+    }, [isAdmin, isStaff, isPatient, router]);
 
     const handleLogout = () => {
         clearAuth();
         router.push("/auth/login");
     };
 
-    // Show nothing while redirecting to a role-specific portal
-    if (isAdmin || isStaff) return null;
+    if (isAdmin || isStaff || isPatient) return null;
 
     return (
         <div>

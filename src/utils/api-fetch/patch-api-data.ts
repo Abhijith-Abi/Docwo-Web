@@ -9,45 +9,16 @@ export default async function patchApiData(path: string, bodyData?: any) {
 
     await refreshTokenIfNeeded(accessToken || "", refreshToken || "");
 
-    const formData = new FormData();
-
-    const appendFormData = (data: any, parentKey = "") => {
-        if (Array.isArray(data)) {
-            data.forEach((val, index) => {
-                appendFormData(val, `${parentKey}[${index}]`);
-            });
-        } else if (
-            data &&
-            typeof data === "object" &&
-            !(data instanceof File)
-        ) {
-            Object.keys(data).forEach((key) => {
-                const value = data[key];
-                if (value === null || value === undefined) return;
-
-                const fullKey = parentKey ? `${parentKey}${key}` : key;
-                if (typeof value === "object" && !(value instanceof File)) {
-                    appendFormData(value, fullKey);
-                } else {
-                    formData.append(fullKey, value);
-                }
-            });
-        } else {
-            formData.append(parentKey, data);
-        }
-    };
-
-    appendFormData(bodyData);
-
     let headers = new Headers();
     if (accessToken) {
         headers.append("Authorization", `Bearer ${accessToken}`);
     }
+    headers.append("Content-Type", "application/json");
 
     try {
         const response = await fetch(`${baseUrl}${path}`, {
             method: "PATCH",
-            body: formData,
+            body: bodyData ? JSON.stringify(bodyData) : undefined,
             headers: headers,
         });
 

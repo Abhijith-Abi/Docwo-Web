@@ -1,7 +1,23 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 import Header from "@/components/Header";
 import LoginForm from "@/components/auth/LoginForm";
 
-export default function page() {
+export default function LoginPage() {
+    const router = useRouter();
+    const token = useAuthStore((state) => state.token);
+
+    useEffect(() => {
+        if (token) {
+            router.replace("/dashboard");
+        }
+    }, [token, router]);
+
+    if (token) return null;
+
     return (
         <div className="flex flex-col min-h-screen">
             <Header />

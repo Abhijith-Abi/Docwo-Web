@@ -9,36 +9,16 @@ export default async function deleteApiData(path: string, bodyData?: any) {
 
     await refreshTokenIfNeeded(accessToken || "", refreshToken || "");
 
-    const formData = new FormData();
-
-    const appendFormData = (data: any, parentKey = "") => {
-        if (data && typeof data === "object" && !(data instanceof File)) {
-            Object.keys(data).forEach((key) => {
-                const value = data[key];
-                if (value === "" || value === null || value === undefined)
-                    return;
-
-                const fullKey = parentKey ? `${parentKey}[${key}]` : key;
-                if (typeof value === "object" && !(value instanceof File)) {
-                    appendFormData(value, fullKey);
-                } else {
-                    formData.append(fullKey, value);
-                }
-            });
-        }
-    };
-
-    appendFormData(bodyData);
-
     let headers = new Headers();
     if (accessToken) {
         headers.append("Authorization", `Bearer ${accessToken}`);
     }
+    headers.append("Content-Type", "application/json");
 
     try {
         const response = await fetch(`${baseUrl}${path}`, {
             method: "DELETE",
-            body: formData,
+            body: bodyData ? JSON.stringify(bodyData) : undefined,
             headers: headers,
         });
 

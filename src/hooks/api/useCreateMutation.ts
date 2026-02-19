@@ -53,6 +53,10 @@ function useCreateMutation(mutationData: {
                     : await postApiData(finalEndpoint, finalSubmitData);
             const { status_code, StatusCode, message, data, errors } = response;
 
+            if (response?.success === false) {
+                throw response;
+            }
+
             const errorStatusCode = status_code || StatusCode;
 
             if (errorStatusCode === 6001) {
@@ -97,6 +101,12 @@ function useCreateMutation(mutationData: {
                         message?.body ||
                         "You have successfully completed the action",
                     position: "top-right",
+                    style: {
+                        backgroundColor: "white",
+                        color: "green",
+                        border: "1px solid green",
+                    },
+                    className: "text-green-600",
                 });
             }
             if (invalidateQueries && invalidateQueries?.length) {
@@ -127,16 +137,32 @@ function useCreateMutation(mutationData: {
                 handleError(error);
             }
 
-            if (inputRefs?.current) {
+            if (inputRefs?.current && error?.form_errors) {
                 focusInputFieldWithError(
                     inputRefs,
                     inputRefs?.current,
-                    error?.form_errors
+                    error.form_errors
                 );
             }
-            setTimeout(() => {
-                toast.dismiss();
-            });
+            // toast.dismiss();
+
+            if (error?.message) {
+                const errorMessage =
+                    typeof error.message === "string"
+                        ? error.message
+                        : error.message?.title ||
+                          error.message?.body ||
+                          "An error occurred";
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    style: {
+                        backgroundColor: "white",
+                        color: "red",
+                        border: "1px solid red",
+                    },
+                    className: "text-red-600",
+                });
+            }
 
             const hasGeneralErrors =
                 Array.isArray(error?.general_errors) &&

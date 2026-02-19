@@ -63,20 +63,16 @@ export default function LoginForm() {
         inputRefs: inputRefs,
         handleSuccess: (response: any) => {
             const { data } = response;
-            const user = data?.data?.user ?? {};
-            setAuth(
-                data?.data?.accessToken ?? "",
-                data?.data?.refreshToken ?? "",
-                {
-                    user_id: user?.user_id ?? "",
-                    first_name: user?.first_name ?? "",
-                    last_name: user?.last_name ?? "",
-                    email: user?.email ?? "",
-                    phone_number: user?.phone_number ?? "",
-                    roles: user?.roles ?? [],
-                    patient_id: data?.data?.patient_id ?? "",
-                },
-            );
+            const user = data?.user ?? {};
+            setAuth(data?.accessToken ?? "", data?.refreshToken ?? "", {
+                user_id: user?.user_id ?? "",
+                first_name: user?.first_name ?? "",
+                last_name: user?.last_name ?? "",
+                email: user?.email ?? "",
+                phone_number: user?.phone_number ?? "",
+                roles: user?.roles ?? [],
+                patient_id: data?.patient_id ?? "",
+            });
         },
         isToast: true,
     });
@@ -109,12 +105,12 @@ export default function LoginForm() {
                                     <FormLabel className="font-semibold text-foreground/80 data-[error=true]:text-foreground/80">
                                         Email or Phone Number
                                     </FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                            <span className="absolute left-8 top-3 text-muted-foreground/30">
-                                                |
-                                            </span>
+                                    <div className="relative">
+                                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <span className="absolute left-8 top-3 text-muted-foreground/30">
+                                            |
+                                        </span>
+                                        <FormControl>
                                             <Input
                                                 placeholder="Enter your email or phone number"
                                                 className="pl-12 h-11 bg-muted/20 border-muted-foreground/20 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-300"
@@ -126,8 +122,8 @@ export default function LoginForm() {
                                                     ] = el;
                                                 }}
                                             />
-                                        </div>
-                                    </FormControl>
+                                        </FormControl>
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -148,12 +144,12 @@ export default function LoginForm() {
                                             Forgot password?
                                         </Link>
                                     </div>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                            <span className="absolute left-8 top-3 text-muted-foreground/30">
-                                                |
-                                            </span>
+                                    <div className="relative">
+                                        <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <span className="absolute left-8 top-3 text-muted-foreground/30">
+                                            |
+                                        </span>
+                                        <FormControl>
                                             <Input
                                                 type={
                                                     showPassword
@@ -170,30 +166,28 @@ export default function LoginForm() {
                                                     ] = el;
                                                 }}
                                             />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                                                onClick={() =>
-                                                    setShowPassword(
-                                                        !showPassword,
-                                                    )
-                                                }
-                                            >
-                                                {showPassword ? (
-                                                    <EyeOff className="h-4 w-4" />
-                                                ) : (
-                                                    <Eye className="h-4 w-4" />
-                                                )}
-                                                <span className="sr-only">
-                                                    {showPassword
-                                                        ? "Hide password"
-                                                        : "Show password"}
-                                                </span>
-                                            </Button>
-                                        </div>
-                                    </FormControl>
+                                        </FormControl>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                            onClick={() =>
+                                                setShowPassword(!showPassword)
+                                            }
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                            <span className="sr-only">
+                                                {showPassword
+                                                    ? "Hide password"
+                                                    : "Show password"}
+                                            </span>
+                                        </Button>
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )}
