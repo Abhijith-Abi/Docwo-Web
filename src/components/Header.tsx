@@ -8,12 +8,14 @@ function Header() {
         <>
             <header className="flex items-center justify-between px-4 md:px-12 lg:px-32 py-2 border-b border-gray-200">
                 <h1>
-                    <Image
-                        src="/images/logo.svg"
-                        alt="Logo"
-                        width={50}
-                        height={50}
-                    />
+                    <Link href="/">
+                        <Image
+                            src="/images/logo.svg"
+                            alt="Logo"
+                            width={50}
+                            height={50}
+                        />
+                    </Link>
                 </h1>
                 <ul className="flex items-center gap-2">
                     <li>
