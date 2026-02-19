@@ -24,7 +24,7 @@ export async function refreshTokenIfNeeded(
     useAuthStore.getState().setAuth(
         generateNewAccessTokenResponse.access,
         storedRefreshToken || refreshToken,
-        user || {}
+        user!
     );
 }
 
