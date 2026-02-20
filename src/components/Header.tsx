@@ -6,7 +6,7 @@ import Link from "next/link";
 function Header() {
     return (
         <>
-            <header className="flex items-center justify-between px-4 md:px-12 lg:px-32 py-2 border-b border-gray-200">
+            <header className="flex items-center justify-between px-4 md:px-12 lg:px-32 py-1 border-b border-gray-200">
                 <h1>
                     <Link href="/">
                         <Image

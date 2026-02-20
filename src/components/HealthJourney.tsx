@@ -60,13 +60,13 @@ const itemVariants = {
 
 export default function HealthJourney() {
     return (
-        <section className="w-full max-w-7xl px-4 md:px-8 lg:px-12 pb-24">
+        <section className="w-full max-w-7xl px-4 md:px-8 lg:px-12 pb-10">
             <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="text-3xl md:text-4xl font-bold text-center mb-16 font-headline"
+                className="text-3xl md:text-4xl font-bold text-center mb-10 font-headline"
             >
                 Your Health Journey in 3 Simple Steps
             </motion.h2>
@@ -76,7 +76,7 @@ export default function HealthJourney() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
             >
                 {steps.map((step, index) => (
                     <motion.div
@@ -85,18 +85,18 @@ export default function HealthJourney() {
                         whileHover={{ y: -10, transition: { duration: 0.2 } }}
                         className="h-full"
                     >
-                        <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md h-full flex flex-col text-center p-4 rounded-2xl transition-shadow duration-300">
-                            <CardHeader className="flex flex-col items-center">
+                        <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md h-full flex flex-col text-center p-2 rounded-2xl transition-shadow duration-300">
+                            <CardHeader className="flex flex-col items-center p-2">
                                 <step.icon
-                                    className="h-10 w-10 text-[#1F7A53] mb-2"
+                                    className="h-10 w-10 text-[#1F7A53] mb-1"
                                     strokeWidth={2}
                                 />
-                                <CardTitle className="text-lg font-bold text-center text-gray-900 ">
+                                <CardTitle className="text-lg font-bold text-center text-gray-900">
                                     {step.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-0">
-                                <CardDescription className="text-center text-sm text-gray-500 leading-relaxed px-2">
+                            <CardContent className="p-1">
+                                <CardDescription className="text-center text-sm text-gray-700 leading-relaxed px-2">
                                     {step.description}
                                 </CardDescription>
                             </CardContent>

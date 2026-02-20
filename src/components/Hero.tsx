@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -30,19 +31,19 @@ const itemVariants = {
 export default function Hero() {
     return (
         <motion.div
-            className="w-full max-w-5xl px-4 md:px-6 py-16 md:py-20 flex flex-col items-center text-center"
+            className="w-full max-w-5xl px-4 md:px-6 py-8 md:py-10 flex flex-col items-center text-center"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
             <motion.h2
-                className="text-4xl md:text-6xl font-bold font-headline mb-10 text-foreground"
+                className="text-3xl md:text-5xl font-bold font-headline mb-10 text-foreground"
                 variants={itemVariants}
             >
                 Find Your Doctor, Book with Ease
             </motion.h2>
             <motion.p
-                className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10"
+                className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10"
                 variants={itemVariants}
             >
                 Connect with top specialists near you, check their availability,
@@ -53,8 +54,10 @@ export default function Hero() {
                     size="lg"
                     className="h-12 px-8 text-lg font-semibold bg-[#1F7A53] hover:bg-[#186142] text-white cursor-pointer"
                 >
-                    Get Started
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <Link href="/auth/login" className="flex items-center">
+                        Get Started
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                    </Link>
                 </Button>
             </motion.div>
         </motion.div>
