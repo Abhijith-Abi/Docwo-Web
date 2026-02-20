@@ -56,7 +56,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import Image from "next/image";
 import { API_ENDPOINTS } from "@/constants/api-endpoints";
-import useCreateMutation from "@/hooks/api/useCreateMutation";
+import useRegister from "@/hooks/api/useRegister";
 
 const registerSchema = z.object({
     // Step 1: Personal Info
@@ -108,13 +108,7 @@ export default function RegisterForm() {
         mode: "onChange",
     });
 
-    const { mutate: handleRegister, isPending } = useCreateMutation({
-        method: "post",
-        endpoint: API_ENDPOINTS.REGISTER,
-        submitData: form.getValues() as any,
-        redirectPath: "/auth/login",
-        isToast: true,
-    });
+    const { register: handleRegister, isPending } = useRegister();
 
     const nextStep = async () => {
         let fieldsToValidate: (keyof RegisterFormValues)[] = [];
