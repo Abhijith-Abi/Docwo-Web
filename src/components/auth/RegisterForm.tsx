@@ -336,7 +336,7 @@ export default function RegisterForm() {
                                                     </FormControl>
                                                     <SelectContent
                                                         position="popper"
-                                                        className="w-[var(--radix-select-trigger-width)]"
+                                                        className="w-(--radix-select-trigger-width)"
                                                     >
                                                         <SelectItem value="male">
                                                             Male
@@ -377,7 +377,7 @@ export default function RegisterForm() {
                                                     </FormControl>
                                                     <SelectContent
                                                         position="popper"
-                                                        className="w-[var(--radix-select-trigger-width)]"
+                                                        className="w-(--radix-select-trigger-width)"
                                                     >
                                                         <SelectItem value="A+">
                                                             A+
