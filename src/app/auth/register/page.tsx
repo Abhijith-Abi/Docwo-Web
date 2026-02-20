@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
+import { useEffect } from "react";
 import Header from "@/components/Header";
-import LoginForm from "@/components/auth/LoginForm";
+import RegisterForm from "@/components/auth/RegisterForm";
 
-export default function LoginPage() {
+export default function RegisterPage() {
     const router = useRouter();
     const token = useAuthStore((state) => state.token);
 
@@ -29,8 +29,8 @@ export default function LoginPage() {
                     backgroundPosition: "center",
                 }}
             >
-                <main className="flex flex-col items-center justify-center flex-1 w-full px-4 relative z-10 py-4 sm:py-8">
-                    <LoginForm />
+                <main className="flex flex-col items-center justify-center flex-1 w-full px-4 relative z-10 py-2 sm:py-4 lg:py-8">
+                    <RegisterForm />
                 </main>
             </div>
         </div>

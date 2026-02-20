@@ -82,38 +82,38 @@ export default function LoginForm() {
     };
 
     return (
-        <Card className="w-full max-w-md border-none shadow-2xl bg-white/90 backdrop-blur-md rounded-4xl">
-            <CardHeader className="space-y-1 text-center pb-8 pt-10">
-                <CardTitle className="text-3xl font-bold tracking-tight text-primary">
+        <Card className="w-full max-w-md border-none shadow-2xl bg-white/90 backdrop-blur-md rounded-3xl">
+            <CardHeader className="space-y-1 text-center pb-4 pt-6">
+                <CardTitle className="text-2xl font-bold tracking-tight text-primary">
                     Welcome Back
                 </CardTitle>
-                <CardDescription className="text-muted-foreground text-lg">
+                <CardDescription className="text-muted-foreground text-sm">
                     Sign in to continue
                 </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-3 py-2">
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-6"
+                        className="space-y-4"
                     >
                         <FormField
                             control={form.control}
                             name="identifier"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="font-semibold text-foreground/80 data-[error=true]:text-foreground/80">
+                                <FormItem className="space-y-1 relative pb-3.5">
+                                    <FormLabel className="font-semibold text-xs text-foreground/80 data-[error=true]:text-foreground/80">
                                         Email or Phone Number
                                     </FormLabel>
                                     <div className="relative">
-                                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                        <span className="absolute left-8 top-3 text-muted-foreground/30">
+                                        <Mail className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="absolute left-8 top-2.5 text-muted-foreground/30">
                                             |
                                         </span>
                                         <FormControl>
                                             <Input
                                                 placeholder="Enter your email or phone number"
-                                                className="pl-12 h-11 bg-muted/20 border-muted-foreground/20 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-300"
+                                                className="pl-12 h-9 text-sm bg-muted/20 border-muted-foreground/20 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-300"
                                                 {...field}
                                                 ref={(el) => {
                                                     field.ref(el);
@@ -124,7 +124,7 @@ export default function LoginForm() {
                                             />
                                         </FormControl>
                                     </div>
-                                    <FormMessage />
+                                    <FormMessage className="text-[10px] absolute bottom-0 left-0" />
                                 </FormItem>
                             )}
                         />
@@ -132,21 +132,21 @@ export default function LoginForm() {
                             control={form.control}
                             name="password"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="space-y-1 relative pb-3.5">
                                     <div className="flex items-center justify-between">
-                                        <FormLabel className="font-semibold text-foreground/80 data-[error=true]:text-foreground/80">
+                                        <FormLabel className="font-semibold text-xs text-foreground/80 data-[error=true]:text-foreground/80">
                                             Password
                                         </FormLabel>
                                         <Link
                                             href="/auth/forgot-password"
-                                            className="text-xs font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
+                                            className="text-[10px] font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
                                         >
                                             Forgot password?
                                         </Link>
                                     </div>
                                     <div className="relative">
-                                        <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                        <span className="absolute left-8 top-3 text-muted-foreground/30">
+                                        <KeyRound className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="absolute left-8 top-2.5 text-muted-foreground/30">
                                             |
                                         </span>
                                         <FormControl>
@@ -157,7 +157,7 @@ export default function LoginForm() {
                                                         : "password"
                                                 }
                                                 placeholder="••••••••"
-                                                className="pl-12 pr-10 h-11 bg-muted/20 border-muted-foreground/20 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-300"
+                                                className="pl-12 pr-10 h-9 text-sm bg-muted/20 border-muted-foreground/20 focus-visible:ring-primary/20 focus-visible:border-primary transition-all duration-300"
                                                 {...field}
                                                 ref={(el) => {
                                                     field.ref(el);
@@ -171,15 +171,15 @@ export default function LoginForm() {
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                            className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                                             onClick={() =>
                                                 setShowPassword(!showPassword)
                                             }
                                         >
                                             {showPassword ? (
-                                                <EyeOff className="h-4 w-4" />
+                                                <EyeOff className="h-3.5 w-3.5" />
                                             ) : (
-                                                <Eye className="h-4 w-4" />
+                                                <Eye className="h-3.5 w-3.5" />
                                             )}
                                             <span className="sr-only">
                                                 {showPassword
@@ -188,60 +188,60 @@ export default function LoginForm() {
                                             </span>
                                         </Button>
                                     </div>
-                                    <FormMessage />
+                                    <FormMessage className="text-[10px] absolute bottom-0 left-0" />
                                 </FormItem>
                             )}
                         />
                         <Button
                             type="submit"
-                            className="w-full h-11 text-base font-medium shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 transition-all duration-300 bg-linear-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 cursor-pointer"
+                            className="w-full h-9 text-sm font-medium shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 transition-all duration-300 bg-linear-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 cursor-pointer"
                             disabled={isPending}
                         >
                             {isPending && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                             )}
                             Sign In
                         </Button>
                     </form>
                 </Form>
 
-                <div className="relative my-4">
+                <div className="relative my-2">
                     <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t border-muted-foreground/20" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-white px-2 text-muted-foreground">
+                    <div className="relative flex justify-center text-[10px] uppercase">
+                        <span className="bg-white/90 backdrop-blur-md px-2 text-muted-foreground">
                             Or continue with
                         </span>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                     <Button
                         variant="outline"
-                        className="h-11 border-muted-foreground/20 hover:bg-muted/30 hover:text-foreground transition-all duration-300 cursor-pointer"
+                        className="h-9 text-sm border-muted-foreground/20 hover:bg-muted/30 hover:text-foreground transition-all duration-300 cursor-pointer"
                         type="button"
                     >
                         <Image
                             src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp"
                             alt="Google logo"
-                            width={20}
-                            height={20}
-                            className="mr-2 h-5 w-5"
+                            width={16}
+                            height={16}
+                            className="mr-2 h-4 w-4"
                         />
                         Google
                     </Button>
                     <Button
                         variant="outline"
-                        className="h-11 border-muted-foreground/20 hover:bg-muted/30 hover:text-foreground transition-all duration-300 cursor-pointer"
+                        className="h-9 text-sm border-muted-foreground/20 hover:bg-muted/30 hover:text-foreground transition-all duration-300 cursor-pointer"
                         type="button"
                     >
                         Sign in with OTP
                     </Button>
                 </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-center justify-center pb-8 pt-2">
-                <p className="px-8 text-center text-sm text-muted-foreground">
+            <CardFooter className="flex flex-col items-center justify-center pb-6 pt-1">
+                <p className="px-8 text-center text-xs text-muted-foreground">
                     Don't have an account?{" "}
                     <Link
                         href="/auth/register"
