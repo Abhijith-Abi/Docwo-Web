@@ -20,7 +20,9 @@ export default function RegisterPage() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Header />
+            <div className="sticky top-0 z-50 bg-white shadow-sm">
+                <Header />
+            </div>
             <div
                 className="flex flex-col flex-1 bg-background relative overflow-hidden "
                 style={{

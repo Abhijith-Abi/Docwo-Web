@@ -20,7 +20,9 @@ export default function Home() {
 
     return (
         <div className="flex flex-col min-h-screen justify-between">
-            <Header />
+            <div className="sticky top-0 z-50 bg-white shadow-sm">
+                <Header />
+            </div>
             <main className="grow flex flex-col items-center">
                 <Hero />
                 <HealthJourney />

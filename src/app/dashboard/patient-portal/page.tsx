@@ -11,8 +11,10 @@ import { PatientPortalFooter } from "./_components/PatientPortalFooter";
 export default function PatientPortalPage() {
     return (
         <div className="min-h-screen">
-            <PatientHeader />
-            <PatientNavBar />
+            <div className="sticky top-0 z-50 bg-white shadow-sm">
+                <PatientHeader />
+                <PatientNavBar />
+            </div>
             <PatientHeroCarousel />
             <DepartmentScroll />
             <BrowseOptions />
