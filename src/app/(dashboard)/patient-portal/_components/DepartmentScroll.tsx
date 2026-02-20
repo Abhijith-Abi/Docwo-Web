@@ -87,7 +87,7 @@ export function DepartmentScroll() {
                     Choose your department
                 </h2>
                 <Link
-                    href="/dashboard/patient-portal/departments"
+                    href="/patient-portal/departments"
                     className="text-sm font-medium text-gray-600 hover:text-[#14532D] transition-colors"
                 >
                     See all
@@ -108,7 +108,7 @@ export function DepartmentScroll() {
                             className="pl-4 basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-1/8 text-center"
                         >
                             <Link
-                                href={`/dashboard/patient-portal/departments/${dept.id}`}
+                                href={`/patient-portal/departments/${dept.id}`}
                             >
                                 <div className="flex flex-col items-center gap-3 group cursor-pointer">
                                     <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-emerald-100 flex items-center justify-center bg-white shadow-sm transition-all duration-300 group-hover:border-[#14532D] group-hover:shadow-md">

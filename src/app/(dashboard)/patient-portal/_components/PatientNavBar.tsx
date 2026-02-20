@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-    { name: "Home", href: "/dashboard/patient-portal" },
-    { name: "Clinic", href: "/dashboard/patient-portal/clinic" },
-    { name: "Departments", href: "/dashboard/patient-portal/departments" },
-    { name: "My Bookings", href: "/dashboard/patient-portal/my-bookings" },
-    { name: "About", href: "/dashboard/patient-portal/about" },
-    { name: "Contact", href: "/dashboard/patient-portal/contact" },
+    { name: "Home", href: "/patient-portal" },
+    { name: "Clinic", href: "/patient-portal/clinic" },
+    { name: "Departments", href: "/patient-portal/departments" },
+    { name: "My Bookings", href: "/patient-portal/my-bookings" },
+    { name: "About", href: "/patient-portal/about" },
+    { name: "Contact", href: "/patient-portal/contact" },
 ];
 
 export default function PatientNavBar() {

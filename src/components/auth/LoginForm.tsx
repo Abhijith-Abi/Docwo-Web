@@ -59,7 +59,7 @@ export default function LoginForm() {
         method: "post",
         endpoint: API_ENDPOINTS.LOGIN,
         submitData: formData as Record<string, unknown>,
-        redirectPath: "/dashboard",
+        redirectPath: "/",
         inputRefs: inputRefs,
         handleSuccess: (response: any) => {
             const { data } = response;

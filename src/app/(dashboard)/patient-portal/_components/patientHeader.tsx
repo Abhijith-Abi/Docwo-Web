@@ -44,7 +44,7 @@ export default function PatientHeader() {
     return (
         <header className="flex items-center justify-between px-4 py-3 bg-white md:px-8 h-16">
             <div className="flex items-center">
-                <Link href="/dashboard/patient-portal">
+                <Link href="/patient-portal">
                     <div className="flex items-center">
                         <div className="relative w-10 h-10 md:w-12 md:h-12">
                             <Image

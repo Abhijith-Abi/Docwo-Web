@@ -86,9 +86,7 @@ export function DoctorScroll() {
                             key={doc.id}
                             className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6 text-center"
                         >
-                            <Link
-                                href={`/dashboard/patient-portal/doctors/${doc.id}`}
-                            >
+                            <Link href={`/patient-portal/doctors/${doc.id}`}>
                                 <div className="flex flex-col items-center gap-3 group cursor-pointer">
                                     <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-2 border-white shadow-md transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
                                         <Image

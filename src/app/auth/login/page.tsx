@@ -12,7 +12,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (token) {
-            router.replace("/dashboard");
+            router.replace("/");
         }
     }, [token, router]);
 

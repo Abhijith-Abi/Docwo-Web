@@ -10,13 +10,25 @@ import HealthJourney from "@/components/HealthJourney";
 
 export default function Home() {
     const router = useRouter();
-    const token = useAuthStore((state) => state.token);
+    const { user, token } = useAuthStore();
+
+    const isAdmin = user?.roles?.includes("admin") ?? false;
+    const isStaff = user?.roles?.includes("staff") ?? false;
+    const isPatient = user?.roles?.includes("patient") ?? false;
 
     useEffect(() => {
         if (token) {
-            router.replace("/dashboard");
+            if (isAdmin) {
+                router.replace("/admin-portal");
+            } else if (isStaff) {
+                router.replace("/staff-portal");
+            } else if (isPatient) {
+                router.replace("/patient-portal");
+            } else {
+                router.replace("/patient-portal");
+            }
         }
-    }, [token, router]);
+    }, [token, isAdmin, isStaff, isPatient, router]);
 
     return (
         <div className="flex flex-col min-h-screen justify-between">
