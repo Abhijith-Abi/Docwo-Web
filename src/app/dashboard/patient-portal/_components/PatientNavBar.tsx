@@ -18,7 +18,7 @@ export default function PatientNavBar() {
 
     return (
         <nav className="w-full bg-white overflow-x-auto">
-            <div className="flex items-center px-4 md:px-8 py-0 min-w-max">
+            <div className="flex items-center px-4 sm:px-6 lg:px-8 py-4 min-w-max">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (

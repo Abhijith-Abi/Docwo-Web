@@ -53,7 +53,7 @@ export function HeroCard({
             </div>
 
             {/* Image Container */}
-            <div className="relative z-10 flex-shrink-0 w-[180px] h-[220px] ml-4">
+            <div className="relative z-10 shrink-0 w-[180px] h-[220px] ml-4">
                 <Image
                     src={imageSrc}
                     alt={imageAlt}
