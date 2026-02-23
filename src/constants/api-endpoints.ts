@@ -5,5 +5,5 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     
     // USER:
-    PROFILE: '/user/profile',
+    PROFILE: '/users/me',
 }

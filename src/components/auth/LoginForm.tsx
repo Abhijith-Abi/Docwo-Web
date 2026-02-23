@@ -9,6 +9,7 @@ import { Eye, EyeOff, Loader2, KeyRound, Mail } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 
 import { API_ENDPOINTS } from "@/constants/api-endpoints";
+import getApiData from "@/utils/api-fetch/get-api-data";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -44,6 +45,7 @@ export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const setAuth = useAuthStore((s) => s.setAuth);
+    const setUser = useAuthStore((s) => s.setUser);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -61,7 +63,7 @@ export default function LoginForm() {
         submitData: formData as Record<string, unknown>,
         redirectPath: "/",
         inputRefs: inputRefs,
-        handleSuccess: (response: any) => {
+        handleSuccess: async (response: any) => {
             const { data } = response;
             const user = data?.user ?? {};
             setAuth(data?.accessToken ?? "", data?.refreshToken ?? "", {
@@ -73,6 +75,15 @@ export default function LoginForm() {
                 roles: user?.roles ?? [],
                 patient_id: data?.patient_id ?? "",
             });
+            try {
+                const profileResponse = await getApiData(API_ENDPOINTS.PROFILE);
+                const profileData = profileResponse?.data ?? profileResponse;
+                if (profileData) {
+                    setUser(profileData);
+                }
+            } catch {
+                // silently fail — basic user data is already set
+            }
         },
         isToast: true,
     });
