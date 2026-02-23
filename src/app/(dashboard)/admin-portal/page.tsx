@@ -1,24 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth-store";
-import { useRouter } from "next/navigation";
-
 export default function AdminPortalPage() {
-    const router = useRouter();
-    const { user, clearAuth } = useAuthStore();
-
-    const handleLogout = () => {
-        clearAuth();
-        router.push("/auth/login");
-    };
-
     return (
-        <div className="flex flex-col items-center justify-center h-screen gap-4">
-            <h1>AdminPortalPage</h1>
-            <Button variant="secondary" onClick={handleLogout}>
-                Logout
-            </Button>
+        <div className="flex flex-col h-full gap-6">
+            <h1 className="text-[28px] font-semibold text-slate-800 tracking-tight">
+                Dashboard
+            </h1>
+            <div className="flex-1 w-full bg-slate-50 border border-slate-100 rounded-2xl border-dashed flex items-center justify-center">
+                <p className="text-slate-400 font-medium tracking-wide">
+                    Dashboard Content
+                </p>
+            </div>
         </div>
     );
 }
