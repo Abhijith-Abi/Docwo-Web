@@ -9,13 +9,15 @@ import LoginForm from "@/components/auth/LoginForm";
 export default function LoginPage() {
     const router = useRouter();
     const token = useAuthStore((state) => state.token);
+    const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
     useEffect(() => {
-        if (token) {
+        if (hasHydrated && token) {
             router.replace("/");
         }
-    }, [token, router]);
+    }, [token, router, hasHydrated]);
 
+    if (!hasHydrated) return null;
     if (token) return null;
 
     return (

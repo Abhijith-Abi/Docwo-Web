@@ -9,13 +9,15 @@ import RegisterForm from "@/components/auth/RegisterForm";
 export default function RegisterPage() {
     const router = useRouter();
     const token = useAuthStore((state) => state.token);
+    const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
     useEffect(() => {
-        if (token) {
+        if (hasHydrated && token) {
             router.replace("/dashboard");
         }
-    }, [token, router]);
+    }, [token, router, hasHydrated]);
 
+    if (!hasHydrated) return null;
     if (token) return null;
 
     return (

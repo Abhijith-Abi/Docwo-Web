@@ -1,3 +1,5 @@
+import { PatientsClient } from "./_components/patients-client";
+
 export default function PatientsPage() {
-    return <div>PatientsPage</div>;
+    return <PatientsClient />;
 }
