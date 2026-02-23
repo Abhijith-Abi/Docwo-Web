@@ -76,7 +76,7 @@ export default function LoginForm() {
                 patient_id: data?.patient_id ?? "",
             });
             try {
-                const profileResponse = await getApiData(API_ENDPOINTS.PROFILE);
+                const profileResponse = await getApiData(API_ENDPOINTS.USER_ME);
                 const profileData = profileResponse?.data ?? profileResponse;
                 if (profileData) {
                     setUser(profileData);

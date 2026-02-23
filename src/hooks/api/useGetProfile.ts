@@ -11,7 +11,7 @@ export function useGetProfile() {
     return useQuery({
         queryKey: ["user-profile"],
         queryFn: async () => {
-            const response = await getApiData(API_ENDPOINTS.PROFILE);
+            const response = await getApiData(API_ENDPOINTS.USER_ME);
             const user = response?.data ?? response;
             if (user) {
                 setUser(user);

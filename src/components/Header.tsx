@@ -19,26 +19,26 @@ function Header() {
                 </h1>
                 <ul className="flex items-center gap-2">
                     <li>
-                        <Button variant="outline" className="cursor-pointer">
-                            <Link
-                                href="/auth/login"
-                                className="flex items-center"
+                        <Link href="/auth/login" className="flex items-center">
+                            <Button
+                                variant="outline"
+                                className="cursor-pointer"
                             >
                                 <LogIn className="mr-2 h-4 w-4" />
                                 Login
-                            </Link>
-                        </Button>
+                            </Button>
+                        </Link>
                     </li>
                     <li>
-                        <Button className="cursor-pointer">
-                            <Link
-                                href="/auth/register"
-                                className="flex items-center"
-                            >
+                        <Link
+                            href="/auth/register"
+                            className="flex items-center"
+                        >
+                            <Button className="cursor-pointer">
                                 <UserPlus className="mr-2 h-4 w-4" />
                                 Register
-                            </Link>
-                        </Button>
+                            </Button>
+                        </Link>
                     </li>
                 </ul>
             </header>
