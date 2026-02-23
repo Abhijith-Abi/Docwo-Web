@@ -10,6 +10,7 @@ export const useRegister = () => {
     isToast: true,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const register = (formData: any) => {
     const payload = {
       first_name: formData.first_name,

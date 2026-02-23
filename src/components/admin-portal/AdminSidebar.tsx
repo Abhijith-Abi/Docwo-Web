@@ -22,7 +22,7 @@ const navItems = [
         label: "Appointment\nAnalytics",
     },
     {
-        href: "/admin-portal/staff",
+        href: "/admin-portal/management",
         icon: "/images/doctor_and_staff.svg",
         label: "Doctor & Staff\nManagement",
     },

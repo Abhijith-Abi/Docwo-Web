@@ -2,7 +2,8 @@ import { useAuthStore } from "@/store/auth-store";
 import { refreshTokenIfNeeded } from "../token-refresh/refresh-token-if-needed";
 
 export default async function getApiData(endpoint: string) {
-    let { token: accessToken, refreshToken } = useAuthStore.getState();
+    let { token: accessToken } = useAuthStore.getState();
+    const { refreshToken } = useAuthStore.getState();
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     try {
