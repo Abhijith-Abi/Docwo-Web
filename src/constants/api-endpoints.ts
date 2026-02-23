@@ -78,4 +78,12 @@ export const API_ENDPOINTS = {
     REVENUE_SUMMARY: '/revenue/summary',
     REVENUE_LIST: '/revenue/list',
     REVENUE_STATS: '/revenue/stats',
+    
+    // ANALYTICS:
+    ANALYTICS_APPOINTMENTS: '/analytics/appointments',
+    ANALYTICS_FILTERS: '/analytics/filters',
+    ANALYTICS_APPOINTMENT_SUMMARY: '/analytics/appointment-summary',
+    ANALYTICS_STAFF_DIRECTORY_SUMMARY: '/analytics/staff-directory-summary',
+    ANALYTICS_BILLING_KPIS: '/analytics/billing-kpis',
+    ANALYTICS_BILLING_CHARTS: '/analytics/billing-charts',
 }
