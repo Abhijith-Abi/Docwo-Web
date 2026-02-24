@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Filter, Download } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function DashboardHeader() {
+export function DashboardHeader({
+    onToggleFilters,
+    isFiltersActive,
+}: {
+    onToggleFilters?: () => void;
+    isFiltersActive?: boolean;
+}) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -14,9 +21,15 @@ export function DashboardHeader() {
             </div>
             <div className="flex items-center gap-3">
                 <Button
-                    variant="outline"
+                    variant={isFiltersActive ? "default" : "outline"}
                     size="sm"
-                    className="h-9 gap-2 text-slate-600 font-medium bg-white"
+                    className={cn(
+                        "h-9 gap-2 font-medium transition-all duration-200",
+                        isFiltersActive
+                            ? "bg-[#1B5041] hover:bg-[#143c31] text-white border-transparent"
+                            : "bg-white text-slate-600 border-slate-200",
+                    )}
+                    onClick={onToggleFilters}
                 >
                     <Filter className="w-4 h-4" />
                     Filters

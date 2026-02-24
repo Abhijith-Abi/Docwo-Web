@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import HealthJourney from "@/components/HealthJourney";
+import { Loader } from "@/components/Loader";
 
 export default function Home() {
     const router = useRouter();
@@ -19,19 +20,18 @@ export default function Home() {
 
     useEffect(() => {
         if (hasHydrated && token) {
-            if (isAdmin) {
-                router.replace("/admin-portal");
-            } else if (isStaff) {
-                router.replace("/staff-portal");
-            } else if (isPatient) {
-                router.replace("/patient-portal");
-            } else {
-                router.replace("/patient-portal");
-            }
+            const path = isAdmin
+                ? "/admin-portal"
+                : isStaff
+                  ? "/staff-portal"
+                  : "/patient-portal";
+            router.replace(path);
         }
     }, [token, isAdmin, isStaff, isPatient, router, hasHydrated]);
 
-    if (!hasHydrated) return null;
+    if (!hasHydrated || token) {
+        return <Loader />;
+    }
 
     return (
         <div className="flex flex-col min-h-screen justify-between">

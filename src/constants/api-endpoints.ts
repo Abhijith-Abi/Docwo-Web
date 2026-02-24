@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
     RESEND_OTP: '/auth/resend-otp',
     LOGOUT: '/auth/logout',
     REFRESH_TOKEN: '/auth/refresh-token',
+    REGISTER: '/auth/register',
     FORGET_PASSWORD: '/auth/forget-password',
     RESET_PASSWORD: '/auth/reset-password',
     

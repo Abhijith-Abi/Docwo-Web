@@ -6,14 +6,36 @@ import { StatCards } from "./_components/stat-cards";
 import { AppointmentsChart } from "./_components/appointments-chart";
 import { AppointmentStatusChart } from "./_components/appointment-status-chart";
 import { AppointmentHeatmap } from "./_components/heatmap-calendar";
+import { useGetAppointmentSummary } from "@/hooks/api/useGetAppointmentSummary";
+import { useState } from "react";
+import { FilterState } from "./_components/dashboard-filters";
 
 export default function AdminPortalPage() {
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState<FilterState>({
+        source: "docwo",
+    });
+
+    const { data, isLoading, isError } = useGetAppointmentSummary(filters);
+
     return (
         <div className="flex flex-col h-full bg-slate-50/20 w-full animate-in fade-in duration-500">
             <div className="max-w-[1400px] w-full mx-auto pb-10">
-                <DashboardHeader />
-                <DashboardFilters />
-                <StatCards />
+                <DashboardHeader
+                    onToggleFilters={() => setShowFilters(!showFilters)}
+                    isFiltersActive={showFilters}
+                />
+                {showFilters && (
+                    <DashboardFilters
+                        filters={filters}
+                        onFilterChange={(newFilters) => setFilters(newFilters)}
+                    />
+                )}
+                <StatCards
+                    data={data?.summary}
+                    isLoading={isLoading}
+                    isError={isError}
+                />
 
                 <h2 className="text-[20px] font-bold text-slate-900 mb-6 mt-4 tracking-tight">
                     Analytics

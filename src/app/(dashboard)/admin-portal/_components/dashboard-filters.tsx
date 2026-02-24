@@ -19,11 +19,21 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-export function DashboardFilters() {
-    const [date, setDate] = React.useState<Date>();
+export interface FilterState {
+    date?: Date;
+    doctor?: string;
+    source?: string;
+}
 
+export function DashboardFilters({
+    filters,
+    onFilterChange,
+}: {
+    filters: FilterState;
+    onFilterChange: (filters: FilterState) => void;
+}) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6 transition-all duration-300">
             {/* Date Filter */}
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-slate-900">
@@ -35,12 +45,14 @@ export function DashboardFilters() {
                             variant={"outline"}
                             className={cn(
                                 "w-full justify-between h-10 px-3 text-left font-normal border-slate-200 bg-slate-50 shadow-none hover:bg-slate-100 hover:text-slate-900 text-sm",
-                                !date ? "text-slate-500" : "text-slate-900",
+                                !filters.date
+                                    ? "text-slate-500"
+                                    : "text-slate-900",
                             )}
                         >
                             <span className="truncate">
-                                {date
-                                    ? format(date, "dd/MM/yyyy")
+                                {filters.date
+                                    ? format(filters.date, "dd/MM/yyyy")
                                     : "DD/MM/YYYY"}
                             </span>
                             <CalendarIcon className="h-4 w-4 text-slate-600 opacity-70" />
@@ -49,8 +61,10 @@ export function DashboardFilters() {
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={setDate}
+                            selected={filters.date}
+                            onSelect={(date) =>
+                                onFilterChange({ ...filters, date })
+                            }
                             initialFocus
                         />
                     </PopoverContent>
@@ -62,7 +76,12 @@ export function DashboardFilters() {
                 <label className="text-xs font-semibold text-slate-900">
                     Doctors
                 </label>
-                <Select defaultValue="all">
+                <Select
+                    value={filters.doctor || "all"}
+                    onValueChange={(doctor) =>
+                        onFilterChange({ ...filters, doctor })
+                    }
+                >
                     <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 shadow-none text-slate-600 font-medium">
                         <SelectValue placeholder="Select Doctor" />
                     </SelectTrigger>
@@ -79,7 +98,12 @@ export function DashboardFilters() {
                 <label className="text-xs font-semibold text-slate-900">
                     Sources
                 </label>
-                <Select defaultValue="docwo">
+                <Select
+                    value={filters.source || "docwo"}
+                    onValueChange={(source) =>
+                        onFilterChange({ ...filters, source })
+                    }
+                >
                     <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 shadow-none text-slate-600 font-medium">
                         <SelectValue placeholder="Select Source" />
                     </SelectTrigger>

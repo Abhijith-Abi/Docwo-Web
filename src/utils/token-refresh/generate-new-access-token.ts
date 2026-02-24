@@ -1,5 +1,7 @@
+import { API_ENDPOINTS } from "@/constants/api-endpoints";
+
 export async function generateNewAccessToken(refreshToken: string) {
-    const baseUrl = process.env.NEXT_PUBLIC_REFRESH_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -8,7 +10,7 @@ export async function generateNewAccessToken(refreshToken: string) {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-        const response = await fetch(`${baseUrl}api/token/refresh/`, {
+        const response = await fetch(`${baseUrl}${API_ENDPOINTS.REFRESH_TOKEN}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
