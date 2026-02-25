@@ -15,7 +15,7 @@ export async function generateNewAccessToken(refreshToken: string) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ refresh: refreshToken }),
+            body: JSON.stringify({ refreshToken: refreshToken }),
             signal: signal,
         });
 

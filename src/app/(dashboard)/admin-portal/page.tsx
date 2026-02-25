@@ -42,9 +42,21 @@ export default function AdminPortalPage() {
                 </h2>
 
                 <div className="flex flex-col gap-6">
-                    <AppointmentsChart />
-                    <AppointmentStatusChart />
-                    <AppointmentHeatmap />
+                    <AppointmentsChart
+                        data={data?.trends}
+                        isLoading={isLoading}
+                        isError={isError}
+                    />
+                    <AppointmentStatusChart
+                        data={data?.statusDistribution}
+                        isLoading={isLoading}
+                        isError={isError}
+                    />
+                    <AppointmentHeatmap
+                        data={data?.heatmap}
+                        isLoading={isLoading}
+                        isError={isError}
+                    />
                 </div>
             </div>
         </div>

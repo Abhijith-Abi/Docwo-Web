@@ -25,7 +25,15 @@ const legend = [
     { label: "Holiday or Not working", color: "bg-[#b0c4de]" }, // blueish
 ];
 
-export function AppointmentHeatmap() {
+export function AppointmentHeatmap({
+    data,
+    isLoading,
+    isError,
+}: {
+    data?: any;
+    isLoading?: boolean;
+    isError?: boolean;
+}) {
     const MonthView = ({
         name,
         month,
