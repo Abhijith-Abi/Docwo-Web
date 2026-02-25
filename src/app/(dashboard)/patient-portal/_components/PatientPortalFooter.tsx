@@ -133,7 +133,7 @@ export function PatientPortalFooter() {
                                         placeholder="example@gmail.com"
                                         className="bg-transparent border-none text-white placeholder:text-gray-500 text-sm flex-1 outline-none focus:ring-0 min-w-0" // min-w-0 fixes flex issues
                                     />
-                                    <Button className="bg-[#198754] hover:bg-[#146c43] text-white rounded-full px-6 py-2 h-auto text-sm font-medium ml-2">
+                                    <Button className="rounded-full px-6 py-2 h-auto text-sm font-medium ml-2">
                                         Submit{" "}
                                         <ArrowRight className="w-4 h-4 ml-1" />
                                     </Button>

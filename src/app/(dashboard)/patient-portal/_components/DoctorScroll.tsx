@@ -95,8 +95,7 @@ export function DoctorScroll() {
                                             fill
                                             className="object-cover"
                                         />
-                                        {/* Overlay for 'View Profile' - mimicking the green pill at bottom of image */}
-                                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#14532D] text-white text-[10px] px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                                             View Profile
                                         </div>
                                     </div>

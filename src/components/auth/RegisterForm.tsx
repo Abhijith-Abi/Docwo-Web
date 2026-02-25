@@ -20,6 +20,8 @@ import {
     Users,
     Droplets,
     Globe,
+    Eye,
+    EyeOff,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -84,6 +86,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
     const [step, setStep] = useState(1);
+    const [showPassword, setShowPassword] = useState(false);
     const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const router = useRouter();
 
@@ -184,7 +187,7 @@ export default function RegisterForm() {
                                                     First Name
                                                 </FormLabel>
                                                 <div className="relative">
-                                                    <User className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                     <FormControl>
                                                         <Input
                                                             placeholder="John"
@@ -206,7 +209,7 @@ export default function RegisterForm() {
                                                     Last Name
                                                 </FormLabel>
                                                 <div className="relative">
-                                                    <User className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                     <FormControl>
                                                         <Input
                                                             placeholder="Doe"
@@ -233,7 +236,7 @@ export default function RegisterForm() {
                                                     +91
                                                 </div>
                                                 <div className="relative flex-1">
-                                                    <Phone className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                     <FormControl>
                                                         <Input
                                                             placeholder="Mobile number"
@@ -256,15 +259,41 @@ export default function RegisterForm() {
                                                 Password
                                             </FormLabel>
                                             <div className="relative">
-                                                <Lock className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                 <FormControl>
                                                     <Input
-                                                        type="password"
+                                                        type={
+                                                            showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
                                                         placeholder="••••••••"
-                                                        className="pl-10 h-9 text-sm"
+                                                        className="pl-10 pr-10 h-9 text-sm"
                                                         {...field}
                                                     />
                                                 </FormControl>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                                    onClick={() =>
+                                                        setShowPassword(
+                                                            !showPassword,
+                                                        )
+                                                    }
+                                                >
+                                                    {showPassword ? (
+                                                        <EyeOff className="h-3.5 w-3.5" />
+                                                    ) : (
+                                                        <Eye className="h-3.5 w-3.5" />
+                                                    )}
+                                                    <span className="sr-only">
+                                                        {showPassword
+                                                            ? "Hide password"
+                                                            : "Show password"}
+                                                    </span>
+                                                </Button>
                                             </div>
                                             <FormMessage className="text-[10px] absolute bottom-0 left-0" />
                                         </FormItem>
@@ -273,7 +302,7 @@ export default function RegisterForm() {
                                 <Button
                                     type="button"
                                     onClick={nextStep}
-                                    className="w-full h-10 bg-emerald-700 hover:bg-emerald-800 transition-colors mt-1 text-sm"
+                                    className="w-full h-10 mt-1 text-sm transition-colors"
                                 >
                                     Next{" "}
                                     <ChevronRight className="ml-2 h-3.5 w-3.5" />
@@ -292,7 +321,7 @@ export default function RegisterForm() {
                                                 Email
                                             </FormLabel>
                                             <div className="relative">
-                                                <Mail className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                 <FormControl>
                                                     <Input
                                                         placeholder="m@example.com"
@@ -493,7 +522,7 @@ export default function RegisterForm() {
                                     <Button
                                         type="button"
                                         onClick={nextStep}
-                                        className="flex-1 h-9 bg-emerald-700 hover:bg-emerald-800 transition-colors text-sm"
+                                        className="flex-1 h-9 text-sm transition-colors"
                                     >
                                         Next{" "}
                                         <ChevronRight className="ml-2 h-3.5 w-3.5" />
@@ -513,7 +542,7 @@ export default function RegisterForm() {
                                                 Address Line 1
                                             </FormLabel>
                                             <div className="relative">
-                                                <MapPin className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Street, building, etc."
@@ -535,7 +564,7 @@ export default function RegisterForm() {
                                                 Address Line 2
                                             </FormLabel>
                                             <div className="relative">
-                                                <Building2 className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Apartment, suite, etc."
@@ -617,7 +646,7 @@ export default function RegisterForm() {
                                                     Country
                                                 </FormLabel>
                                                 <div className="relative">
-                                                    <Globe className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                                                     <FormControl>
                                                         <Input
                                                             placeholder="India"
@@ -644,7 +673,7 @@ export default function RegisterForm() {
                                     <Button
                                         type="submit"
                                         disabled={isPending}
-                                        className="flex-1 h-9 bg-emerald-700 hover:bg-emerald-800 transition-colors text-sm"
+                                        className="flex-1 h-9 text-sm transition-colors"
                                     >
                                         {isPending ? (
                                             "Submitting..."

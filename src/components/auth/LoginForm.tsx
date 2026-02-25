@@ -117,8 +117,8 @@ export default function LoginForm() {
                                         Email or Phone Number
                                     </FormLabel>
                                     <div className="relative">
-                                        <Mail className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                                        <span className="absolute left-8 top-2.5 text-muted-foreground/30">
+                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/30">
                                             |
                                         </span>
                                         <FormControl>
@@ -156,8 +156,8 @@ export default function LoginForm() {
                                         </Link>
                                     </div>
                                     <div className="relative">
-                                        <KeyRound className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                                        <span className="absolute left-8 top-2.5 text-muted-foreground/30">
+                                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/30">
                                             |
                                         </span>
                                         <FormControl>
@@ -205,7 +205,7 @@ export default function LoginForm() {
                         />
                         <Button
                             type="submit"
-                            className="w-full h-9 text-sm font-medium shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 transition-all duration-300 bg-linear-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 cursor-pointer"
+                            className="w-full h-9 text-sm font-medium shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 cursor-pointer"
                             disabled={isPending}
                         >
                             {isPending && (

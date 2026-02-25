@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image"; // In case we want to use an image inside the phone screen, or we can use div structure.
+import { Button } from "@/components/ui/button";
 
 export function BookingSteps() {
     return (
@@ -42,9 +43,9 @@ export function BookingSteps() {
                             </div>
 
                             {/* Button */}
-                            <button className="w-full bg-[#14532D] text-white text-xs font-semibold py-2 rounded-md mt-auto">
+                            <Button className="w-full mt-auto text-xs font-semibold py-2">
                                 Next
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </PhoneMockup>
@@ -77,9 +78,9 @@ export function BookingSteps() {
                             </div>
 
                             {/* Button */}
-                            <button className="w-full bg-[#14532D] text-white text-xs font-semibold py-2 rounded-md mt-auto">
+                            <Button className="w-full mt-auto text-xs font-semibold py-2">
                                 Next
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </PhoneMockup>
@@ -112,9 +113,9 @@ export function BookingSteps() {
                             </div>
 
                             {/* Button */}
-                            <button className="w-full bg-[#14532D] text-white text-xs font-semibold py-2 rounded-md mt-auto">
+                            <Button className="w-full mt-auto text-xs font-semibold py-2">
                                 Get Started
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </PhoneMockup>

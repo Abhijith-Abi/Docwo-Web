@@ -45,7 +45,7 @@ export function HeroCard({
                 <div className="pt-2">
                     <Button
                         onClick={onButtonClick}
-                        className="bg-[#14532D] hover:bg-[#0f4022] text-white rounded-xl px-7 py-3 h-auto text-base font-bold transition-all hover:scale-105 active:scale-95 shadow-md shadow-black/10"
+                        className="rounded-xl px-7 py-3 h-auto text-base font-bold transition-all hover:scale-105 active:scale-95 shadow-md shadow-primary/20 hover:shadow-primary/40"
                     >
                         {buttonText}
                     </Button>
