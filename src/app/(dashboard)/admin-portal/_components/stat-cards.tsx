@@ -19,6 +19,7 @@ interface StatCardProps {
     iconBgColor?: string;
     iconColor?: string;
     isLoading?: boolean;
+    isError?: boolean;
 }
 
 function StatCard({
@@ -30,6 +31,7 @@ function StatCard({
     iconBgColor,
     iconColor,
     isLoading = false,
+    isError = false,
 }: StatCardProps) {
     return (
         <Card className="shadow-sm border-slate-100 h-full rounded-xl">
@@ -43,6 +45,12 @@ function StatCard({
                             <div className="mt-2 space-y-2">
                                 <div className="h-8 w-16 bg-slate-100 animate-pulse rounded" />
                                 <div className="h-4 w-24 bg-slate-50 animate-pulse rounded" />
+                            </div>
+                        ) : isError ? (
+                            <div className="mt-2 h-[48px] flex items-center">
+                                <span className="text-sm text-red-500 font-medium tracking-tight">
+                                    Failed to load data
+                                </span>
                             </div>
                         ) : (
                             <>
@@ -102,9 +110,6 @@ export function StatCards({
     isLoading: boolean;
     isError: boolean;
 }) {
-    // If error, don't show anything or show empty cards
-    if (isError) return null;
-
     const formatTrend = (trendStr: string) => {
         if (!trendStr) return { trend: "0%", trendUp: true };
         const isUp = trendStr.startsWith("+");
@@ -212,7 +217,12 @@ export function StatCards({
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {cards.map((card, i) => (
-                <StatCard key={i} {...card} isLoading={isLoading} />
+                <StatCard
+                    key={i}
+                    {...card}
+                    isLoading={isLoading}
+                    isError={isError}
+                />
             ))}
         </div>
     );

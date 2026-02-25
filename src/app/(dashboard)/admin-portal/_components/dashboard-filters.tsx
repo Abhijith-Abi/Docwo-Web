@@ -18,6 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useGetAnalyticsFilters } from "@/hooks/api/useGetAnalyticsFilters";
 
 export interface FilterState {
     date?: Date;
@@ -32,6 +33,13 @@ export function DashboardFilters({
     filters: FilterState;
     onFilterChange: (filters: FilterState) => void;
 }) {
+    const { data: filterOptions, isLoading } = useGetAnalyticsFilters();
+
+    const doctors =
+        filterOptions?.data?.doctors || filterOptions?.doctors || [];
+    const sources =
+        filterOptions?.data?.sources || filterOptions?.sources || [];
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6 transition-all duration-300">
             {/* Date Filter */}
@@ -81,14 +89,35 @@ export function DashboardFilters({
                     onValueChange={(doctor) =>
                         onFilterChange({ ...filters, doctor })
                     }
+                    disabled={isLoading}
                 >
                     <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 shadow-none text-slate-600 font-medium">
-                        <SelectValue placeholder="Select Doctor" />
+                        <SelectValue
+                            placeholder={
+                                isLoading ? "Loading..." : "Select Doctor"
+                            }
+                        />
                     </SelectTrigger>
                     <SelectContent position="popper">
                         <SelectItem value="all">All Doctors</SelectItem>
-                        <SelectItem value="dr-smith">Dr. Smith</SelectItem>
-                        <SelectItem value="dr-jones">Dr. Jones</SelectItem>
+                        {Array.isArray(doctors) &&
+                            doctors.map((doc: any) => (
+                                <SelectItem
+                                    key={doc.id || doc._id || doc.value}
+                                    value={
+                                        doc.id ||
+                                        doc._id ||
+                                        doc.value ||
+                                        doc.name
+                                    }
+                                >
+                                    {doc.name ||
+                                        doc.label ||
+                                        (doc.profile
+                                            ? `${doc.profile.firstName} ${doc.profile.lastName}`
+                                            : "Unknown Doctor")}
+                                </SelectItem>
+                            ))}
                     </SelectContent>
                 </Select>
             </div>
@@ -99,7 +128,7 @@ export function DashboardFilters({
                     Sources
                 </label>
                 <Select
-                    value={filters.source || "docwo"}
+                    value={filters.source || "all"}
                     onValueChange={(source) =>
                         onFilterChange({ ...filters, source })
                     }
@@ -108,6 +137,7 @@ export function DashboardFilters({
                         <SelectValue placeholder="Select Source" />
                     </SelectTrigger>
                     <SelectContent position="popper">
+                        <SelectItem value="all">All Sources</SelectItem>
                         <SelectItem value="docwo">Docwo app</SelectItem>
                         <SelectItem value="web">Website</SelectItem>
                         <SelectItem value="walk-in">Walk-in</SelectItem>
