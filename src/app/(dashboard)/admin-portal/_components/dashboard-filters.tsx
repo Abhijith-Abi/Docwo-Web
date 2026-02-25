@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -40,9 +41,17 @@ export function DashboardFilters({
     const doctors =
         filterOptions?.data?.doctors || filterOptions?.doctors || [];
 
+    const [isTablet, setIsTablet] = React.useState(false);
+
+    React.useEffect(() => {
+        const checkTablet = () => setIsTablet(window.innerWidth < 1024);
+        checkTablet();
+        window.addEventListener("resize", checkTablet);
+        return () => window.removeEventListener("resize", checkTablet);
+    }, []);
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6 transition-all duration-300">
-            {/* Date Filter */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6 transition-all duration-300">
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-slate-900">
                     Date Range
@@ -133,7 +142,7 @@ export function DashboardFilters({
                                         endDate: end,
                                     });
                                 }}
-                                numberOfMonths={2}
+                                numberOfMonths={isTablet ? 1 : 2}
                                 initialFocus
                             />
                         </PopoverContent>
