@@ -15,6 +15,8 @@ export default function AdminPortalPage() {
     const [filters, setFilters] = useState<FilterState>({
         booking_source: "all",
         doctorId: "",
+        startDate: "",
+        endDate: "",
     });
 
     const { data, isLoading, isError } = useGetAppointmentSummary(filters);

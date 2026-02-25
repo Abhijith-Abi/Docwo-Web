@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,6 +24,8 @@ export interface FilterState {
     doctor?: string;
     booking_source?: string;
     doctorId?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 export function DashboardFilters({
@@ -43,38 +45,120 @@ export function DashboardFilters({
             {/* Date Filter */}
             <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-slate-900">
-                    Date
+                    Date Range
                 </label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-full justify-between h-10 px-3 text-left font-normal border-slate-200 bg-slate-50 shadow-none hover:bg-slate-100 hover:text-slate-900 text-sm",
-                                !filters.date
-                                    ? "text-slate-500"
-                                    : "text-slate-900",
-                            )}
+                <div className="relative">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-between h-10 px-3 text-left font-normal border-slate-200 bg-slate-50 shadow-none hover:bg-slate-100 hover:text-slate-900 text-sm",
+                                    !filters.startDate
+                                        ? "text-slate-500"
+                                        : "text-slate-900",
+                                )}
+                            >
+                                <span className="truncate pr-6">
+                                    {filters.startDate ? (
+                                        filters.endDate ? (
+                                            <>
+                                                {format(
+                                                    new Date(
+                                                        filters.startDate +
+                                                            "T00:00:00",
+                                                    ),
+                                                    "dd/MM/yyyy",
+                                                )}{" "}
+                                                -{" "}
+                                                {format(
+                                                    new Date(
+                                                        filters.endDate +
+                                                            "T00:00:00",
+                                                    ),
+                                                    "dd/MM/yyyy",
+                                                )}
+                                            </>
+                                        ) : (
+                                            format(
+                                                new Date(
+                                                    filters.startDate +
+                                                        "T00:00:00",
+                                                ),
+                                                "dd/MM/yyyy",
+                                            )
+                                        )
+                                    ) : (
+                                        "DD/MM/YYYY - DD/MM/YYYY"
+                                    )}
+                                </span>
+                                <CalendarIcon className="h-4 w-4 text-slate-600 opacity-70" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="range"
+                                defaultMonth={
+                                    filters.startDate
+                                        ? new Date(
+                                              filters.startDate + "T00:00:00",
+                                          )
+                                        : undefined
+                                }
+                                selected={{
+                                    from: filters.startDate
+                                        ? new Date(
+                                              filters.startDate + "T00:00:00",
+                                          )
+                                        : undefined,
+                                    to: filters.endDate
+                                        ? new Date(
+                                              filters.endDate + "T00:00:00",
+                                          )
+                                        : undefined,
+                                }}
+                                onSelect={(range) => {
+                                    const start = range?.from
+                                        ? format(range.from, "yyyy-MM-dd")
+                                        : "";
+                                    let end = range?.to
+                                        ? format(range.to, "yyyy-MM-dd")
+                                        : "";
+                                    if (start === end) {
+                                        end = "";
+                                    }
+                                    onFilterChange({
+                                        ...filters,
+                                        startDate: start,
+                                        endDate: end,
+                                    });
+                                }}
+                                numberOfMonths={2}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    {filters.startDate && (
+                        <div
+                            className="absolute right-9 top-1/2 -translate-y-1/2 cursor-pointer z-10 flex items-center justify-center p-1"
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                onFilterChange({
+                                    ...filters,
+                                    startDate: "",
+                                    endDate: "",
+                                });
+                            }}
                         >
-                            <span className="truncate">
-                                {filters.date
-                                    ? format(filters.date, "dd/MM/yyyy")
-                                    : "DD/MM/YYYY"}
-                            </span>
-                            <CalendarIcon className="h-4 w-4 text-slate-600 opacity-70" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={filters.date}
-                            onSelect={(date) =>
-                                onFilterChange({ ...filters, date })
-                            }
-                            initialFocus
-                        />
-                    </PopoverContent>
-                </Popover>
+                            <X className="h-4 w-4 text-slate-400 hover:text-slate-600 transition-colors" />
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Doctors Filter */}
