@@ -43,6 +43,15 @@ export function AppointmentStatusChart({
         }));
     }, [data]);
 
+    const isAllZero = useMemo(() => {
+        if (chartData.length === 0) return true;
+        return chartData.every((item) => item.value === 0);
+    }, [chartData]);
+
+    const displayData = isAllZero
+        ? [{ name: "No Data", value: 1, color: "#f1f5f9" }]
+        : chartData;
+
     return (
         <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm w-full mb-8 flex flex-col items-center">
             <div className="w-full flex justify-start">
@@ -59,33 +68,31 @@ export function AppointmentStatusChart({
                     <div className="text-sm text-red-500">
                         Failed to load data
                     </div>
-                ) : chartData.length === 0 ? (
-                    <div className="text-sm text-slate-400">
-                        No data available
-                    </div>
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                            <Tooltip
-                                contentStyle={{
-                                    borderRadius: "8px",
-                                    border: "none",
-                                    boxShadow:
-                                        "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                                }}
-                                itemStyle={{
-                                    color: "#334155",
-                                    fontSize: "14px",
-                                    fontWeight: 500,
-                                }}
-                            />
+                            {!isAllZero && (
+                                <Tooltip
+                                    contentStyle={{
+                                        borderRadius: "8px",
+                                        border: "none",
+                                        boxShadow:
+                                            "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                                    }}
+                                    itemStyle={{
+                                        color: "#334155",
+                                        fontSize: "14px",
+                                        fontWeight: 500,
+                                    }}
+                                />
+                            )}
                             <Pie
-                                data={chartData}
+                                data={displayData}
                                 cx="50%"
                                 cy="50%"
                                 innerRadius={40}
                                 outerRadius={80}
-                                paddingAngle={2}
+                                paddingAngle={isAllZero ? 0 : 2}
                                 dataKey="value"
                                 stroke="white"
                                 strokeWidth={2}
@@ -99,7 +106,7 @@ export function AppointmentStatusChart({
                                     index,
                                     value,
                                 }) => {
-                                    if (value === 0) return null; // Don't show labels for 0 values to prevent overlapping
+                                    if (isAllZero || value === 0) return null; // Don't show labels for empty or 0 values
 
                                     const RADIAN = Math.PI / 180;
                                     // Position labels nicely outside the pie
@@ -116,7 +123,7 @@ export function AppointmentStatusChart({
                                             x={x}
                                             y={y}
                                             fill={
-                                                chartData[index]?.color ||
+                                                displayData[index]?.color ||
                                                 "#64748b"
                                             }
                                             textAnchor={
@@ -131,7 +138,7 @@ export function AppointmentStatusChart({
                                     );
                                 }}
                             >
-                                {chartData?.map((entry, index) => (
+                                {displayData?.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
                                         fill={entry.color}

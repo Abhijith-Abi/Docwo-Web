@@ -14,7 +14,7 @@ export function useGetAppointmentSummary(params?: Record<string, any>) {
             if (params) {
                 const searchParams = new URLSearchParams();
                 Object.entries(params).forEach(([key, value]) => {
-                    if (value !== undefined && value !== null && value !== "all") {
+                    if (value !== undefined && value !== null && value !== "all" && value !== "") {
                         if (value instanceof Date) {
                             searchParams.append(key, value.toISOString().split('T')[0]);
                         } else {

@@ -13,7 +13,8 @@ import { FilterState } from "./_components/dashboard-filters";
 export default function AdminPortalPage() {
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<FilterState>({
-        source: "docwo",
+        booking_source: "all",
+        doctorId: "",
     });
 
     const { data, isLoading, isError } = useGetAppointmentSummary(filters);

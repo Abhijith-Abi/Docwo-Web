@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,7 +22,8 @@ import { useGetAnalyticsFilters } from "@/hooks/api/useGetAnalyticsFilters";
 export interface FilterState {
     date?: Date;
     doctor?: string;
-    source?: string;
+    booking_source?: string;
+    doctorId?: string;
 }
 
 export function DashboardFilters({
@@ -37,8 +37,6 @@ export function DashboardFilters({
 
     const doctors =
         filterOptions?.data?.doctors || filterOptions?.doctors || [];
-    const sources =
-        filterOptions?.data?.sources || filterOptions?.sources || [];
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-xl shadow-sm border border-slate-100 mb-6 transition-all duration-300">
@@ -85,10 +83,14 @@ export function DashboardFilters({
                     Doctors
                 </label>
                 <Select
-                    value={filters.doctor || "all"}
-                    onValueChange={(doctor) =>
-                        onFilterChange({ ...filters, doctor })
-                    }
+                    value={filters.doctorId || "all"}
+                    onValueChange={(doctorId) => {
+                        if (doctorId === "all") {
+                            onFilterChange({ ...filters, doctorId: "" });
+                        } else {
+                            onFilterChange({ ...filters, doctorId });
+                        }
+                    }}
                     disabled={isLoading}
                 >
                     <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 shadow-none text-slate-600 font-medium">
@@ -128,19 +130,28 @@ export function DashboardFilters({
                     Sources
                 </label>
                 <Select
-                    value={filters.source || "all"}
-                    onValueChange={(source) =>
-                        onFilterChange({ ...filters, source })
-                    }
+                    value={filters.booking_source || "all"}
+                    onValueChange={(value) => {
+                        if (value === "all") {
+                            onFilterChange({ ...filters, booking_source: "" });
+                        } else {
+                            onFilterChange({
+                                ...filters,
+                                booking_source: value,
+                            });
+                        }
+                    }}
                 >
                     <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 shadow-none text-slate-600 font-medium">
                         <SelectValue placeholder="Select Source" />
                     </SelectTrigger>
                     <SelectContent position="popper">
                         <SelectItem value="all">All Sources</SelectItem>
-                        <SelectItem value="docwo">Docwo app</SelectItem>
-                        <SelectItem value="web">Website</SelectItem>
-                        <SelectItem value="walk-in">Walk-in</SelectItem>
+                        <SelectItem value="website">Website</SelectItem>
+                        <SelectItem value="mobile_app">Mobile App</SelectItem>
+                        <SelectItem value="clinic_staff">
+                            Clinic Staff
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
