@@ -10,7 +10,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((state) => state.token);
     const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
-    // Fetch and persist full user profile whenever the token is available
     useGetProfile();
 
     useEffect(() => {
@@ -19,7 +18,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         }
     }, [token, router, hasHydrated]);
 
-    if (!hasHydrated) return null; // Wait for zustand to hydrate from localStorage
+    if (!hasHydrated) return null;
     if (!token) return null;
 
     return <>{children}</>;

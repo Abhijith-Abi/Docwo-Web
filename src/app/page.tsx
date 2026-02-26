@@ -14,9 +14,14 @@ export default function Home() {
     const { user, token } = useAuthStore();
     const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
-    const isAdmin = user?.roles?.includes("admin") ?? false;
+    const isAdmin =
+        (user?.roles?.includes("admin") ||
+            user?.roles?.includes("clinic_staff")) ??
+        false;
     const isStaff = user?.roles?.includes("staff") ?? false;
     const isPatient = user?.roles?.includes("patient") ?? false;
+
+    console.log(user?.roles, "---user?.roles");
 
     useEffect(() => {
         if (hasHydrated && token) {
