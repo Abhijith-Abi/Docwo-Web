@@ -60,7 +60,7 @@ export default function AdminSidebar({ className }: { className?: string }) {
 
     return (
         <aside
-            className={`w-[300px] bg-[#0F5B46] h-screen flex flex-col py-8 shrink-0 relative overflow-hidden ${className || ""}`}
+            className={`w-[300px] bg-[#0F5B46] h-full flex flex-col py-6 md:py-8 shrink-0 relative overflow-hidden ${className || ""}`}
         >
             {/* Logo area */}
             <div className="pl-10 mb-12 flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function AdminSidebar({ className }: { className?: string }) {
             </div>
 
             {/* Main Navigation */}
-            <nav className="flex-1 overflow-y-auto w-full no-scrollbar">
+            <nav className="flex-1 overflow-y-auto w-full no-scrollbar min-h-0">
                 <ul className="flex flex-col gap-2 w-full">
                     {navItems.map((item) => (
                         <SidebarItem key={item.href} {...item} />

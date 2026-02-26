@@ -17,10 +17,8 @@ export default function AdminPortalLayout({
 }) {
     return (
         <div className="flex flex-col md:flex-row h-screen w-full bg-[#0F5B46] overflow-hidden">
-            {/* Desktop Sidebar */}
             <AdminSidebar className="hidden md:flex" />
 
-            {/* Mobile Header */}
             <div className="md:hidden flex items-center justify-between p-4 bg-[#0F5B46]">
                 <div className="flex items-center gap-3">
                     <Image
