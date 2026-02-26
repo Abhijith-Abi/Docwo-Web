@@ -28,7 +28,8 @@ export default async function getClientApiData(
         });
 
         if (response.ok) {
-            return response?.json();
+            const text = await response.text();
+            return text ? JSON.parse(text) : {};
         } else {
             throw new Error(response?.status?.toString());
         }

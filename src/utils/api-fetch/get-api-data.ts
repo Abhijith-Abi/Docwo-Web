@@ -37,7 +37,8 @@ export default async function getApiData(endpoint: string) {
                     });
 
                     if (retryResponse.ok) {
-                        return retryResponse.json();
+                        const retryText = await retryResponse.text();
+                        return retryText ? JSON.parse(retryText) : {};
                     } else {
                         throw new Error(retryResponse.status.toString());
                     }
@@ -49,7 +50,8 @@ export default async function getApiData(endpoint: string) {
         }
 
         if (response.ok) {
-            return response.json();
+            const text = await response.text();
+            return text ? JSON.parse(text) : {};
         } else {
             throw new Error(response.status.toString());
         }

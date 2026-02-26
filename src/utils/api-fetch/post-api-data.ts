@@ -22,7 +22,8 @@ export default async function postApiData(path: string, bodyData: any) {
             headers: headers,
         });
 
-        const responseData = await response.json();
+        const responseText = await response.text();
+        const responseData = responseText ? JSON.parse(responseText) : {};
 
         if (!response.ok) {
             throw responseData;
