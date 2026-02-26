@@ -4,6 +4,7 @@ import Image from "next/image";
 import SidebarItem from "./SidebarItem";
 import { useAuthStore } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const navItems = [
     {
@@ -49,9 +50,11 @@ const bottomItems = [
 export default function AdminSidebar({ className }: { className?: string }) {
     const { clearAuth } = useAuthStore();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const handleLogout = () => {
         clearAuth();
+        queryClient.clear();
         router.push("/auth/login");
     };
 

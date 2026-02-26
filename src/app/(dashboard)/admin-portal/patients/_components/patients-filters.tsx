@@ -7,26 +7,71 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-export function PatientsFilters() {
+interface FiltersType {
+    doctorId: string;
+    gender: string;
+    age: string;
+}
+
+interface PatientsFiltersProps {
+    filters: FiltersType;
+    onFilterChange: (key: keyof FiltersType, value: string) => void;
+    doctors?: any[];
+    isLoading?: boolean;
+}
+
+export function PatientsFilters({
+    filters,
+    onFilterChange,
+    doctors = [],
+    isLoading = false,
+}: PatientsFiltersProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 animate-in slide-in-from-top-2 fade-in duration-200">
             <div className="flex flex-col gap-2">
                 <Label className="text-xs font-semibold px-1">Doctor</Label>
-                <Select defaultValue="all">
+                <Select
+                    value={filters.doctorId}
+                    onValueChange={(val) => onFilterChange("doctorId", val)}
+                    disabled={isLoading}
+                >
                     <SelectTrigger className="w-full bg-muted/30 border-none h-10 shadow-sm">
-                        <SelectValue placeholder="Select Doctor" />
+                        <SelectValue
+                            placeholder={
+                                isLoading ? "Loading..." : "Select Doctor"
+                            }
+                        />
                     </SelectTrigger>
                     <SelectContent position="popper" sideOffset={4}>
                         <SelectItem value="all">All Doctors</SelectItem>
-                        <SelectItem value="ajmal">Dr. Ajmal</SelectItem>
-                        <SelectItem value="smith">Dr. Smith</SelectItem>
+                        {Array.isArray(doctors) &&
+                            doctors.map((doc: any) => (
+                                <SelectItem
+                                    key={doc.id || doc._id || doc.value}
+                                    value={
+                                        doc.id ||
+                                        doc._id ||
+                                        doc.value ||
+                                        doc.name
+                                    }
+                                >
+                                    {doc.name ||
+                                        doc.label ||
+                                        (doc.profile
+                                            ? `${doc.profile.firstName} ${doc.profile.lastName}`
+                                            : "Unknown Doctor")}
+                                </SelectItem>
+                            ))}
                     </SelectContent>
                 </Select>
             </div>
 
             <div className="flex flex-col gap-2">
                 <Label className="text-xs font-semibold px-1">Gender</Label>
-                <Select defaultValue="all">
+                <Select
+                    value={filters.gender}
+                    onValueChange={(val) => onFilterChange("gender", val)}
+                >
                     <SelectTrigger className="w-full bg-muted/30 border-none h-10 shadow-sm">
                         <SelectValue placeholder="Select Gender" />
                     </SelectTrigger>
@@ -41,7 +86,10 @@ export function PatientsFilters() {
 
             <div className="flex flex-col gap-2">
                 <Label className="text-xs font-semibold px-1">Age</Label>
-                <Select defaultValue="all">
+                <Select
+                    value={filters.age}
+                    onValueChange={(val) => onFilterChange("age", val)}
+                >
                     <SelectTrigger className="w-full bg-muted/30 border-none h-10 shadow-sm">
                         <SelectValue placeholder="Select Age" />
                     </SelectTrigger>

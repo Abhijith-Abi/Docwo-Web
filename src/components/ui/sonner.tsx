@@ -20,9 +20,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
             position="bottom-right"
             toastOptions={{
                 classNames: {
-                    toast: "!rounded-2xl !shadow-2xl !border-none !p-3",
-                    title: "!font-bold !text-sm",
-                    description: "!text-xs !opacity-90",
+                    toast: "!rounded-xl !border !shadow-xl flex items-start !p-2 !px-3 gap-3 backdrop-blur-md",
+                    title: "!font-bold !text-[15px] !tracking-tight",
+                    description:
+                        "!text-[14px] !text-inherit !opacity-90 !leading-relaxed mt-0.5",
+                    success:
+                        "!bg-emerald-50 !border-emerald-200 !text-emerald-900 dark:!bg-emerald-950 dark:!border-emerald-800 dark:!text-emerald-100 [&>[data-icon]]:!text-emerald-600",
+                    error: "!bg-red-50 !border-red-200 !text-red-900 dark:!bg-red-950 dark:!border-red-800 dark:!text-red-100 [&>[data-icon]]:!text-red-600",
+                    info: "!bg-blue-50 !border-blue-200 !text-blue-900 dark:!bg-blue-950 dark:!border-blue-800 dark:!text-blue-100 [&>[data-icon]]:!text-blue-600",
+                    warning:
+                        "!bg-amber-50 !border-amber-200 !text-amber-900 dark:!bg-amber-950 dark:!border-amber-800 dark:!text-amber-100 [&>[data-icon]]:!text-amber-600",
+                    icon: "!mt-0.5 !scale-125",
                 },
             }}
             icons={{
@@ -38,6 +46,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
                     "--normal-text": "var(--popover-foreground)",
                     "--normal-border": "var(--border)",
                     "--border-radius": "1rem",
+                    zIndex: 9999,
                 } as React.CSSProperties
             }
             {...props}

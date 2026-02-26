@@ -101,11 +101,6 @@ function useCreateMutation(mutationData: {
                         message?.body ||
                         "You have successfully completed the action",
                     position: "bottom-right",
-                    style: {
-                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                        boxShadow: "0 10px 15px -3px rgba(16, 185, 129, 0.4), 0 4px 6px -4px rgba(16, 185, 129, 0.2)",
-                    },
-                    className: "text-white rounded-2xl border-none",
                 });
             }
             if (invalidateQueries && invalidateQueries?.length) {
@@ -154,11 +149,6 @@ function useCreateMutation(mutationData: {
                           "An error occurred";
                 toast.error(errorMessage, {
                     position: "bottom-right",
-                    style: {
-                        background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                        boxShadow: "0 10px 15px -3px rgba(239, 68, 68, 0.4), 0 4px 6px -4px rgba(239, 68, 68, 0.2)",
-                    },
-                    className: "text-white rounded-2xl border-none",
                 });
             }
 

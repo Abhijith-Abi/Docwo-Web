@@ -11,6 +11,8 @@ interface PatientsToolbarProps {
     onToggleFilters: () => void;
     view: "list" | "grid";
     onViewChange: (view: "list" | "grid") => void;
+    searchQuery: string;
+    onSearchChange: (query: string) => void;
 }
 
 export function PatientsToolbar({
@@ -18,6 +20,8 @@ export function PatientsToolbar({
     onToggleFilters,
     view,
     onViewChange,
+    searchQuery,
+    onSearchChange,
 }: PatientsToolbarProps) {
     return (
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
@@ -26,6 +30,8 @@ export function PatientsToolbar({
                 <Input
                     placeholder="Search by name, ID, or phone ..."
                     className="pl-9 bg-muted/30 border-none h-10 w-full rounded-md shadow-sm"
+                    value={searchQuery}
+                    onChange={(e) => onSearchChange(e.target.value)}
                 />
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">

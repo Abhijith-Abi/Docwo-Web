@@ -89,7 +89,15 @@ export default function LoginForm() {
     });
 
     const onSubmit = (values: LoginFormValues) => {
-        handleSubmit(values as any);
+        const payload = { ...values };
+
+        // If the identifier is exactly 10 digits, it's a mobile number that needs the +91 prefix
+        const isTenDigits = /^\d{10}$/.test(payload.identifier);
+        if (isTenDigits) {
+            payload.identifier = `+91${payload.identifier}`;
+        }
+
+        handleSubmit(payload as any);
     };
 
     return (

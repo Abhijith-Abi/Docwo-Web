@@ -12,6 +12,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/auth-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const KERALA_DISTRICTS = [
     "Thiruvananthapuram",
@@ -36,6 +38,8 @@ export default function PatientHeader() {
     const [isLocationOpen, setIsLocationOpen] = useState(false);
     const [isUserOpen, setIsUserOpen] = useState(false);
     const { user, clearAuth } = useAuthStore();
+    const queryClient = useQueryClient();
+    const router = useRouter();
 
     const filteredDistricts = KERALA_DISTRICTS.filter((district) =>
         district.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -149,7 +153,11 @@ export default function PatientHeader() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer justify-center font-medium text-red-600 focus:text-red-700 focus:bg-red-50"
-                            onClick={() => clearAuth()}
+                            onClick={() => {
+                                clearAuth();
+                                queryClient.clear();
+                                router.push("/auth/login");
+                            }}
                         >
                             Logout
                         </DropdownMenuItem>

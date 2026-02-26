@@ -21,14 +21,14 @@ export function ManagementHeader({ activeTab }: ManagementHeaderProps) {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="h-9 w-9 rounded-md shrink-0 bg-black text-white hover:bg-black/90 hover:text-white border-0"
+                    className="h-9 w-9 rounded-md shrink-0"
                     aria-label="Refresh"
                 >
                     <RefreshCw className="h-4 w-4" />
                 </Button>
                 <Button
                     variant="default"
-                    className="h-9 gap-2 rounded-md shrink-0 bg-black text-white hover:bg-black/90 shadow-sm"
+                    className="h-9 gap-2 rounded-md shrink-0 shadow-sm"
                 >
                     <Plus className="h-4 w-4" />
                     <span className="hidden sm:inline">
@@ -39,7 +39,7 @@ export function ManagementHeader({ activeTab }: ManagementHeaderProps) {
                 </Button>
                 <Button
                     variant="outline"
-                    className="h-9 gap-2 rounded-md shrink-0 bg-black text-white hover:bg-black/90 hover:text-white border-0 shadow-sm"
+                    className="h-9 gap-2 rounded-md shrink-0 shadow-sm"
                 >
                     <span className="hidden sm:inline">Export Data</span>
                     <Reply className="h-4 w-4 rotate-180 scale-y-[-1]" />

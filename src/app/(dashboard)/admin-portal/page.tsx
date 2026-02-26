@@ -22,8 +22,8 @@ export default function AdminPortalPage() {
     const { data, isLoading, isError } = useGetAppointmentSummary(filters);
 
     return (
-        <div className="flex flex-col h-full bg-slate-50/20 w-full animate-in fade-in duration-500">
-            <div className="max-w-[1400px] w-full mx-auto pb-10">
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-500">
+            <div className="">
                 <DashboardHeader
                     onToggleFilters={() => setShowFilters(!showFilters)}
                     isFiltersActive={showFilters}

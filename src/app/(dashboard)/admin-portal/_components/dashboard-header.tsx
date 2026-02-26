@@ -23,20 +23,16 @@ export function DashboardHeader({
                 <Button
                     variant={isFiltersActive ? "default" : "outline"}
                     size="sm"
-                    className={cn(
-                        "h-9 gap-2 font-medium transition-all duration-200",
-                        isFiltersActive
-                            ? "bg-[#1B5041] hover:bg-[#143c31] text-white border-transparent"
-                            : "bg-white text-slate-600 border-slate-200",
-                    )}
+                    className="h-9 gap-2 font-medium transition-all duration-200"
                     onClick={onToggleFilters}
                 >
                     <Filter className="w-4 h-4" />
                     Filters
                 </Button>
                 <Button
+                    variant="default"
                     size="sm"
-                    className="h-9 gap-2 bg-[#1B5041] hover:bg-[#143c31] text-white font-medium"
+                    className="h-9 gap-2 font-medium"
                 >
                     Export Data
                     <Download className="w-4 h-4 ml-0.5" />

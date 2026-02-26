@@ -5,14 +5,24 @@ import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Patient } from "./data";
 
-export function PatientCard({ patient }: { patient: Patient }) {
+export function PatientCard({
+    patient,
+    isSelected,
+    onSelect,
+}: {
+    patient: Patient;
+    isSelected: boolean;
+    onSelect: (checked: boolean) => void;
+}) {
     return (
         <Card className="rounded-[10px] shadow-sm border border-border/80">
             <CardContent className="p-5">
                 <div className="flex items-start gap-4 mb-5">
                     <Checkbox
-                        className="mt-2.5 rounded-[4px] border-muted-foreground/40 h-4 w-4 shrink-0"
+                        className="mt-2.5 rounded-[4px] border-muted-foreground/40 h-4 w-4 shrink-0 data-[state=checked]:bg-primary"
                         aria-label="Select patient"
+                        checked={isSelected}
+                        onCheckedChange={(checked) => onSelect(!!checked)}
                     />
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 font-bold bg-muted/60 rounded-[8px]">

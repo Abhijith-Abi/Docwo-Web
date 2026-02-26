@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
 
     // PATIENTS:
     PATIENTS: '/patients',
+    CLINIC_PATIENTS: '/clinics/:clinicId/patients',
     PATIENT_DETAILS: '/patients/:id',
     PATIENT_SEARCH: '/patients/search',
     PATIENT_PROFILES: '/patients/:id/profiles',
