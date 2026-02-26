@@ -3,14 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Patient } from "./data";
 
 export function PatientCard({
     patient,
     isSelected,
     onSelect,
 }: {
-    patient: Patient;
+    patient: any;
     isSelected: boolean;
     onSelect: (checked: boolean) => void;
 }) {
