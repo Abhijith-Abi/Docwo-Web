@@ -55,6 +55,10 @@ export default function AdminSidebar({ className }: { className?: string }) {
     const handleLogout = () => {
         clearAuth();
         queryClient.clear();
+        if (typeof window !== "undefined") {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+        }
         router.push("/auth/login");
     };
 
