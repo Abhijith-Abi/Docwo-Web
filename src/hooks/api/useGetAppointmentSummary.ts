@@ -26,7 +26,7 @@ export function useGetAppointmentSummary(params?: Record<string, any>) {
                 if (s) queryString = `?${s}`;
             }
 
-            const response = await getApiData(`${API_ENDPOINTS.ANALYTICS_APPOINTMENTS}${queryString}`);
+            const response = await getApiData(`${API_ENDPOINTS.ANALYTICS_APPOINTMENT_SUMMARY}${queryString}`);
             return response?.data ?? response;
         },
         enabled: !!token,

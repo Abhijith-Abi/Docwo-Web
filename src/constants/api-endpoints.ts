@@ -52,6 +52,7 @@ export const API_ENDPOINTS = {
 
     // APPOINTMENTS:
     APPOINTMENTS: '/appointments',
+    CLINIC_APPOINTMENTS: '/clinics/:clinicId/appointments',
     APPOINTMENT_DETAILS: '/appointments/:id',
     RESCHEDULE_APPOINTMENT: '/appointments/:id/reschedule',
     CANCEL_APPOINTMENT: '/appointments/:id/cancel',
