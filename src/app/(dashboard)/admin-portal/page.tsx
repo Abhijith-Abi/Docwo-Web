@@ -6,7 +6,7 @@ import { StatCards } from "./_components/stat-cards";
 import { AppointmentsChart } from "./_components/appointments-chart";
 import { AppointmentStatusChart } from "./_components/appointment-status-chart";
 import { AppointmentHeatmap } from "./_components/heatmap-calendar";
-import { useGetAppointmentSummary } from "@/hooks/api/useGetAppointmentSummary";
+import { useGetAppointmentsAnalytics } from "@/hooks/api/useGetAppointmentsAnalytics";
 import { useState } from "react";
 import { FilterState } from "./_components/dashboard-filters";
 
@@ -19,7 +19,7 @@ export default function AdminPortalPage() {
         endDate: "",
     });
 
-    const { data, isLoading, isError } = useGetAppointmentSummary(filters);
+    const { data, isLoading, isError } = useGetAppointmentsAnalytics(filters);
 
     return (
         <div className="flex flex-col h-full w-full animate-in fade-in duration-500">
