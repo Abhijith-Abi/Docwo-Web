@@ -73,6 +73,7 @@ export default function LoginForm() {
                 email: user?.email ?? "",
                 phone_number: user?.phone_number ?? "",
                 roles: user?.roles ?? [],
+                clinic_assignments: user?.clinic_assignments ?? [],
                 patient_id: data?.patient_id ?? "",
             });
             try {
