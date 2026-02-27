@@ -27,7 +27,7 @@ const chartConfig = {
 
 export function BillingRevenueByDoctorChart() {
     return (
-        <Card className="flex flex-col shadow-sm border-border/60 rounded-[12px] h-[400px]">
+        <Card className="flex flex-col shadow-sm border-border/60 rounded-[12px] min-h-[400px] w-full">
             <CardHeader className="pb-4 pt-5">
                 <CardTitle className="text-[13px] font-medium text-foreground/80 flex items-center gap-1">
                     Revenue by{" "}
@@ -39,7 +39,7 @@ export function BillingRevenueByDoctorChart() {
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="w-[500px] h-[300px] mt-4"
+                    className="w-full h-[300px] mt-4"
                 >
                     <BarChart
                         accessibilityLayer
