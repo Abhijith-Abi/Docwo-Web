@@ -12,6 +12,8 @@ import { dummyInvoices } from "./data";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { BillingPagination } from "./billing-pagination";
 import { Button } from "@/components/ui/button";
+import { BillingAnalytics } from "./billing-analytics";
+import { BillingRefunds } from "./billing-refunds";
 
 export function BillingClient() {
     const [view, setView] = useState<"list" | "grid">("list");
@@ -65,7 +67,6 @@ export function BillingClient() {
 
             <Tabs defaultValue="invoices" className="w-full">
                 <BillingTabs />
-
                 <TabsContent value="invoices" className="m-0 mt-6 space-y-6">
                     <div className="bg-background border border-border/80 rounded-[12px] p-4 sm:p-5 shadow-sm">
                         <BillingToolbar
@@ -84,57 +85,47 @@ export function BillingClient() {
                         )}
                     </div>
 
-                    <div className="border border-border/40 bg-card rounded-[12px] shadow-sm p-5">
-                        <div className="flex justify-between items-center mb-5">
-                            <h2 className="text-[15px] font-semibold text-foreground/90">
-                                Invoice Management
-                            </h2>
-                            {selectedInvoices.length > 0 && (
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setSelectedInvoices([])}
-                                    className="h-[34px] text-[12px] font-semibold rounded-[6px] px-3 shadow-sm border-border/80 text-foreground/80 hover:text-foreground"
-                                >
-                                    Clear Selection ({selectedInvoices.length})
-                                </Button>
-                            )}
-                        </div>
-
-                        {view === "list" ? (
-                            <BillingListView
-                                invoices={paginatedInvoices}
-                                selectedInvoices={selectedInvoices}
-                                onSelectAll={handleSelectAll}
-                                onSelectInvoice={handleSelectInvoice}
-                            />
-                        ) : (
-                            <BillingGridView invoices={paginatedInvoices} />
+                    <div className="flex justify-between items-center mb-5">
+                        <h2 className="text-[15px] font-semibold text-foreground/90">
+                            Invoice Management
+                        </h2>
+                        {selectedInvoices.length > 0 && (
+                            <Button
+                                variant="outline"
+                                onClick={() => setSelectedInvoices([])}
+                                className="h-[34px] text-[12px] font-semibold rounded-[6px] px-3 shadow-sm border-border/80 text-foreground/80 hover:text-foreground"
+                            >
+                                Clear Selection ({selectedInvoices.length})
+                            </Button>
                         )}
+                    </div>
 
-                        <div className="pt-4">
-                            <BillingPagination
-                                currentPage={page}
-                                totalPages={totalPages}
-                                hasNextPage={page < totalPages}
-                                hasPrevPage={page > 1}
-                                onPageChange={setPage}
-                            />
-                        </div>
+                    {view === "list" ? (
+                        <BillingListView
+                            invoices={paginatedInvoices}
+                            selectedInvoices={selectedInvoices}
+                            onSelectAll={handleSelectAll}
+                            onSelectInvoice={handleSelectInvoice}
+                        />
+                    ) : (
+                        <BillingGridView invoices={paginatedInvoices} />
+                    )}
+
+                    <div className="pt-4">
+                        <BillingPagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            hasNextPage={page < totalPages}
+                            hasPrevPage={page > 1}
+                            onPageChange={setPage}
+                        />
                     </div>
                 </TabsContent>
-
-                <TabsContent
-                    value="analytics"
-                    className="m-0 mt-4 border border-border/40 bg-card rounded-[12px] shadow-sm p-8 text-center text-muted-foreground"
-                >
-                    Analytics Dashboard (Coming Soon)
+                <TabsContent value="analytics" className="m-0 mt-6">
+                    <BillingAnalytics />
                 </TabsContent>
-
-                <TabsContent
-                    value="refunds"
-                    className="m-0 mt-4 border border-border/40 bg-card rounded-[12px] shadow-sm p-8 text-center text-muted-foreground"
-                >
-                    Refunds Management (Coming Soon)
+                <TabsContent value="refunds" className="m-0 mt-6">
+                    <BillingRefunds />
                 </TabsContent>
             </Tabs>
         </div>

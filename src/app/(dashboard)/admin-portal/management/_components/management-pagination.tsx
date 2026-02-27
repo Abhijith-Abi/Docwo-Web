@@ -1,9 +1,30 @@
 import { SharedPagination } from "@/components/customize-components/shared-pagination";
 
-export function ManagementPagination() {
+interface ManagementPaginationProps {
+    currentPage: number;
+    totalPages: number;
+    hasNextPage?: boolean;
+    hasPrevPage?: boolean;
+    onPageChange: (page: number) => void;
+}
+
+export function ManagementPagination({
+    currentPage,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+    onPageChange,
+}: ManagementPaginationProps) {
+    if (totalPages <= 1) return null;
+
     return (
-        <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-            <SharedPagination className="mt-0" />
-        </div>
+        <SharedPagination
+            className="pb-8"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            hasNextPage={hasNextPage}
+            hasPrevPage={hasPrevPage}
+            onPageChange={onPageChange}
+        />
     );
 }

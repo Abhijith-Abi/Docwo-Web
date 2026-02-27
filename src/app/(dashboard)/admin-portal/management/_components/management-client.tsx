@@ -14,7 +14,7 @@ export function ManagementClient() {
     const [tab, setTab] = useState<"doctors" | "staffs">("doctors");
 
     return (
-        <div className="flex-1 space-y-7 p-6 md:p-10 pt-8 bg-[#FDFDFE]">
+        <div className="flex-1 space-y-7 animate-in fade-in duration-500">
             <ManagementHeader activeTab={tab as "doctors" | "staffs"} />
 
             {/* Search and View Toggle Box */}
@@ -61,17 +61,17 @@ export function ManagementClient() {
                 className="w-full"
                 onValueChange={(v) => setTab(v as any)}
             >
-                <div className="bg-muted/40 p-1.5 rounded-[12px] w-full border shadow-sm">
-                    <TabsList className="w-full h-10 bg-transparent p-0 justify-start gap-2">
+                <div className="bg-muted/40 p-1.5 rounded-[12px] w-full border shadow-sm overflow-x-auto no-scrollbar">
+                    <TabsList className="w-full min-w-[340px] h-10 bg-transparent p-0 justify-start gap-2 flex">
                         <TabsTrigger
                             value="doctors"
-                            className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm text-[13px] font-semibold h-full rounded-md"
+                            className="flex-1 data-[state=active]:bg-background data-[state=active]:shadow-sm text-[13px] font-semibold h-full rounded-md text-muted-foreground data-[state=active]:text-foreground transition-all"
                         >
                             Doctors
                         </TabsTrigger>
                         <TabsTrigger
                             value="staffs"
-                            className="flex-1 data-[state=active]:bg-white data-[state=active]:shadow-sm text-[13px] font-semibold h-full rounded-md"
+                            className="flex-1 data-[state=active]:bg-background data-[state=active]:shadow-sm text-[13px] font-semibold h-full rounded-md text-muted-foreground data-[state=active]:text-foreground transition-all"
                         >
                             Other Staffs
                         </TabsTrigger>

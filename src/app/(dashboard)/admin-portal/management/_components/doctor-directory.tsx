@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { ManagementPagination } from "./management-pagination";
+import { useState } from "react";
 
 const doctors = [
     {
@@ -72,11 +73,19 @@ const doctors = [
 ];
 
 export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
+    const totalPages = Math.ceil(doctors.length / itemsPerPage);
+    const paginatedDoctors = doctors.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage,
+    );
+
     if (view === "grid") {
         return (
             <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in duration-300">
-                    {doctors.map((doc, docIndex) => (
+                    {paginatedDoctors.map((doc, docIndex) => (
                         <div
                             key={doc.id}
                             className="bg-white border rounded-[12px] p-5 shadow-sm flex flex-col relative group"
@@ -157,7 +166,13 @@ export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
                     ))}
                 </div>
                 <div className="flex justify-center w-full pt-4">
-                    <ManagementPagination />
+                    <ManagementPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        hasNextPage={currentPage < totalPages}
+                        hasPrevPage={currentPage > 1}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             </div>
         );
@@ -166,7 +181,7 @@ export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
     return (
         <div className="bg-white border rounded-[8px] shadow-sm flex flex-col">
             <div className="p-5 font-semibold text-[15px] border-b">
-                Doctor Directory (6 results)
+                Doctor Directory ({doctors.length} results)
             </div>
 
             <div className="overflow-x-auto w-full">
@@ -191,7 +206,7 @@ export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {doctors.map((doc, docIndex) => {
+                        {paginatedDoctors.map((doc, docIndex) => {
                             return doc.schedules.map(
                                 (schedule, scheduleIndex) => (
                                     <TableRow
@@ -272,8 +287,14 @@ export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
                 </Table>
             </div>
 
-            <div className="p-4 border-t mt-auto">
-                <ManagementPagination />
+            <div className="pt-2">
+                <ManagementPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    hasNextPage={currentPage < totalPages}
+                    hasPrevPage={currentPage > 1}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );

@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { ManagementPagination } from "./management-pagination";
+import { useState } from "react";
 
 const staffs = [
     {
@@ -60,11 +61,19 @@ const staffs = [
 ];
 
 export function StaffDirectory({ view }: { view: "list" | "grid" }) {
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
+    const totalPages = Math.ceil(staffs.length / itemsPerPage);
+    const paginatedStaffs = staffs.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage,
+    );
+
     if (view === "grid") {
         return (
             <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in duration-300">
-                    {staffs.map((staff, i) => (
+                    {paginatedStaffs.map((staff, i) => (
                         <div
                             key={i}
                             className="bg-white border rounded-[12px] p-5 shadow-sm flex flex-col relative group"
@@ -126,7 +135,13 @@ export function StaffDirectory({ view }: { view: "list" | "grid" }) {
                     ))}
                 </div>
                 <div className="flex justify-center w-full pt-4">
-                    <ManagementPagination />
+                    <ManagementPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        hasNextPage={currentPage < totalPages}
+                        hasPrevPage={currentPage > 1}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             </div>
         );
@@ -135,7 +150,7 @@ export function StaffDirectory({ view }: { view: "list" | "grid" }) {
     return (
         <div className="bg-white border rounded-[8px] shadow-sm flex flex-col">
             <div className="p-5 font-semibold text-[15px] border-b">
-                Staff Directory (6 results)
+                Staff Directory ({staffs.length} results)
             </div>
 
             <div className="overflow-x-auto w-full">
@@ -160,7 +175,7 @@ export function StaffDirectory({ view }: { view: "list" | "grid" }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {staffs.map((staff, i) => (
+                        {paginatedStaffs.map((staff, i) => (
                             <TableRow key={i} className="hover:bg-transparent">
                                 <TableCell className="pl-5 py-5 border-b w-[250px]">
                                     <div className="flex flex-col gap-1">
@@ -214,8 +229,14 @@ export function StaffDirectory({ view }: { view: "list" | "grid" }) {
                 </Table>
             </div>
 
-            <div className="p-4 border-t mt-auto">
-                <ManagementPagination />
+            <div className="pt-2">
+                <ManagementPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    hasNextPage={currentPage < totalPages}
+                    hasPrevPage={currentPage > 1}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );
