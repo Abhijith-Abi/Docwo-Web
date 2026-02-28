@@ -179,115 +179,178 @@ export function DoctorDirectory({ view }: { view: "list" | "grid" }) {
     }
 
     return (
-        <div className="bg-white border rounded-[8px] shadow-sm flex flex-col">
-            <div className="p-5 font-semibold text-[15px] border-b">
+        <div className="rounded-[10px] border border-border/60 bg-card overflow-hidden animate-in fade-in duration-300 shadow-sm mt-3 flex flex-col">
+            <div className="p-5 font-semibold text-[15px] border-b border-border/60 text-foreground">
                 Doctor Directory ({doctors.length} results)
             </div>
 
             <div className="overflow-x-auto w-full">
-                <Table className="w-full min-w-[800px]">
-                    <TableHeader>
-                        <TableRow className="bg-muted/30">
-                            <TableHead className="font-semibold text-black pl-5 pb-3">
+                <Table className="min-w-[1000px] xl:min-w-full">
+                    <TableHeader className="bg-blue-50/50 hover:bg-blue-50/50">
+                        <TableRow className="border-b-border/60">
+                            <TableHead className="font-bold text-foreground h-[52px] text-sm pl-6 w-[25%]">
                                 Doctor
                             </TableHead>
-                            <TableHead className="font-semibold text-black text-center pb-3">
-                                contact details
+                            <TableHead className="font-bold text-foreground h-[52px] text-sm text-center w-[20%]">
+                                Contact Details
                             </TableHead>
-                            <TableHead className="font-semibold text-black pb-3">
+                            <TableHead className="font-bold text-foreground h-[52px] text-sm w-[20%]">
                                 Next Scheduled Dates
                             </TableHead>
-                            <TableHead className="font-semibold text-black pb-3">
-                                Scheduled hours
+                            <TableHead className="font-bold text-foreground h-[52px] text-sm w-[20%]">
+                                Scheduled Hours
                             </TableHead>
-                            <TableHead className="font-semibold text-black text-right pr-10 pb-3">
+                            <TableHead className="font-bold text-foreground h-[52px] text-sm text-center pr-6 w-[15%]">
                                 Actions
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedDoctors.map((doc, docIndex) => {
-                            return doc.schedules.map(
-                                (schedule, scheduleIndex) => (
-                                    <TableRow
-                                        key={`${doc.id}-${scheduleIndex}`}
-                                        className="hover:bg-transparent"
-                                    >
-                                        {scheduleIndex === 0 && (
-                                            <>
-                                                <TableCell
-                                                    rowSpan={
-                                                        doc.schedules.length
-                                                    }
-                                                    className="pl-5 align-middle w-[250px] border-b"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-full bg-slate-200 shrink-0" />
-                                                        <span className="font-medium text-[14px]">
-                                                            {doc.name}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell
-                                                    rowSpan={
-                                                        doc.schedules.length
-                                                    }
-                                                    className="align-middle border-b"
-                                                >
-                                                    <div className="flex flex-col gap-1 text-[13px] text-muted-foreground w-max m-auto text-center">
-                                                        {doc.phones.map(
-                                                            (p, i) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className="text-black font-medium"
-                                                                >
-                                                                    {p}
-                                                                </span>
-                                                            ),
-                                                        )}
-                                                        <span className="mt-1">
-                                                            {doc.email}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-                                            </>
-                                        )}
-                                        <TableCell className="py-4">
-                                            <div className="text-[14px] font-medium text-black">
-                                                {schedule.date}
-                                            </div>
-                                            <div className="text-[13px] text-muted-foreground mt-0.5">
-                                                {schedule.day}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                            {schedule.hours.map((h, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="text-[14px] font-medium text-black"
-                                                >
-                                                    {h}
-                                                </div>
-                                            ))}
-                                        </TableCell>
-                                        <TableCell className="py-4 text-right pr-6">
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                className="h-8 w-8 text-muted-foreground"
+                        {paginatedDoctors.length > 0 ? (
+                            paginatedDoctors.map((doc, docIndex) => {
+                                const rowBg =
+                                    docIndex % 2 === 0
+                                        ? "bg-background hover:bg-background"
+                                        : "bg-muted/30 hover:bg-muted/30";
+
+                                return doc.schedules.map(
+                                    (schedule, scheduleIndex) => {
+                                        const isLastSchedule =
+                                            scheduleIndex ===
+                                            doc.schedules.length - 1;
+                                        return (
+                                            <TableRow
+                                                key={`${doc.id}-${scheduleIndex}`}
+                                                className={`border-none ${rowBg} ${
+                                                    isLastSchedule
+                                                        ? "border-b border-border/50"
+                                                        : ""
+                                                }`}
                                             >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ),
-                            );
-                        })}
+                                                {scheduleIndex === 0 && (
+                                                    <>
+                                                        <TableCell
+                                                            rowSpan={
+                                                                doc.schedules
+                                                                    .length
+                                                            }
+                                                            className="pl-6 align-top py-4 border-r border-transparent"
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0" />
+                                                                <span className="font-medium text-[14px] text-foreground/90">
+                                                                    {doc.name}
+                                                                </span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell
+                                                            rowSpan={
+                                                                doc.schedules
+                                                                    .length
+                                                            }
+                                                            className="align-top py-4 border-r border-transparent"
+                                                        >
+                                                            <div className="flex flex-col gap-1 text-[13px] text-muted-foreground w-max m-auto text-center">
+                                                                {doc.phones.map(
+                                                                    (p, i) => (
+                                                                        <span
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                            className="text-[14px] text-foreground/90 font-medium"
+                                                                        >
+                                                                            {p}
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                                <span className="mt-1">
+                                                                    {doc.email}
+                                                                </span>
+                                                            </div>
+                                                        </TableCell>
+                                                    </>
+                                                )}
+                                                <TableCell
+                                                    className={`py-4 align-top ${
+                                                        !isLastSchedule
+                                                            ? "pb-2"
+                                                            : ""
+                                                    } ${scheduleIndex !== 0 ? "pt-2" : ""}`}
+                                                >
+                                                    <div className="text-[14px] font-medium text-foreground/80">
+                                                        {schedule.date}
+                                                    </div>
+                                                    <div className="text-[13px] text-muted-foreground mt-0.5 capitalize">
+                                                        {schedule.day}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell
+                                                    className={`py-4 align-top ${
+                                                        !isLastSchedule
+                                                            ? "pb-2"
+                                                            : ""
+                                                    } ${scheduleIndex !== 0 ? "pt-2" : ""}`}
+                                                >
+                                                    {schedule.hours.map(
+                                                        (h, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="text-[14px] font-medium text-foreground/80"
+                                                            >
+                                                                {h}
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </TableCell>
+                                                {scheduleIndex === 0 && (
+                                                    <TableCell
+                                                        rowSpan={
+                                                            doc.schedules.length
+                                                        }
+                                                        className="py-4 pr-6 text-center align-top"
+                                                    >
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-muted-foreground hover:text-foreground mx-auto"
+                                                        >
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </TableCell>
+                                                )}
+                                            </TableRow>
+                                        );
+                                    },
+                                );
+                            })
+                        ) : (
+                            <TableRow className="hover:bg-transparent border-none">
+                                <TableCell
+                                    colSpan={5}
+                                    className="h-[300px] text-center align-middle"
+                                >
+                                    <div className="flex flex-col items-center justify-center h-full">
+                                        <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                                            <span className="text-muted-foreground font-medium text-lg">
+                                                !
+                                            </span>
+                                        </div>
+                                        <span className="text-[15px] font-semibold text-foreground mb-1">
+                                            No doctors found
+                                        </span>
+                                        <span className="text-[13px] text-muted-foreground max-w-[250px]">
+                                            We couldn't find any doctors
+                                            matching your current filters.
+                                        </span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-4 pb-4">
                 <ManagementPagination
                     currentPage={currentPage}
                     totalPages={totalPages}

@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
     STAFF_DETAILS: '/staff/:id',
     STAFF_CHANGE_PASSWORD: '/staff/:id/change-password',
     STAFF_RESET_PASSWORD: '/staff/:id/reset-password',
+    CLINIC_STAFF_DIRECTORY: '/clinics/:clinicId/staff-directory',
 
     // PATIENTS:
     PATIENTS: '/patients',
@@ -89,4 +90,7 @@ export const API_ENDPOINTS = {
     ANALYTICS_STAFF_DIRECTORY_SUMMARY: '/analytics/staff-directory-summary',
     ANALYTICS_BILLING_KPIS: '/analytics/billing-kpis',
     ANALYTICS_BILLING_CHARTS: '/analytics/billing-charts',
+
+    // BILLINGS & PAYMENTS:
+    BILLINGS_PAYMENTS: '/payments',
 }

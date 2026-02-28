@@ -22,9 +22,9 @@ function BillingStatCard({
     valueColor = "text-emerald-500",
 }: BillingStatCardProps) {
     return (
-        <Card className="shadow-sm border-border/60 rounded-[12px]">
-            <CardContent className="p-5 flex flex-col justify-between h-full min-h-[120px]">
-                <div className="flex justify-between items-start">
+        <Card className="shadow-sm border-border/60 rounded-[12px] p-1">
+            <CardContent className="p-4 flex flex-col justify-between h-full min-h-[100px]">
+                <div className="flex justify-between items-center">
                     <h3 className="text-sm font-semibold text-foreground/80">
                         {title}
                     </h3>

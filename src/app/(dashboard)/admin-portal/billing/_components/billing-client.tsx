@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { BillingHeader } from "./billing-header";
 import { BillingStatCards } from "./billing-stat-cards";
 import { BillingTabs } from "./billing-tabs";
@@ -8,12 +8,15 @@ import { BillingToolbar } from "./billing-toolbar";
 import { BillingFilters } from "./billing-filters";
 import { BillingListView } from "./billing-list-view";
 import { BillingGridView } from "./billing-grid-view";
-import { dummyInvoices } from "./data";
+import { Invoice } from "./data";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { BillingPagination } from "./billing-pagination";
 import { Button } from "@/components/ui/button";
 import { BillingAnalytics } from "./billing-analytics";
 import { BillingRefunds } from "./billing-refunds";
+import { BillingListSkeleton, BillingGridSkeleton } from "./billing-skeleton";
+import { useGetBillingsPayments } from "@/hooks/api/useGetBillingsPayments";
+import { useAuthStore } from "@/store/auth-store";
 
 export function BillingClient() {
     const [view, setView] = useState<"list" | "grid">("list");
@@ -22,10 +25,61 @@ export function BillingClient() {
 
     const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
     const [page, setPage] = useState(1);
-    const itemsPerPage = 6;
+    const itemsPerPage = 10;
 
-    // Filter logic placeholder (using dummy data)
-    const filteredInvoices = dummyInvoices.filter(
+    const user = useAuthStore((state) => state.user);
+    const clinicId = user?.clinic_assignments?.[0]?.clinic_id;
+
+    const {
+        data: { data: billingsPayments = [], pagination = null } = {},
+        isLoading,
+    } = useGetBillingsPayments(clinicId, {
+        page,
+        limit: itemsPerPage,
+    });
+
+    const [totalCount, setTotalCount] = useState<number>(0);
+
+    useEffect(() => {
+        if (pagination?.totalResults !== undefined) {
+            setTotalCount(pagination.totalResults);
+        }
+    }, [pagination?.totalResults]);
+
+    const apiInvoices: Invoice[] = useMemo(() => {
+        if (!Array.isArray(billingsPayments)) return [];
+        return billingsPayments.map((item: any) => {
+            const dateObj = new Date(item.date_and_time);
+            return {
+                id: item.invoice_id,
+                invoiceNumber: item.invoice_id,
+                date: dateObj.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                }),
+                time: dateObj.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }),
+                patientName: item.patient?.name || "Unknown",
+                patientId: item.patient?.patient_code || "",
+                doctorName: item.doctor?.name || "Unknown",
+                specialization: item.department || "",
+                amount: parseFloat(item.total_amount) || 0,
+                status:
+                    item.status === "paid"
+                        ? "Paid"
+                        : item.status === "refund"
+                          ? "Refund"
+                          : item.status,
+                paymentMethod: item.payment_method?.replace(/_/g, " ") || "",
+            };
+        });
+    }, [billingsPayments]);
+
+    // Filter logic placeholder
+    const filteredInvoices = apiInvoices.filter(
         (invoice) =>
             invoice.patientName
                 .toLowerCase()
@@ -36,11 +90,8 @@ export function BillingClient() {
             invoice.patientId.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
-    const paginatedInvoices = filteredInvoices.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage,
-    );
+    const totalPages = pagination?.totalPages || 1;
+    const paginatedInvoices = filteredInvoices; // No longer slice, API sends only current page
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
@@ -87,7 +138,8 @@ export function BillingClient() {
 
                     <div className="flex justify-between items-center mb-5">
                         <h2 className="text-[15px] font-semibold text-foreground/90">
-                            Invoice Management
+                            Invoice Management{" "}
+                            {totalCount > 0 ? `(${totalCount})` : ""}
                         </h2>
                         {selectedInvoices.length > 0 && (
                             <Button
@@ -100,7 +152,13 @@ export function BillingClient() {
                         )}
                     </div>
 
-                    {view === "list" ? (
+                    {isLoading ? (
+                        view === "grid" ? (
+                            <BillingGridSkeleton />
+                        ) : (
+                            <BillingListSkeleton />
+                        )
+                    ) : view === "list" ? (
                         <BillingListView
                             invoices={paginatedInvoices}
                             selectedInvoices={selectedInvoices}

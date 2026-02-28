@@ -104,10 +104,10 @@ export function BillingListView({
                         invoices.map((invoice, index) => (
                             <TableRow
                                 key={`invoice-${invoice.id}-${index}`}
-                                className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30 h-[72px]"
+                                className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30 h-[88px]"
                             >
-                                <TableCell className="p-0 text-center align-middle">
-                                    <div className="px-4 py-3 h-full flex items-center justify-center">
+                                <TableCell className="p-0 text-center align-top">
+                                    <div className="px-4 pt-5 pb-3 h-full flex justify-center">
                                         <Checkbox
                                             aria-label={`Select invoice ${invoice.invoiceNumber}`}
                                             className="rounded-[4px] border-muted-foreground/40 data-[state=checked]:bg-primary h-4 w-4"
@@ -123,41 +123,41 @@ export function BillingListView({
                                         />
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4">
-                                    <div className="font-semibold text-[13px] text-foreground/90">
+                                <TableCell className="py-4 align-top">
+                                    <div className="font-semibold text-[14px] text-foreground/90">
                                         {invoice.invoiceNumber}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4">
+                                <TableCell className="py-4 align-top">
                                     <div className="flex flex-col gap-0.5">
-                                        <div className="text-[13px] text-foreground/80 font-medium">
+                                        <div className="text-[14px] text-foreground/90 font-medium">
                                             {invoice.date}
                                         </div>
-                                        <div className="text-[12px] text-muted-foreground">
+                                        <div className="text-[13px] text-muted-foreground">
                                             {invoice.time}
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4">
+                                <TableCell className="py-4 align-top">
                                     <div className="flex flex-col gap-0.5">
-                                        <div className="font-medium text-[13px] text-foreground/90">
+                                        <div className="font-medium text-[14px] text-foreground/90">
                                             {invoice.patientName}
                                         </div>
-                                        <div className="text-[12px] text-muted-foreground">
+                                        <div className="text-[13px] text-muted-foreground">
                                             {invoice.patientId}
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] text-foreground/80">
+                                <TableCell className="py-4 text-[14px] text-foreground/90 font-medium align-top">
                                     {invoice.doctorName}
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] text-muted-foreground">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {invoice.specialization}
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/90 align-top">
                                     {formatCurrency(invoice.amount)}
                                 </TableCell>
-                                <TableCell className="py-4">
+                                <TableCell className="py-4 align-top">
                                     <Badge
                                         variant="secondary"
                                         className={cn(
@@ -171,15 +171,15 @@ export function BillingListView({
                                         {invoice.status}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="py-4">
+                                <TableCell className="py-4 align-top">
                                     <Badge
                                         variant="outline"
-                                        className="font-semibold text-[11px] px-3 py-0.5 rounded-[12px] min-w-[60px] justify-center border-border/60 text-muted-foreground"
+                                        className="font-semibold text-[11px] px-3 py-0.5 rounded-[12px] min-w-[60px] justify-center border-border/60 text-foreground/90 bg-background"
                                     >
                                         {invoice.paymentMethod}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="py-4 pr-6 text-right">
+                                <TableCell className="py-4 pr-6 text-right align-top">
                                     <Button
                                         variant="outline"
                                         size="icon"

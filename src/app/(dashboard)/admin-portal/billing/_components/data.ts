@@ -8,8 +8,8 @@ export interface Invoice {
     doctorName: string;
     specialization: string;
     amount: number;
-    status: "Paid" | "Refund";
-    paymentMethod: "UPI" | "Direct";
+    status: string;
+    paymentMethod: string;
 }
 
 export const dummyInvoices: Invoice[] = [

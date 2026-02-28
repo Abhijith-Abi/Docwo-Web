@@ -171,9 +171,9 @@ export function AppointmentsListView({
                                     key={`list-${appointment?.appointment_id || index}-${index}`}
                                     className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30 h-[88px]"
                                 >
-                                    <TableCell className="py-4 pl-6">
+                                    <TableCell className="py-4 pl-6 align-top">
                                         <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-1.5 text-[14px] font-medium text-foreground">
+                                            <div className="flex items-center gap-1.5 text-[14px] font-medium text-foreground/90">
                                                 <Clock className="h-[14px] w-[14px] text-muted-foreground" />
                                                 {time}
                                             </div>
@@ -190,41 +190,41 @@ export function AppointmentsListView({
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4">
+                                    <TableCell className="py-4 align-top">
                                         <div>
-                                            <div className="font-medium text-[14px] text-foreground">
+                                            <div className="font-medium text-[14px] text-foreground/90">
                                                 {patientName}
                                             </div>
-                                            <div className="text-[14px] font-medium text-foreground mt-0.5">
+                                            <div className="text-[13px] text-muted-foreground mt-0.5">
                                                 {patientId}
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4 text-[14px] font-medium text-foreground capitalize">
+                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 capitalize align-top">
                                         {age === "N/A" && gender === "N/A"
                                             ? "N/A"
                                             : `${age}/${gender}`}
                                     </TableCell>
-                                    <TableCell className="py-4">
-                                        <div className="text-[14px] font-medium text-foreground">
+                                    <TableCell className="py-4 align-top">
+                                        <div className="text-[14px] font-medium text-foreground/90">
                                             {contactNumber}
                                         </div>
                                         <div
-                                            className="text-[14px] font-medium text-foreground mt-0.5 max-w-[150px] truncate"
+                                            className="text-[13px] text-muted-foreground mt-0.5 max-w-[150px] truncate"
                                             title={contactEmail}
                                         >
                                             {contactEmail}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4">
+                                    <TableCell className="py-4 align-top">
                                         <div
-                                            className="text-[14px] font-medium text-foreground max-w-[200px] xl:max-w-[250px] truncate"
+                                            className="text-[14px] font-medium text-foreground/80 max-w-[200px] xl:max-w-[250px] truncate"
                                             title={doctorDisplay}
                                         >
                                             {doctorDisplay}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4 pr-6">
+                                    <TableCell className="py-4 pr-6 align-top">
                                         <Badge
                                             variant="secondary"
                                             className={cn(

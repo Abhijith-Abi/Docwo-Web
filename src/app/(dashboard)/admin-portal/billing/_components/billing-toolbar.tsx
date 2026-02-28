@@ -21,7 +21,7 @@ export function BillingToolbar({
     onSearchChange,
 }: BillingToolbarProps) {
     return (
-        <div className="flex flex-col md:flex-row gap-3 md:items-center justify-between bg-background p-3 rounded-[12px] border border-border/40 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-3 md:items-center justify-between bg-background rounded-[12px]">
             <div className="relative flex-1 w-full flex items-center bg-muted/30 border border-transparent rounded-[8px] focus-within:bg-background focus-within:border-border transition-all">
                 <Search className="absolute left-3.5 h-4 w-4 text-muted-foreground" />
                 <Input

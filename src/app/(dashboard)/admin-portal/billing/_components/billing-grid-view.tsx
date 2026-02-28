@@ -1,17 +1,39 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Printer } from "lucide-react";
+import { Printer, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Invoice, formatCurrency } from "./data";
 import { cn } from "@/lib/utils";
 
 export function BillingGridView({ invoices }: { invoices: Invoice[] }) {
+    if (!invoices || invoices.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-card rounded-[10px] border border-border/60 shadow-sm mt-3 animate-in fade-in duration-300">
+                <div className="flex flex-col items-center justify-center h-full">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                        <FileText
+                            className="h-6 w-6 text-muted-foreground"
+                            strokeWidth={1.5}
+                        />
+                    </div>
+                    <span className="text-[15px] font-semibold text-foreground mb-1">
+                        No invoices found
+                    </span>
+                    <span className="text-[13px] text-muted-foreground max-w-[250px] text-center">
+                        We couldn&apos;t find any invoices matching your current
+                        filters.
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-6 pt-2 animate-in fade-in duration-300">
             {invoices.map((invoice, index) => (
                 <Card
                     key={`invoice-grid-${invoice.id}-${index}`}
-                    className="shadow-sm border-border/60 rounded-[12px] overflow-hidden"
+                    className="shadow-sm border border-border/80 rounded-[10px] overflow-hidden"
                 >
                     <CardContent className="p-0">
                         {/* Header */}
@@ -52,7 +74,7 @@ export function BillingGridView({ invoices }: { invoices: Invoice[] }) {
                         {/* Body */}
                         <div className="p-4 space-y-4">
                             <div className="flex justify-between items-center text-sm">
-                                <div className="text-muted-foreground">
+                                <div className="text-foreground font-medium text-[14px] shrink-0">
                                     Amount:
                                 </div>
                                 <div className="font-bold text-[16px] text-foreground">
@@ -62,33 +84,33 @@ export function BillingGridView({ invoices }: { invoices: Invoice[] }) {
 
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                    <div className="text-muted-foreground text-[11px] mb-0.5">
+                                    <div className="text-foreground font-medium text-[14px] mb-0.5 shrink-0">
                                         Patient
                                     </div>
-                                    <div className="font-semibold text-foreground/90">
+                                    <div className="font-medium text-[14px] text-foreground">
                                         {invoice.patientName}
                                     </div>
-                                    <div className="text-[11px] text-muted-foreground">
+                                    <div className="text-[14px] font-medium text-foreground mt-0.5">
                                         {invoice.patientId}
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-muted-foreground text-[11px] mb-0.5">
+                                    <div className="text-foreground font-medium text-[14px] mb-0.5 shrink-0">
                                         Doctor
                                     </div>
-                                    <div className="font-medium text-foreground/80">
+                                    <div className="font-medium text-[14px] text-foreground">
                                         {invoice.doctorName}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex justify-between items-center pt-2 border-t border-border/30">
-                                <div className="text-[12px] text-muted-foreground">
+                                <div className="text-[14px] text-foreground font-medium">
                                     {invoice.specialization}
                                 </div>
                                 <Badge
                                     variant="outline"
-                                    className="font-semibold text-[10px] px-2 py-0 rounded-[12px] border-border/60 text-muted-foreground bg-muted/20"
+                                    className="font-bold text-[12px] px-2 py-0.5 rounded-[4px] border-none shadow-sm gap-1 bg-background"
                                 >
                                     {invoice.paymentMethod}
                                 </Badge>

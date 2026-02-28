@@ -45,25 +45,25 @@ export function PatientsListView({
                                 </div>
                             )}
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Patient
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Age/Gender
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Blood Group
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Contact
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Last Visit
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             No. of Visit
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-[13px] tracking-tight">
+                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             Doctor
                         </TableHead>
                         <TableHead className="font-bold text-foreground text-center h-[52px] text-[13px] tracking-tight">
@@ -101,8 +101,8 @@ export function PatientsListView({
                                 key={`list-${patient.id}-${index}`}
                                 className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30"
                             >
-                                <TableCell className="p-0 text-center align-middle">
-                                    <div className="px-4 py-3 h-full flex items-center justify-center">
+                                <TableCell className="p-0 text-center align-top">
+                                    <div className="px-4 pt-5 pb-3 h-full flex justify-center">
                                         <Checkbox
                                             aria-label={`Select patient ${patient.name}`}
                                             className="rounded-[4px] border-muted-foreground/40 data-[state=checked]:bg-primary h-4 w-4"
@@ -118,40 +118,40 @@ export function PatientsListView({
                                         />
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4">
+                                <TableCell className="py-4 align-top">
                                     <div>
-                                        <div className="font-medium text-[13px] text-foreground">
+                                        <div className="font-medium text-[14px] text-foreground/90">
                                             {patient.name}
                                         </div>
-                                        <div className="text-[12px] text-muted-foreground mt-1">
+                                        <div className="text-[13px] text-muted-foreground mt-0.5">
                                             {patient.id}
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-muted-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.age}/{patient.gender}
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-muted-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.bloodGroup}
                                 </TableCell>
-                                <TableCell className="py-4">
-                                    <div className="text-[13px] font-medium text-foreground">
+                                <TableCell className="py-4 align-top">
+                                    <div className="text-[14px] font-medium text-foreground/90">
                                         {patient.phone}
                                     </div>
-                                    <div className="text-[12px] text-muted-foreground mt-1">
+                                    <div className="text-[13px] text-muted-foreground mt-0.5">
                                         {patient.email}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-muted-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.lastVisit}
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-muted-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.noOfVisit}
                                 </TableCell>
-                                <TableCell className="py-4 text-[13px] font-medium text-muted-foreground/90">
+                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.doctor}
                                 </TableCell>
-                                <TableCell className="py-3.5 text-center">
+                                <TableCell className="py-3.5 text-center align-top">
                                     <Button
                                         variant="ghost"
                                         size="icon"
