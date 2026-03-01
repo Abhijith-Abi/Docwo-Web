@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetClinicStaff } from "@/hooks/api/useGetClinicStaff";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataErrorState } from "@/components/ui/data-state-view";
 
 function formatTime12h(time24: string): string {
     if (!time24) return "";
@@ -39,13 +40,22 @@ export function DoctorDirectory({
     const user = useAuthStore((state) => state.user);
     const clinicId = user?.clinic_assignments?.[0]?.clinic_id;
 
-    const { data: { data = [], pagination = null } = {}, isLoading } =
-        useGetClinicStaff(clinicId, {
-            page: currentPage,
-            limit: itemsPerPage,
-            role: "doctor",
-            search,
-        });
+    const {
+        data: { data = [], pagination = null } = {},
+        isLoading,
+        isError,
+    } = useGetClinicStaff(clinicId, {
+        page: currentPage,
+        limit: itemsPerPage,
+        role: "doctor",
+        search,
+    });
+
+    if (isError) {
+        return (
+            <DataErrorState title="Failed to load doctors" className="mt-3" />
+        );
+    }
 
     const totalPages =
         pagination?.totalPages ||

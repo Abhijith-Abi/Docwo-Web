@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetClinicStaff } from "@/hooks/api/useGetClinicStaff";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataErrorState } from "@/components/ui/data-state-view";
 
 export function StaffDirectory({
     view,
@@ -29,13 +30,25 @@ export function StaffDirectory({
     const user = useAuthStore((state) => state.user);
     const clinicId = user?.clinic_assignments?.[0]?.clinic_id;
 
-    const { data: { data: staffs = [], pagination = null } = {}, isLoading } =
-        useGetClinicStaff(clinicId, {
-            page: currentPage,
-            limit: itemsPerPage,
-            role: "clinic_staff",
-            search,
-        });
+    const {
+        data: { data: staffs = [], pagination = null } = {},
+        isLoading,
+        isError,
+    } = useGetClinicStaff(clinicId, {
+        page: currentPage,
+        limit: itemsPerPage,
+        role: "clinic_staff",
+        search,
+    });
+
+    if (isError) {
+        return (
+            <DataErrorState
+                title="Failed to load staff members"
+                className="mt-3"
+            />
+        );
+    }
 
     const totalPages =
         pagination?.totalPages ||

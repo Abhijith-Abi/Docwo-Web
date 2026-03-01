@@ -23,7 +23,7 @@ export function PatientsGridView({
                 <h3 className="text-[15px] font-semibold text-foreground mb-1">
                     No patients found
                 </h3>
-                <p className="text-[13px] text-muted-foreground text-center max-w-[250px]">
+                <p className="text-[13px] text-muted-foreground text-center ">
                     We couldn't find any patients matching your current filters.
                 </p>
             </div>

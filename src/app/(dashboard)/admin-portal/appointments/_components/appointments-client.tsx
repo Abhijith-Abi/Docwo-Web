@@ -18,6 +18,7 @@ import { useGetClinicAppointments } from "@/hooks/api/useGetClinicAppointments";
 import { useGetAnalyticsFilters } from "@/hooks/api/useGetAnalyticsFilters";
 import { useGetAppointmentSummary } from "@/hooks/api/useGetAppointmentSummary";
 import { format } from "date-fns";
+import { DataErrorState } from "@/components/ui/data-state-view";
 
 export function AppointmentsClient() {
     const router = useRouter();
@@ -88,6 +89,7 @@ export function AppointmentsClient() {
     const {
         data: { data: appointments = [], pagination = null } = {},
         isLoading: isAppointmentsLoading,
+        isError: isAppointmentsError,
     } = useGetClinicAppointments(clinicId, {
         page,
         limit: 10,
@@ -146,7 +148,12 @@ export function AppointmentsClient() {
                 </span>
             </div>
 
-            {isAppointmentsLoading ? (
+            {isAppointmentsError ? (
+                <DataErrorState
+                    title="Failed to load appointments"
+                    className="mb-4"
+                />
+            ) : isAppointmentsLoading ? (
                 view === "grid" ? (
                     <AppointmentsGridSkeleton />
                 ) : (

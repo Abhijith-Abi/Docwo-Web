@@ -93,7 +93,7 @@ export function BillingListView({
                                     <span className="text-[15px] font-semibold text-foreground mb-1">
                                         No invoices found
                                     </span>
-                                    <span className="text-[13px] text-muted-foreground max-w-[250px]">
+                                    <span className="text-[13px] text-muted-foreground ">
                                         We couldn&apos;t find any invoices
                                         matching your current filters.
                                     </span>

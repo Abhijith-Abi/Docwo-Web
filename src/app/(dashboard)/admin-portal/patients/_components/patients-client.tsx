@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetClinicPatients } from "@/hooks/api/useGetClinicPatients";
 import { useGetAnalyticsFilters } from "@/hooks/api/useGetAnalyticsFilters";
+import { DataErrorState } from "@/components/ui/data-state-view";
 
 export function PatientsClient() {
     const router = useRouter();
@@ -102,13 +103,16 @@ export function PatientsClient() {
     );
 
     const user = useAuthStore((state) => state.user);
-    const { data: { data: patients = [], pagination = null } = {}, isLoading } =
-        useGetClinicPatients(user?.clinic_assignments?.[0]?.clinic_id, {
-            page,
-            limit: 10,
-            search: debouncedSearch,
-            ...filters,
-        });
+    const {
+        data: { data: patients = [], pagination = null } = {},
+        isLoading,
+        isError,
+    } = useGetClinicPatients(user?.clinic_assignments?.[0]?.clinic_id, {
+        page,
+        limit: 10,
+        search: debouncedSearch,
+        ...filters,
+    });
 
     const [totalCount, setTotalCount] = useState<number>(0);
 
@@ -158,7 +162,12 @@ export function PatientsClient() {
                 )}
             </div>
 
-            {isLoading ? (
+            {isError ? (
+                <DataErrorState
+                    title="Failed to load patients"
+                    className="mb-4"
+                />
+            ) : isLoading ? (
                 view === "grid" ? (
                     <PatientsGridSkeleton />
                 ) : (

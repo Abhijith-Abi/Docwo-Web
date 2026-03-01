@@ -18,7 +18,7 @@ export function AppointmentsGridView({
                 <span className="text-[15px] font-semibold text-foreground mb-1">
                     No appointments found
                 </span>
-                <span className="text-[13px] text-muted-foreground max-w-[250px] text-center">
+                <span className="text-[13px] text-muted-foreground  text-center">
                     We couldn't find any appointments matching your current
                     filters.
                 </span>

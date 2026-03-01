@@ -109,7 +109,7 @@ export function AppointmentsListView({
                                     <span className="text-[15px] font-semibold text-foreground mb-1">
                                         No appointments found
                                     </span>
-                                    <span className="text-[13px] text-muted-foreground max-w-[250px]">
+                                    <span className="text-[13px] text-muted-foreground ">
                                         We couldn't find any appointments
                                         matching your current filters.
                                     </span>
@@ -218,7 +218,7 @@ export function AppointmentsListView({
                                     </TableCell>
                                     <TableCell className="py-4 align-top">
                                         <div
-                                            className="text-[14px] font-medium text-foreground/80 max-w-[200px] xl:max-w-[250px] truncate"
+                                            className="text-[14px] font-medium text-foreground/80 max-w-[200px] xl: truncate"
                                             title={doctorDisplay}
                                         >
                                             {doctorDisplay}

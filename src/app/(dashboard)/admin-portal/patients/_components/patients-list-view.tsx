@@ -88,7 +88,7 @@ export function PatientsListView({
                                     <span className="text-[15px] font-semibold text-foreground mb-1">
                                         No patients found
                                     </span>
-                                    <span className="text-[13px] text-muted-foreground max-w-[250px]">
+                                    <span className="text-[13px] text-muted-foreground">
                                         We couldn't find any patients matching
                                         your current filters.
                                     </span>

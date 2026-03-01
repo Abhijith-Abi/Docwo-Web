@@ -19,7 +19,7 @@ export function BillingGridView({ invoices }: { invoices: Invoice[] }) {
                     <span className="text-[15px] font-semibold text-foreground mb-1">
                         No invoices found
                     </span>
-                    <span className="text-[13px] text-muted-foreground max-w-[250px] text-center">
+                    <span className="text-[13px] text-muted-foreground  text-center">
                         We couldn&apos;t find any invoices matching your current
                         filters.
                     </span>

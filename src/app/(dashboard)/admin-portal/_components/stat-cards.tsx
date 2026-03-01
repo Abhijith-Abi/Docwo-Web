@@ -9,6 +9,11 @@ import {
     TrendingDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+    DataErrorState,
+    DataEmptyState,
+} from "@/components/ui/data-state-view";
 
 interface StatCardProps {
     title: string;
@@ -18,8 +23,6 @@ interface StatCardProps {
     icon: React.ReactNode;
     iconBgColor?: string;
     iconColor?: string;
-    isLoading?: boolean;
-    isError?: boolean;
 }
 
 function StatCard({
@@ -30,55 +33,41 @@ function StatCard({
     icon,
     iconBgColor,
     iconColor,
-    isLoading = false,
-    isError = false,
 }: StatCardProps) {
     return (
-        <Card className="shadow-sm border-slate-100 h-full rounded-xl">
-            <CardContent className="p-5">
+        <Card className="shadow-sm border-slate-100 h-full rounded-[12px]">
+            <CardContent className="p-5 flex flex-col justify-between h-full">
                 <div className="flex justify-between items-start gap-2">
                     <div className="flex flex-col gap-1 min-w-0 flex-1">
                         <h3 className="text-[13px] font-semibold text-slate-800 leading-tight">
                             {title}
                         </h3>
-                        {isLoading ? (
-                            <div className="mt-2 space-y-2">
-                                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded" />
-                                <div className="h-4 w-24 bg-slate-50 animate-pulse rounded" />
-                            </div>
-                        ) : isError ? (
-                            <div className="mt-2 h-[48px] flex items-center">
-                                <span className="text-sm text-red-500 font-medium tracking-tight">
-                                    Failed to load data
-                                </span>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="text-[28px] font-bold text-slate-900 mt-1">
-                                    {value}
-                                </p>
-                                <div className="flex items-center gap-1 mt-1">
-                                    {trendUp ? (
-                                        <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                                    ) : (
-                                        <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
-                                    )}
-                                    <span
-                                        className={cn(
-                                            "text-[11px] font-bold",
-                                            trendUp
-                                                ? "text-emerald-500"
-                                                : "text-rose-500",
-                                        )}
-                                    >
-                                        {trend}
-                                    </span>
-                                    <span className="text-[11px] text-slate-400 font-medium ml-0.5">
-                                        From last month
-                                    </span>
-                                </div>
-                            </>
-                        )}
+                        <p
+                            className="text-[28px] font-bold text-slate-900 mt-2 truncate"
+                            title={value}
+                        >
+                            {value}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                            {trendUp ? (
+                                <TrendingUp className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            ) : (
+                                <TrendingDown className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                            )}
+                            <span
+                                className={cn(
+                                    "text-[11px] font-bold",
+                                    trendUp
+                                        ? "text-emerald-500"
+                                        : "text-rose-500",
+                                )}
+                            >
+                                {trend}
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-medium ml-0.5 truncate">
+                                From last month
+                            </span>
+                        </div>
                     </div>
                     <div
                         className={cn(
@@ -110,6 +99,60 @@ export function StatCards({
     isLoading: boolean;
     isError: boolean;
 }) {
+    const gridClassName =
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6";
+
+    if (isLoading) {
+        return (
+            <div className={gridClassName}>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Card
+                        key={i}
+                        className="shadow-sm border-border/60 rounded-[12px] h-full"
+                    >
+                        <CardContent className="p-5 flex flex-col justify-between h-full">
+                            <div className="flex justify-between items-start">
+                                <Skeleton className="h-4 w-2/3 mb-2" />
+                                <Skeleton className="h-8 w-8 rounded-full" />
+                            </div>
+                            <div className="mt-2 space-y-2">
+                                <Skeleton className="h-8 w-1/2" />
+                                <Skeleton className="h-3 w-3/4" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <DataErrorState
+                className="mb-6"
+                title="Failed to load statistics"
+            />
+        );
+    }
+
+    const analyticsData = data || {};
+
+    // Determine empty state by checking if any key data points exist
+    const hasData =
+        analyticsData.totalAppointments !== undefined ||
+        analyticsData.total_appointments !== undefined ||
+        analyticsData.avgConsultationTime !== undefined ||
+        Object.keys(analyticsData).length > 0;
+
+    if (!hasData) {
+        return (
+            <DataEmptyState
+                className="mb-6"
+                title="No appointment statistics found"
+            />
+        );
+    }
+
     const formatTrend = (trendStr: string) => {
         if (!trendStr) return { trend: "0%", trendUp: true };
         const isUp = trendStr.startsWith("+");
@@ -124,8 +167,6 @@ export function StatCards({
         const mins = Math.floor(seconds / 60);
         return `${mins} min`;
     };
-
-    const analyticsData = data || {};
 
     const cards = [
         {
@@ -215,14 +256,9 @@ export function StatCards({
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className={gridClassName}>
             {cards.map((card, i) => (
-                <StatCard
-                    key={i}
-                    {...card}
-                    isLoading={isLoading}
-                    isError={isError}
-                />
+                <StatCard key={i} {...card} />
             ))}
         </div>
     );

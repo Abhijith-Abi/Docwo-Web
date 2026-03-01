@@ -5,11 +5,14 @@ import { BillingFilters } from "./billing-filters";
 import { BillingPaymentMethodsChart } from "./billing-payment-methods-chart";
 import { BillingRevenueTrendChart } from "./billing-revenue-trend-chart";
 import { BillingRevenueByDoctorChart } from "./billing-revenue-by-doctor-chart";
+import { useGetBillingCharts } from "@/hooks/api/useGetBillingCharts";
 
 export function BillingAnalytics() {
     const [view, setView] = useState<"list" | "grid">("list");
     const [showFilters, setShowFilters] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const { data: chartsData, isLoading, isError } = useGetBillingCharts();
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
@@ -37,9 +40,21 @@ export function BillingAnalytics() {
                         : "grid grid-cols-1 gap-6"
                 }
             >
-                <BillingPaymentMethodsChart />
-                <BillingRevenueTrendChart />
-                <BillingRevenueByDoctorChart />
+                <BillingPaymentMethodsChart
+                    data={chartsData?.paymentMethods}
+                    isLoading={isLoading}
+                    isError={isError}
+                />
+                <BillingRevenueTrendChart
+                    data={chartsData?.revenueTrend}
+                    isLoading={isLoading}
+                    isError={isError}
+                />
+                <BillingRevenueByDoctorChart
+                    data={chartsData?.revenueByDoctor}
+                    isLoading={isLoading}
+                    isError={isError}
+                />
             </div>
         </div>
     );

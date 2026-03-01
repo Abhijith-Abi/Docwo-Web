@@ -1,6 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, AlertCircle, FileX2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGetBillingKPIs } from "@/hooks/api/useGetBillingKPIs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BillingStatCardProps {
     title: string;
@@ -22,29 +24,35 @@ function BillingStatCard({
     valueColor = "text-emerald-500",
 }: BillingStatCardProps) {
     return (
-        <Card className="shadow-sm border-border/60 rounded-[12px] p-1">
+        <Card className="shadow-sm border-border/60 rounded-[12px] p-1 h-full">
             <CardContent className="p-4 flex flex-col justify-between h-full min-h-[100px]">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-semibold text-foreground/80">
+                <div className="flex justify-between items-start gap-2">
+                    <h3 className="text-sm font-semibold text-foreground/80 leading-tight">
                         {title}
                     </h3>
-                    {icon && <div className="text-emerald-500">{icon}</div>}
+                    {icon && (
+                        <div className="text-emerald-500 shrink-0">{icon}</div>
+                    )}
                 </div>
 
                 <div className="mt-4">
                     <p
                         className={cn(
-                            "text-[28px] font-bold leading-none",
+                            "text-2xl sm:text-[28px] font-bold leading-none truncate",
                             valueColor,
                         )}
+                        title={value}
                     >
                         {value}
                     </p>
 
                     {trend && (
-                        <div className="flex items-center gap-1 mt-2">
+                        <div className="flex flex-wrap items-center gap-1 mt-2">
                             <TrendingUp
-                                className={cn("h-3.5 w-3.5", trendColor)}
+                                className={cn(
+                                    "h-3.5 w-3.5 shrink-0",
+                                    trendColor,
+                                )}
                             />
                             <span
                                 className={cn(
@@ -55,7 +63,7 @@ function BillingStatCard({
                                 {trend}
                             </span>
                             {trendSuffix && (
-                                <span className="text-[12px] text-muted-foreground ml-1">
+                                <span className="text-[12px] text-muted-foreground ml-1 truncate">
                                     {trendSuffix}
                                 </span>
                             )}
@@ -63,7 +71,7 @@ function BillingStatCard({
                     )}
 
                     {!trend && trendSuffix && (
-                        <div className="mt-2 text-[12px] text-muted-foreground">
+                        <div className="mt-2 text-[12px] text-muted-foreground truncate">
                             {trendSuffix}
                         </div>
                     )}
@@ -74,19 +82,101 @@ function BillingStatCard({
 }
 
 export function BillingStatCards() {
+    const { data: kpiData, isLoading, isError } = useGetBillingKPIs();
+
+    // The responsive grid classes that will be common across
+    // loading, error, empty, and success states
+    const gridClassName =
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6";
+
+    if (isLoading) {
+        return (
+            <div className={gridClassName}>
+                {[1, 2, 3, 4].map((i) => (
+                    <Card
+                        key={i}
+                        className="shadow-sm border-border/60 rounded-[12px] p-1 h-full"
+                    >
+                        <CardContent className="p-4 flex flex-col justify-between h-full min-h-[100px]">
+                            <div className="flex justify-between items-center">
+                                <Skeleton className="h-4 w-2/3" />
+                                <Skeleton className="h-4 w-4 rounded-full" />
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <Skeleton className="h-8 w-1/2" />
+                                <Skeleton className="h-3 w-1/3" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Card className="mb-6 border-dashed border-destructive/50 bg-destructive/5 rounded-[12px]">
+                <CardContent className="flex flex-col items-center justify-center p-8 text-center min-h-[100px]">
+                    <AlertCircle className="h-8 w-8 text-destructive mb-2" />
+                    <p className="text-sm font-medium text-destructive">
+                        Failed to load billing statistics
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Please try refreshing the page later.
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const data = kpiData?.data || kpiData;
+
+    // Check if data exists - simple sanity check for empty state
+    if (!data || Object.keys(data).length === 0) {
+        return (
+            <Card className="mb-6 border-dashed border-border/60 bg-muted/20 rounded-[12px]">
+                <CardContent className="flex flex-col items-center justify-center p-8 text-center min-h-[100px]">
+                    <FileX2 className="h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-sm font-medium text-foreground">
+                        No stats available
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Check back later once transactions have been processed.
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const formatCurrency = (value: number | undefined) => {
+        if (value === undefined || value === null) return "₹0";
+        return `₹${value.toLocaleString("en-IN")}`;
+    };
+
+    const formatNumber = (value: number | undefined) => {
+        if (value === undefined || value === null) return "0";
+        return value.toString();
+    };
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className={gridClassName}>
             <BillingStatCard
                 title="Todays Payment Received"
-                value="₹0"
-                trend="+12%"
+                value={formatCurrency(
+                    data?.todaysPaymentReceived?.value ??
+                        data?.todaysPaymentReceived,
+                )}
+                trend={data?.todaysPaymentReceived?.trend ?? "+12%"}
                 trendSuffix="from yesterday"
                 icon={<span className="text-xl font-bold">₹</span>}
             />
             <BillingStatCard
                 title="Monthly Payment Received"
-                value="₹0"
-                trend="+8%"
+                value={formatCurrency(
+                    data?.monthlyPaymentReceived?.value ??
+                        data?.monthlyPaymentReceived,
+                )}
+                trend={data?.monthlyPaymentReceived?.trend ?? "+8%"}
                 trendSuffix="from yesterday"
                 icon={<span className="text-xl font-bold">₹</span>}
                 valueColor="text-blue-500"
@@ -94,13 +184,17 @@ export function BillingStatCards() {
             />
             <BillingStatCard
                 title="Total Invoices"
-                value="325"
+                value={formatNumber(
+                    data?.totalInvoices?.value ?? data?.totalInvoices,
+                )}
                 trendSuffix="This month"
                 valueColor="text-slate-500"
             />
             <BillingStatCard
                 title="Refund Issued"
-                value="₹550"
+                value={formatCurrency(
+                    data?.refundIssued?.value ?? data?.refundIssued,
+                )}
                 trendSuffix="This month"
                 valueColor="text-orange-400"
             />
