@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ManagementHeader } from "./management-header";
 import { Search, LayoutGrid, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,15 @@ import { StaffDirectory } from "./staff-directory";
 export function ManagementClient() {
     const [view, setView] = useState<"list" | "grid">("list");
     const [tab, setTab] = useState<"doctors" | "staffs">("doctors");
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     return (
         <div className="flex-1 space-y-7 animate-in fade-in duration-500">
@@ -25,6 +34,8 @@ export function ManagementClient() {
                         <Input
                             placeholder="Search by name, ID, or phone ..."
                             className="pl-9 bg-muted/30 border-none h-10 w-full rounded-md shadow-sm"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
                     <div className="flex items-center justify-end w-full sm:w-auto">
@@ -82,14 +93,14 @@ export function ManagementClient() {
                     value="doctors"
                     className="mt-8 border-none p-0 outline-none"
                 >
-                    <DoctorDirectory view={view} />
+                    <DoctorDirectory view={view} search={debouncedSearch} />
                 </TabsContent>
 
                 <TabsContent
                     value="staffs"
                     className="mt-8 border-none p-0 outline-none"
                 >
-                    <StaffDirectory view={view} />
+                    <StaffDirectory view={view} search={debouncedSearch} />
                 </TabsContent>
             </Tabs>
         </div>

@@ -6,13 +6,14 @@ interface PaginationParams {
     page?: number;
     limit?: number;
     search?: string;
+    role?: string;
 }
 
 export function useGetClinicStaff(clinicId?: string, params?: PaginationParams) {
-    const { page = 1, limit = 8, search } = params || {};
+    const { page = 1, limit = 10, search, role } = params || {};
 
     return useQuery({
-        queryKey: ["clinic-staff", clinicId, page, limit, search],
+        queryKey: ["clinic-staff", clinicId, page, limit, search, role],
         queryFn: async () => {
             if (!clinicId) return { data: [], pagination: null };
             
@@ -22,19 +23,21 @@ export function useGetClinicStaff(clinicId?: string, params?: PaginationParams) 
             });
 
             if (search) searchParams.append("search", search);
+            if (role) searchParams.append("role", role);
 
             const endpoint = `${API_ENDPOINTS.CLINIC_STAFF_DIRECTORY.replace(":clinicId", clinicId)}?${searchParams.toString()}`;
             const response = await getApiData(endpoint);
             
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const staffs = (response?.data ?? []).map((p: any) => {
+                const userObj = p.user || {};
                 return {
-                    id: p.employee_id || p.staff_id || "-",
-                    name: `${p.first_name || ""} ${p.last_name || ""}`.trim() || "-",
-                    role: p.role?.name || p.designation || "-",
+                    id: p.doctor_code || p.employee_id || p.staff_id || "-",
+                    name: `${userObj.first_name || p.first_name || ""} ${userObj.last_name || p.last_name || ""}`.trim() || "-",
+                    role: p.role?.name || p.role || p.designation || "-",
                     availability: p.availability || [],
-                    phone: p.phone_number || "-",
-                    email: p.email || "-",
+                    phone: userObj.phone_number || p.phone_number || "-",
+                    email: userObj.email || p.email || "-",
                     ...p
                 };
             });
