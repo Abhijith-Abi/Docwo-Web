@@ -1,19 +1,23 @@
 /* eslint-disable */
+import { useAuthStore } from "@/store/auth-store";
 import { refreshTokenIfNeeded } from "../token-refresh/refresh-token-if-needed";
 
 export default async function getClientApiData(
     path: string,
     customBaseUrl?: string,
 ) {
-    let accessToken = "";
-    let refreshToken = "";
-    if (typeof window !== "undefined") {
-        accessToken = localStorage.getItem("token") || "";
-        refreshToken = localStorage.getItem("refreshToken") || "";
-    }
+    let { token: accessToken } = useAuthStore.getState();
+    const { refreshToken } = useAuthStore.getState();
+
+    accessToken = accessToken || "";
+    const refreshTokenStr = refreshToken || "";
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-    await refreshTokenIfNeeded(accessToken, refreshToken);
+    if (accessToken && refreshTokenStr) {
+        await refreshTokenIfNeeded(accessToken, refreshTokenStr);
+        accessToken = useAuthStore.getState().token || "";
+    }
 
     try {
         let headersData = {};
@@ -26,6 +30,35 @@ export default async function getClientApiData(
             cache: "no-store",
             headers: headersData,
         });
+
+        if (response.status === 401 && refreshTokenStr) {
+            try {
+                await refreshTokenIfNeeded(accessToken, refreshTokenStr, true);
+                const newAccessToken = useAuthStore.getState().token;
+
+                if (newAccessToken) {
+                    const retryResponse = await fetch(
+                        `${customBaseUrl ?? baseUrl}${path}`,
+                        {
+                            cache: "no-store",
+                            headers: {
+                                Authorization: `Bearer ${newAccessToken}`,
+                            },
+                        },
+                    );
+
+                    if (retryResponse.ok) {
+                        const retryText = await retryResponse.text();
+                        return retryText ? JSON.parse(retryText) : {};
+                    } else {
+                        throw new Error(retryResponse.status.toString());
+                    }
+                }
+            } catch (refreshError) {
+                console.log(refreshError);
+                throw new Error("401");
+            }
+        }
 
         if (response.ok) {
             const text = await response.text();

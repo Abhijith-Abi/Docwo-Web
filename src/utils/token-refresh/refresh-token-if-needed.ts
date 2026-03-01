@@ -5,9 +5,10 @@ let refreshPromise: Promise<void> | null = null;
 
 export async function refreshTokenIfNeeded(
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
+    forceRefresh: boolean = false
 ) {
-    if (!accessToken || !isTokenExpired(accessToken)) return;
+    if (!forceRefresh && (!accessToken || !isTokenExpired(accessToken))) return;
 
     if (!refreshToken) {
         throw new Error("No refresh token available");
@@ -23,17 +24,23 @@ export async function refreshTokenIfNeeded(
                 refreshToken
             );
 
-            if (!generateNewAccessTokenResponse?.access) {
+            if (!generateNewAccessTokenResponse?.access && !generateNewAccessTokenResponse?.accessToken) {
                 throw new Error("Failed to refresh access token");
             }
 
             // Update the store with the new access token
-            const { refreshToken: storedRefreshToken, user } = useAuthStore.getState();
+            const { user } = useAuthStore.getState();
             useAuthStore.getState().setAuth(
-                generateNewAccessTokenResponse.access,
-                storedRefreshToken || refreshToken,
+                generateNewAccessTokenResponse.accessToken || generateNewAccessTokenResponse.access,
+                generateNewAccessTokenResponse.refreshToken || generateNewAccessTokenResponse.refresh || refreshToken,
                 user!
             );
+        } catch (error) {
+            useAuthStore.getState().clearAuth();
+            if (typeof window !== "undefined") {
+                window.location.href = "/auth/login";
+            }
+            throw error;
         } finally {
             refreshPromise = null;
         }
@@ -43,7 +50,11 @@ export async function refreshTokenIfNeeded(
 }
 
 function isTokenExpired(token: string) {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const now = Date.now() / 1000;
-    return payload.exp < now;
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const now = Date.now() / 1000;
+        return payload.exp < now;
+    } catch {
+        return true;
+    }
 }

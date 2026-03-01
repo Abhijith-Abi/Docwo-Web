@@ -25,7 +25,7 @@ export default async function getApiData(endpoint: string) {
 
         if (response.status === 401 && refreshToken) {
             try {
-                await refreshTokenIfNeeded(accessToken || "", refreshToken);
+                await refreshTokenIfNeeded(accessToken || "", refreshToken, true);
                 const newAccessToken = useAuthStore.getState().token;
 
                 if (newAccessToken) {

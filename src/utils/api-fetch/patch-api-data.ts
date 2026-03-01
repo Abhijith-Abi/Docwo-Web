@@ -22,6 +22,33 @@ export default async function patchApiData(path: string, bodyData?: any) {
             headers: headers,
         });
 
+        if (response.status === 401 && refreshToken) {
+            try {
+                await refreshTokenIfNeeded(accessToken || "", refreshToken, true);
+                const newAccessToken = useAuthStore.getState().token;
+
+                if (newAccessToken) {
+                    headers.set("Authorization", `Bearer ${newAccessToken}`);
+                    const retryResponse = await fetch(`${baseUrl}${path}`, {
+                        method: "PATCH",
+                        body: bodyData ? JSON.stringify(bodyData) : undefined,
+                        headers: headers,
+                    });
+
+                    const retryText = await retryResponse.text();
+                    const retryData = retryText ? JSON.parse(retryText) : {};
+
+                    if (!retryResponse.ok) {
+                        throw retryData;
+                    }
+                    return retryData;
+                }
+            } catch (refreshError) {
+                console.log(refreshError);
+                throw { message: "401 Unauthorized" };
+            }
+        }
+
         const responseText = await response.text();
         const responseData = responseText ? JSON.parse(responseText) : {};
 
