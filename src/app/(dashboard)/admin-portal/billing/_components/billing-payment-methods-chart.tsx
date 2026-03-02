@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown } from "lucide-react";
+import { useMemo } from "react";
 import { Pie, PieChart, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,21 +10,7 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const defaultChartData = [
-    { method: "Cash", visitors: 40, fill: "var(--color-cash)" },
-    { method: "UPI", visitors: 60, fill: "var(--color-upi)" },
-];
-
-const chartConfig = {
-    cash: {
-        label: "Cash Payments",
-        color: "hsl(var(--chart-1))",
-    },
-    upi: {
-        label: "UPI",
-        color: "hsl(var(--chart-2))",
-    },
-} satisfies ChartConfig;
+const chartConfig = {} satisfies ChartConfig;
 
 interface Props {
     data?: any[];
@@ -37,7 +23,30 @@ export function BillingPaymentMethodsChart({
     isLoading,
     isError,
 }: Props) {
-    const chartData = data && data.length > 0 ? data : defaultChartData;
+    const hasData = data && data.length > 0;
+
+    const chartData = useMemo(() => {
+        if (!hasData) {
+            return [{ method: "No Data", percentage: 100 }];
+        }
+        return data.map((item) => ({
+            ...item,
+            method: item.method
+                ? item.method
+                      .split("_")
+                      .map(
+                          (word: string) =>
+                              word.charAt(0).toUpperCase() +
+                              word.slice(1).toLowerCase(),
+                      )
+                      .join(" ")
+                : "Unknown",
+            percentage:
+                typeof item.percentage === "string"
+                    ? parseFloat(item.percentage)
+                    : item.percentage || 0,
+        }));
+    }, [data, hasData]);
 
     return (
         <Card className="flex flex-col shadow-sm border-border/60 rounded-[12px]">
@@ -57,82 +66,129 @@ export function BillingPaymentMethodsChart({
                             Failed to load data
                         </span>
                     </div>
-                ) : !data || data.length === 0 ? (
-                    <div className="w-full h-[280px] flex items-center justify-center mt-4 flex-col text-muted-foreground">
-                        <span className="text-sm font-medium">
-                            No data available
-                        </span>
-                    </div>
                 ) : (
                     <ChartContainer
                         config={chartConfig}
-                        className="mx-auto aspect-square max-h-[350px]"
+                        className="mx-auto w-full h-[300px]"
                     >
-                        <PieChart>
-                            <ChartTooltip
-                                cursor={false}
-                                content={<ChartTooltipContent hideLabel />}
-                            />
+                        <PieChart
+                            margin={{
+                                top: 20,
+                                right: 80,
+                                bottom: 20,
+                                left: 80,
+                            }}
+                        >
+                            {hasData && (
+                                <ChartTooltip
+                                    cursor={false}
+                                    content={<ChartTooltipContent hideLabel />}
+                                />
+                            )}
                             <Pie
                                 data={chartData}
-                                dataKey="visitors"
+                                dataKey="percentage"
                                 nameKey="method"
                                 cx="50%"
                                 cy="50%"
                                 innerRadius={0}
-                                outerRadius={120}
+                                outerRadius={90}
                                 strokeWidth={2}
                                 stroke="hsl(var(--background))"
-                                label={({
-                                    cx,
-                                    cy,
-                                    midAngle,
-                                    innerRadius,
-                                    outerRadius,
-                                    value,
-                                    index,
-                                }) => {
-                                    const RADIAN = Math.PI / 180;
-                                    const radius =
-                                        25 +
-                                        innerRadius +
-                                        (outerRadius - innerRadius);
-                                    const x =
-                                        cx +
-                                        radius * Math.cos(-midAngle * RADIAN);
-                                    const y =
-                                        cy +
-                                        radius * Math.sin(-midAngle * RADIAN);
+                                label={
+                                    hasData
+                                        ? ({
+                                              cx,
+                                              cy,
+                                              midAngle,
+                                              innerRadius,
+                                              outerRadius,
+                                              value,
+                                              index,
+                                          }) => {
+                                              const RADIAN = Math.PI / 180;
+                                              const radius = outerRadius + 25;
+                                              const x =
+                                                  cx +
+                                                  radius *
+                                                      Math.cos(
+                                                          -midAngle * RADIAN,
+                                                      );
+                                              const y =
+                                                  cy +
+                                                  radius *
+                                                      Math.sin(
+                                                          -midAngle * RADIAN,
+                                                      );
 
-                                    const labelText = `${chartData[index].method}: ${value}%`;
-                                    // Using defined colors to match UI
-                                    const fillStyle =
-                                        index === 0 ? "#43b28b" : "#b78af1";
+                                              const labelText = `${chartData[index].method}: ${value}%`;
+                                              const colors = [
+                                                  "#43b28b",
+                                                  "#b78af1",
+                                                  "#f59e0b",
+                                                  "#ef4444",
+                                                  "#3b82f6",
+                                                  "#10b981",
+                                                  "#8b5cf6",
+                                                  "#ec4899",
+                                                  "#f97316",
+                                                  "#06b6d4",
+                                              ];
+                                              const fillStyle =
+                                                  colors[index % colors.length];
 
-                                    return (
-                                        <text
-                                            x={x}
-                                            y={y}
-                                            fill={fillStyle}
-                                            textAnchor={
-                                                x > cx ? "start" : "end"
-                                            }
-                                            dominantBaseline="central"
-                                            className="text-[11px] font-semibold tracking-wide"
-                                        >
-                                            {labelText}
-                                        </text>
-                                    );
-                                }}
+                                              return (
+                                                  <text
+                                                      x={x}
+                                                      y={y}
+                                                      fill={fillStyle}
+                                                      textAnchor={
+                                                          x > cx
+                                                              ? "start"
+                                                              : "end"
+                                                      }
+                                                      dominantBaseline="central"
+                                                      className="text-[11px] font-semibold tracking-wide"
+                                                  >
+                                                      {labelText}
+                                                  </text>
+                                              );
+                                          }
+                                        : false
+                                }
                             >
-                                {chartData.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={
-                                            index === 0 ? "#6fc29c" : "#c49bf5"
-                                        }
-                                    />
-                                ))}
+                                {chartData.map((entry, index) => {
+                                    if (!hasData) {
+                                        return (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill="#e5e7eb"
+                                            />
+                                        );
+                                    }
+                                    const segmentColors = [
+                                        "#6fc29c",
+                                        "#c49bf5",
+                                        "#fbbf24",
+                                        "#f87171",
+                                        "#60a5fa",
+                                        "#34d399",
+                                        "#a78bfa",
+                                        "#f472b6",
+                                        "#fb923c",
+                                        "#22d3ee",
+                                    ];
+                                    return (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={
+                                                segmentColors[
+                                                    index % segmentColors.length
+                                                ]
+                                            }
+                                        />
+                                    );
+                                })}
                             </Pie>
                         </PieChart>
                     </ChartContainer>

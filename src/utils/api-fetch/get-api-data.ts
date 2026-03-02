@@ -44,7 +44,6 @@ export default async function getApiData(endpoint: string) {
                     }
                 }
             } catch (refreshError) {
-                console.log(refreshError);
                 throw new Error("401");
             }
         }

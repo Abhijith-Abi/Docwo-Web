@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { API_ENDPOINTS } from "@/constants/api-endpoints";
 
 export interface BillingChartsResponse {
-    paymentMethods: { method: string; visitors: number; fill?: string }[];
+    paymentMethodDistribution: { method: string; visitors: number; fill?: string }[];
     revenueTrend: { date: string; revenue: number }[];
     revenueByDoctor: { doctor: string; revenue: number }[];
 }

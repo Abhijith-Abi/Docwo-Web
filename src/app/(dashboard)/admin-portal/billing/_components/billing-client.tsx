@@ -22,6 +22,7 @@ export function BillingClient() {
     const [view, setView] = useState<"list" | "grid">("list");
     const [showFilters, setShowFilters] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
     const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
     const [page, setPage] = useState(1);
@@ -36,9 +37,21 @@ export function BillingClient() {
     } = useGetBillingsPayments(clinicId, {
         page,
         limit: itemsPerPage,
+        tab: "invoices",
+        search: debouncedSearch,
     });
 
     const [totalCount, setTotalCount] = useState<number>(0);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (debouncedSearch !== searchQuery) {
+                setDebouncedSearch(searchQuery);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, debouncedSearch]);
 
     useEffect(() => {
         if (pagination?.totalResults !== undefined) {
@@ -78,20 +91,8 @@ export function BillingClient() {
         });
     }, [billingsPayments]);
 
-    // Filter logic placeholder
-    const filteredInvoices = apiInvoices.filter(
-        (invoice) =>
-            invoice.patientName
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            invoice.invoiceNumber
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-            invoice.patientId.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-
     const totalPages = pagination?.totalPages || 1;
-    const paginatedInvoices = filteredInvoices; // No longer slice, API sends only current page
+    const paginatedInvoices = apiInvoices; // API already paginates and filters
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
@@ -114,7 +115,7 @@ export function BillingClient() {
     return (
         <div className="flex-1 space-y-6 animate-in fade-in duration-500">
             <BillingHeader />
-            <BillingStatCards />
+            <BillingStatCards clinicId={clinicId} />
 
             <Tabs defaultValue="invoices" className="w-full">
                 <BillingTabs />
@@ -180,7 +181,7 @@ export function BillingClient() {
                     </div>
                 </TabsContent>
                 <TabsContent value="analytics" className="m-0 mt-6">
-                    <BillingAnalytics />
+                    <BillingAnalytics clinicId={clinicId} />
                 </TabsContent>
                 <TabsContent value="refunds" className="m-0 mt-6">
                     <BillingRefunds />

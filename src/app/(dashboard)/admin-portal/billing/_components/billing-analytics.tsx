@@ -7,12 +7,16 @@ import { BillingRevenueTrendChart } from "./billing-revenue-trend-chart";
 import { BillingRevenueByDoctorChart } from "./billing-revenue-by-doctor-chart";
 import { useGetBillingCharts } from "@/hooks/api/useGetBillingCharts";
 
-export function BillingAnalytics() {
+export function BillingAnalytics({ clinicId }: { clinicId?: string }) {
     const [view, setView] = useState<"list" | "grid">("list");
     const [showFilters, setShowFilters] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const { data: chartsData, isLoading, isError } = useGetBillingCharts();
+    const {
+        data: chartsData,
+        isLoading,
+        isError,
+    } = useGetBillingCharts(clinicId ? { clinicId } : undefined);
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
@@ -41,7 +45,7 @@ export function BillingAnalytics() {
                 }
             >
                 <BillingPaymentMethodsChart
-                    data={chartsData?.paymentMethods}
+                    data={chartsData?.paymentMethodDistribution}
                     isLoading={isLoading}
                     isError={isError}
                 />

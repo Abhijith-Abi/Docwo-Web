@@ -44,7 +44,6 @@ export default async function postApiData(path: string, bodyData: any) {
                     return retryData;
                 }
             } catch (refreshError) {
-                console.log(refreshError);
                 throw { message: "401 Unauthorized" };
             }
         }

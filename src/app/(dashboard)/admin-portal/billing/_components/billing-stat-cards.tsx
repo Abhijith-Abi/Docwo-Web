@@ -81,8 +81,12 @@ function BillingStatCard({
     );
 }
 
-export function BillingStatCards() {
-    const { data: kpiData, isLoading, isError } = useGetBillingKPIs();
+export function BillingStatCards({ clinicId }: { clinicId?: string }) {
+    const {
+        data: kpiData,
+        isLoading,
+        isError,
+    } = useGetBillingKPIs(clinicId ? { clinicId } : undefined);
 
     // The responsive grid classes that will be common across
     // loading, error, empty, and success states
@@ -163,8 +167,7 @@ export function BillingStatCards() {
             <BillingStatCard
                 title="Todays Payment Received"
                 value={formatCurrency(
-                    data?.todaysPaymentReceived?.value ??
-                        data?.todaysPaymentReceived,
+                    data?.monthlyPaymentReceived?.amount ?? "0",
                 )}
                 trend={data?.todaysPaymentReceived?.trend ?? "+12%"}
                 trendSuffix="from yesterday"
@@ -173,8 +176,7 @@ export function BillingStatCards() {
             <BillingStatCard
                 title="Monthly Payment Received"
                 value={formatCurrency(
-                    data?.monthlyPaymentReceived?.value ??
-                        data?.monthlyPaymentReceived,
+                    data?.monthlyPaymentReceived?.value ?? "0",
                 )}
                 trend={data?.monthlyPaymentReceived?.trend ?? "+8%"}
                 trendSuffix="from yesterday"

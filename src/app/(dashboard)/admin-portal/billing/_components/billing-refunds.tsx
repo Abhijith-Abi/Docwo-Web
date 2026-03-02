@@ -1,43 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BillingToolbar } from "./billing-toolbar";
 import { BillingFilters } from "./billing-filters";
 import { BillingListView } from "./billing-list-view";
 import { BillingGridView } from "./billing-grid-view";
 import { BillingPagination } from "./billing-pagination";
-import { dummyInvoices } from "./data";
+import { Invoice } from "./data";
 import { Button } from "@/components/ui/button";
+import { useGetBillingsPayments } from "@/hooks/api/useGetBillingsPayments";
+import { useAuthStore } from "@/store/auth-store";
+import { BillingListSkeleton, BillingGridSkeleton } from "./billing-skeleton";
 
 export function BillingRefunds() {
     const [view, setView] = useState<"list" | "grid">("list");
     const [showFilters, setShowFilters] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
     const [selectedRefunds, setSelectedRefunds] = useState<string[]>([]);
     const [page, setPage] = useState(1);
-    const itemsPerPage = 6;
+    const itemsPerPage = 10;
 
-    // Filter logic for refunds (status === "Refund")
-    const filteredRefunds = dummyInvoices.filter(
-        (invoice) =>
-            invoice.status === "Refund" &&
-            (invoice.patientName
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-                invoice.invoiceNumber
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                invoice.patientId
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())),
-    );
+    const user = useAuthStore((state) => state.user);
+    const clinicId = user?.clinic_assignments?.[0]?.clinic_id;
 
-    const totalPages = Math.ceil(filteredRefunds.length / itemsPerPage);
-    const paginatedRefunds = filteredRefunds.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage,
-    );
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (debouncedSearch !== searchQuery) {
+                setDebouncedSearch(searchQuery);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, debouncedSearch]);
+
+    const {
+        data: { data: billingsPayments = [], pagination = null } = {},
+        isLoading,
+    } = useGetBillingsPayments(clinicId, {
+        page,
+        limit: itemsPerPage,
+        tab: "refunds",
+        search: debouncedSearch,
+    });
+
+    const [totalCount, setTotalCount] = useState<number>(0);
+
+    useEffect(() => {
+        if (pagination?.totalResults !== undefined) {
+            setTotalCount(pagination.totalResults);
+        }
+    }, [pagination?.totalResults]);
+
+    const apiRefunds: Invoice[] = useMemo(() => {
+        if (!Array.isArray(billingsPayments)) return [];
+        return billingsPayments.map((item: any) => {
+            const dateObj = new Date(item.date_and_time);
+            return {
+                id: item.invoice_id,
+                invoiceNumber: item.invoice_id,
+                date: dateObj.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                }),
+                time: dateObj.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }),
+                patientName: item.patient?.name || "Unknown",
+                patientId: item.patient?.patient_code || "",
+                doctorName: item.doctor?.name || "Unknown",
+                specialization: item.department || "",
+                amount: parseFloat(item.total_amount) || 0,
+                status:
+                    item.status === "paid"
+                        ? "Paid"
+                        : item.status === "refund"
+                          ? "Refund"
+                          : item.status,
+                paymentMethod: item.payment_method?.replace(/_/g, " ") || "",
+            };
+        });
+    }, [billingsPayments]);
+
+    const totalPages = pagination?.totalPages || 1;
+    const paginatedRefunds = apiRefunds;
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
@@ -76,7 +126,7 @@ export function BillingRefunds() {
 
             <div className="flex justify-between items-center mb-5">
                 <h2 className="text-[15px] font-semibold text-foreground/90">
-                    Refund Management
+                    Refund Management {totalCount > 0 ? `(${totalCount})` : ""}
                 </h2>
                 {selectedRefunds.length > 0 && (
                     <Button
@@ -89,7 +139,13 @@ export function BillingRefunds() {
                 )}
             </div>
 
-            {view === "list" ? (
+            {isLoading ? (
+                view === "grid" ? (
+                    <BillingGridSkeleton />
+                ) : (
+                    <BillingListSkeleton />
+                )
+            ) : view === "list" ? (
                 <BillingListView
                     invoices={paginatedRefunds}
                     selectedInvoices={selectedRefunds}

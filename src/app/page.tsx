@@ -21,8 +21,6 @@ export default function Home() {
     const isStaff = user?.roles?.includes("staff") ?? false;
     const isPatient = user?.roles?.includes("patient") ?? false;
 
-    console.log(user?.roles, "---user?.roles");
-
     useEffect(() => {
         if (hasHydrated && token) {
             const path = isAdmin
