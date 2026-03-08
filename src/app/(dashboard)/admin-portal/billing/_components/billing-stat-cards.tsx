@@ -88,8 +88,6 @@ export function BillingStatCards({ clinicId }: { clinicId?: string }) {
         isError,
     } = useGetBillingKPIs(clinicId ? { clinicId } : undefined);
 
-    // The responsive grid classes that will be common across
-    // loading, error, empty, and success states
     const gridClassName =
         "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6";
 
@@ -169,16 +167,16 @@ export function BillingStatCards({ clinicId }: { clinicId?: string }) {
                 value={formatCurrency(
                     data?.monthlyPaymentReceived?.amount ?? "0",
                 )}
-                trend={data?.todaysPaymentReceived?.trend ?? "+12%"}
+                trend={data?.todaysPaymentReceived?.percentage ?? "0%"}
                 trendSuffix="from yesterday"
                 icon={<span className="text-xl font-bold">₹</span>}
             />
             <BillingStatCard
                 title="Monthly Payment Received"
                 value={formatCurrency(
-                    data?.monthlyPaymentReceived?.value ?? "0",
+                    data?.monthlyPaymentReceived?.amount ?? "0",
                 )}
-                trend={data?.monthlyPaymentReceived?.trend ?? "+8%"}
+                trend={data?.monthlyPaymentReceived?.percentage ?? "0%"}
                 trendSuffix="from yesterday"
                 icon={<span className="text-xl font-bold">₹</span>}
                 valueColor="text-blue-500"
@@ -186,16 +184,14 @@ export function BillingStatCards({ clinicId }: { clinicId?: string }) {
             />
             <BillingStatCard
                 title="Total Invoices"
-                value={formatNumber(
-                    data?.totalInvoices?.value ?? data?.totalInvoices,
-                )}
+                value={formatNumber(data?.totalInvoicesThisMonth?.count ?? "0")}
                 trendSuffix="This month"
                 valueColor="text-slate-500"
             />
             <BillingStatCard
                 title="Refund Issued"
                 value={formatCurrency(
-                    data?.refundIssued?.value ?? data?.refundIssued,
+                    data?.refundsIssuedThisMonth?.amount ?? "0",
                 )}
                 trendSuffix="This month"
                 valueColor="text-orange-400"

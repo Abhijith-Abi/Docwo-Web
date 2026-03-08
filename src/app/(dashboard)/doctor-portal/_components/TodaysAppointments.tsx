@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { SharedPagination } from "@/components/customize-components/shared-pagination";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RefreshCcw, Clock } from "lucide-react";
@@ -14,10 +15,11 @@ import { DataErrorState } from "@/components/ui/data-state-view";
 export default function TodaysAppointments() {
     const user = useAuthStore((state) => state.user);
     const doctorId = user?.doctor_profile?.doctor_id;
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Filter appointments for "future"
     const {
-        data: { data: appointments = [] } = {},
+        data: { data: appointments = [], pagination } = {},
         isLoading,
         isError,
         refetch,
@@ -25,6 +27,7 @@ export default function TodaysAppointments() {
     } = useGetDoctorAppointments(doctorId, {
         limit: 10,
         time: "future",
+        page: currentPage,
     });
 
     const scheduleGroups = useMemo(() => {
@@ -35,8 +38,11 @@ export default function TodaysAppointments() {
 
         appointments.forEach((apt) => {
             const startSlot =
-                apt?.doctor_slots?.slot_timestamp || apt?.slot_timestamp;
+                apt?.slot?.slot_timestamp ||
+                apt?.doctor_slots?.slot_timestamp ||
+                apt?.slot_timestamp;
             const endSlot =
+                apt?.slot?.slot_end_timestamp ||
                 apt?.doctor_slots?.slot_end_timestamp ||
                 apt?.slot_end_timestamp;
 
@@ -57,12 +63,14 @@ export default function TodaysAppointments() {
             Object.entries(groups)
                 .sort((a, b) => {
                     const aTime = new Date(
-                        a[1][0]?.doctor_slots?.slot_timestamp ||
+                        a[1][0]?.slot?.slot_timestamp ||
+                            a[1][0]?.doctor_slots?.slot_timestamp ||
                             a[1][0]?.slot_timestamp ||
                             0,
                     ).getTime();
                     const bTime = new Date(
-                        b[1][0]?.doctor_slots?.slot_timestamp ||
+                        b[1][0]?.slot?.slot_timestamp ||
+                            b[1][0]?.doctor_slots?.slot_timestamp ||
                             b[1][0]?.slot_timestamp ||
                             0,
                     ).getTime();
@@ -73,27 +81,30 @@ export default function TodaysAppointments() {
                     return {
                         time,
                         appointments: apts.map((apt) => {
+                            const patientData =
+                                apt?.patient || apt?.patients || {};
                             const patientName =
+                                patientData?.name ||
                                 apt?.patient_name ||
                                 `${apt?.first_name || ""} ${apt?.last_name || ""}`.trim() ||
                                 "N/A";
-                            const patientId = apt?.patients?.user_id
-                                ? `PT-${apt.patients.user_id.toString().padStart(4, "0")}`
+                            const patientId = patientData?.user_id
+                                ? `PT-${patientData.user_id.toString().padStart(4, "0")}`
                                 : "N/A";
                             const dob =
-                                apt?.patients?.date_of_birth ||
+                                patientData?.date_of_birth ||
                                 apt?.date_of_birth;
                             const age = dob
                                 ? differenceInYears(new Date(), new Date(dob))
                                 : "N/A";
-                            const gender = apt?.patients?.gender || "N/A";
+                            const gender = patientData?.gender || "N/A";
                             const ageGender =
                                 age === "N/A" && gender === "N/A"
                                     ? "N/A"
                                     : `${age}/${gender}`;
-                            const phone = apt?.patients?.phone_number || "N/A";
+                            const phone = patientData?.phone_number || "N/A";
                             const email =
-                                apt?.email || apt?.patients?.email || "N/A";
+                                apt?.email || patientData?.email || "N/A";
                             const token =
                                 apt?.token_number
                                     ?.toString()
@@ -236,11 +247,15 @@ export default function TodaysAppointments() {
                 </div>
             </div>
 
-            {scheduleGroups.length > 0 && (
+            {pagination && pagination.totalPages > 1 && (
                 <div className="mb-4 flex justify-center w-full">
-                    <Button className="bg-black hover:bg-gray-800 text-white rounded-full px-8 h-10 text-xs font-semibold shadow-none border-none">
-                        See full appointment list &gt;&gt;&gt;
-                    </Button>
+                    <SharedPagination
+                        currentPage={pagination.page}
+                        totalPages={pagination.totalPages}
+                        hasNextPage={pagination.hasNextPage}
+                        hasPrevPage={pagination.hasPrevPage}
+                        onPageChange={(page) => setCurrentPage(page)}
+                    />
                 </div>
             )}
         </Card>
