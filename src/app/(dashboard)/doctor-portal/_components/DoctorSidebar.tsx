@@ -3,8 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
+import { useQueryClient } from "@tanstack/react-query";
 
 const mainNavItems = [
     {
@@ -49,6 +51,19 @@ const bottomNavItems = [
 
 export default function DoctorSidebar({ className }: { className?: string }) {
     const pathname = usePathname();
+    const { clearAuth } = useAuthStore();
+    const router = useRouter();
+    const queryClient = useQueryClient();
+
+    const handleLogout = () => {
+        clearAuth();
+        queryClient.clear();
+        if (typeof window !== "undefined") {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+        }
+        router.push("/auth/login");
+    };
 
     return (
         <aside
@@ -164,7 +179,10 @@ export default function DoctorSidebar({ className }: { className?: string }) {
                         );
                     })}
                     <li className="relative">
-                        <button className="flex w-full items-center gap-4 py-3.5 px-6 ml-4 text-white hover:bg-white/10 rounded-l-full transition-colors font-medium text-[15px] text-left">
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-4 py-3.5 px-6 ml-4 text-white hover:bg-white/10 rounded-l-full transition-colors font-medium text-[15px] text-left"
+                        >
                             <div className="w-6 flex justify-center items-center">
                                 <div
                                     className="w-[22px] h-[22px] bg-current"

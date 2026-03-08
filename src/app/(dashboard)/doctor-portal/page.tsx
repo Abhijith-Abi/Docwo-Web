@@ -1,4 +1,3 @@
-import React from "react";
 import TodaysAppointments from "@/app/(dashboard)/doctor-portal/_components/TodaysAppointments";
 import NextAppointment from "@/app/(dashboard)/doctor-portal/_components/NextAppointment";
 import WeeklyOverview from "@/app/(dashboard)/doctor-portal/_components/WeeklyOverview";
@@ -15,9 +14,7 @@ export default function DoctorDashboard() {
 
             <div className="space-y-6">
                 <NextAppointment />
-
                 <WeeklyOverview />
-
                 <CalendarQuickView />
             </div>
         </div>

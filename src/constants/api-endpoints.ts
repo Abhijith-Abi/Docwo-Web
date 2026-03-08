@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
     // DOCTORS:
     DOCTORS: '/doctors',
     DOCTOR_DETAILS: '/doctors/:id',
+    DOCTOR_APPOINTMENTS: '/doctors/:id/appointments',
     DOCTOR_SEARCH: '/doctors/search',
     DOCTOR_BULK_UPLOAD: '/doctors/bulk-upload',
     DOCTOR_CHANGE_PASSWORD: '/doctors/:id/change-password',
@@ -59,6 +60,9 @@ export const API_ENDPOINTS = {
     CANCEL_APPOINTMENT: '/appointments/:id/cancel',
     COMPLETE_APPOINTMENT: '/appointments/:id/complete',
     APPOINTMENT_STATUS: '/appointments/:id/status',
+
+    // QUEUES:
+    QUEUE_STATE: '/queues/:clinicId/:doctorId/:date',
 
     // AVAILABILITY:
     AVAILABILITY: '/availability',

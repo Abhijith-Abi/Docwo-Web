@@ -1,7 +1,10 @@
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { format } from "date-fns";
 
 export default function DoctorHeader() {
+    const date = format(new Date(), "dd MMMM, EEEE, yyyy");
+
     return (
         <header className="sticky top-0 z-50 bg-[#F8F9FA] pt-4 md:rounded-tl-[2.5rem]">
             <div className="flex items-center justify-between px-4 md:px-8 h-16 max-w-7xl mx-auto pb-4">
@@ -19,7 +22,7 @@ export default function DoctorHeader() {
                         Dashboard
                     </h1>
                     <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
-                        31 July, Thursday, 2025
+                        {date}
                     </span>
                 </div>
 
