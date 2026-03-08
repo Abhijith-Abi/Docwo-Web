@@ -20,6 +20,7 @@ export default function Home() {
         false;
     const isStaff = user?.roles?.includes("staff") ?? false;
     const isPatient = user?.roles?.includes("patient") ?? false;
+    const isDoctor = user?.roles?.includes("doctor") ?? false;
 
     useEffect(() => {
         if (hasHydrated && token) {
@@ -27,10 +28,12 @@ export default function Home() {
                 ? "/admin-portal"
                 : isStaff
                   ? "/staff-portal"
-                  : "/patient-portal";
+                  : isDoctor
+                    ? "/doctor-portal"
+                    : "/patient-portal";
             router.replace(path);
         }
-    }, [token, isAdmin, isStaff, isPatient, router, hasHydrated]);
+    }, [token, isAdmin, isStaff, isPatient, isDoctor, router, hasHydrated]);
 
     if (!hasHydrated || token) {
         return <Loader />;
