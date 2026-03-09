@@ -82,15 +82,22 @@ export default function TodaysAppointments() {
                         time,
                         appointments: apts.map((apt) => {
                             const patientData =
-                                apt?.patient || apt?.patients || {};
+                                apt?.patients || apt?.patient || {};
                             const patientName =
-                                patientData?.name ||
                                 apt?.patient_name ||
+                                (patientData?.first_name ||
+                                patientData?.last_name
+                                    ? `${patientData?.first_name || ""} ${patientData?.last_name || ""}`.trim()
+                                    : null) ||
+                                patientData?.name ||
                                 `${apt?.first_name || ""} ${apt?.last_name || ""}`.trim() ||
                                 "N/A";
-                            const patientId = patientData?.user_id
-                                ? `PT-${patientData.user_id.toString().padStart(4, "0")}`
-                                : "N/A";
+                            const patientId =
+                                patientData?.patient_code ||
+                                apt?.patient_code ||
+                                (patientData?.user_id
+                                    ? `PT-${patientData.user_id.toString().padStart(4, "0")}`
+                                    : "N/A");
                             const dob =
                                 patientData?.date_of_birth ||
                                 apt?.date_of_birth;
@@ -104,7 +111,7 @@ export default function TodaysAppointments() {
                                     : `${age}/${gender}`;
                             const phone = patientData?.phone_number || "N/A";
                             const email =
-                                apt?.email || patientData?.email || "N/A";
+                                patientData?.email || apt?.email || "N/A";
                             const token =
                                 apt?.token_number
                                     ?.toString()

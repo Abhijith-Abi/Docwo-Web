@@ -10,7 +10,7 @@ interface PaginationParams {
     date?: string;
     startDate?: string;
     endDate?: string;
-    time?: "future" | "past";
+    time?: "previous" | "future";
 }
 
 interface DoctorAppointmentsResponse {
@@ -21,7 +21,7 @@ interface DoctorAppointmentsResponse {
 }
 
 export function useGetDoctorAppointments(doctorId?: string, params?: PaginationParams) {
-    const { page = 1, limit = 100, search, status, date, startDate, endDate, time } = params || {};
+    const { page = 1, limit = 10, search, status, date, startDate, endDate, time } = params || {};
 
     return useQuery<DoctorAppointmentsResponse>({
         queryKey: ["doctor-appointments", doctorId, page, limit, search, status, date, startDate, endDate, time],
@@ -44,7 +44,7 @@ export function useGetDoctorAppointments(doctorId?: string, params?: PaginationP
             const response = await getApiData(endpoint);
             
             return {
-                data: response?.data ?? [],
+                data: response?.results ?? response?.data ?? [],
                 pagination: response?.pagination || null
             };
         },

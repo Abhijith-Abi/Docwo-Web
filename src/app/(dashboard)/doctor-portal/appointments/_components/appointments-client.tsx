@@ -16,8 +16,7 @@ import {
     AppointmentsListSkeleton,
 } from "./appointments-skeleton";
 import { useAuthStore } from "@/store/auth-store";
-import { useGetClinicAppointments } from "@/hooks/api/useGetClinicAppointments";
-import { useGetAnalyticsFilters } from "@/hooks/api/useGetAnalyticsFilters";
+import { useGetDoctorAppointments } from "@/hooks/api/useGetDoctorAppointments";
 import { DataErrorState } from "@/components/ui/data-state-view";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -32,16 +31,11 @@ export function AppointmentsClient() {
         "previous",
     );
 
-    const { data: filterOptions, isLoading: isFiltersLoading } =
-        useGetAnalyticsFilters();
-    const doctors =
-        filterOptions?.data?.doctors || filterOptions?.doctors || [];
-
     // Search and filters state
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [filters, setFilters] = useState<DoctorPortalFiltersType>({
-        doctorId: "all",
+        status: "all",
         gender: "all",
         age: "all",
     });
@@ -84,19 +78,20 @@ export function AppointmentsClient() {
     );
 
     const user = useAuthStore((state) => state.user);
-    const clinicId = user?.clinic_assignments?.[0]?.clinic_id;
+    const doctorId = user?.doctor_profile?.doctor_id?.toString();
 
-    // Passing parameters to the API request
-    // We omit gender, age, and activeTab right now since API doesn't fully support them out of the box but the UI is there.
+    const timeFilter = activeTab === "previous" ? "previous" : "future";
+
     const {
         data: { data: appointments = [], pagination = null } = {},
         isLoading: isAppointmentsLoading,
         isError: isAppointmentsError,
-    } = useGetClinicAppointments(clinicId, {
+    } = useGetDoctorAppointments(doctorId, {
         page,
         limit: 10,
         search: debouncedSearch,
-        doctorId: filters.doctorId,
+        status: filters.status !== "all" ? filters.status : undefined,
+        time: timeFilter,
     });
 
     const [totalCount, setTotalCount] = useState<number>(0);
@@ -124,8 +119,6 @@ export function AppointmentsClient() {
                         <AppointmentsFilters
                             filters={filters}
                             onFilterChange={handleFilterChange}
-                            doctors={doctors}
-                            isLoading={isFiltersLoading}
                         />
                     </div>
                 )}
@@ -134,9 +127,10 @@ export function AppointmentsClient() {
             <div className="flex flex-col gap-5">
                 <Tabs
                     value={activeTab}
-                    onValueChange={(v) =>
-                        setActiveTab(v as "previous" | "future")
-                    }
+                    onValueChange={(v) => {
+                        setActiveTab(v as "previous" | "future");
+                        setPage(1);
+                    }}
                     className="w-full"
                 >
                     <div className="bg-muted/40 p-1.5 rounded-[12px] w-full border shadow-sm overflow-x-auto no-scrollbar">

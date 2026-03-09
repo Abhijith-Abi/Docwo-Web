@@ -15,6 +15,7 @@ export default function DoctorDashboard() {
             <div className="space-y-6">
                 <NextAppointment />
                 <WeeklyOverview />
+
                 <CalendarQuickView />
             </div>
         </div>

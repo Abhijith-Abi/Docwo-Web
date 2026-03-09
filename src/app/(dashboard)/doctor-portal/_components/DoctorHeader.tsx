@@ -14,7 +14,6 @@ const PAGE_TITLES: Record<string, string> = {
 
 function getPageTitle(pathname: string): string {
     const segments = pathname.split("/").filter(Boolean);
-    // Last segment after "doctor-portal"
     const last = segments[segments.length - 1];
     return PAGE_TITLES[last] ?? "Dashboard";
 }
@@ -26,7 +25,7 @@ export default function DoctorHeader() {
 
     return (
         <header className="sticky top-0 z-50 bg-[#F8F9FA] pt-4 md:rounded-tl-[2.5rem]">
-            <div className="flex items-center justify-between px-4 md:px-8 h-16 max-w-7xl mx-auto pb-4">
+            <div className="flex items-center justify-between px-2 md:px-8 h-16 max-w-7xl mx-auto pb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center shrink-0"></div>
                     <span className="font-semibold text-sm md:text-base whitespace-nowrap hidden lg:inline-block">

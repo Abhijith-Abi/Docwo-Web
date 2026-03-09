@@ -116,40 +116,69 @@ export function AppointmentsListView({
                         </TableRow>
                     ) : (
                         appointments.map((appointment, index) => {
+                            // Support both nested (new API) and flat (legacy) field structures
+                            const slot = appointment?.slot;
+                            const patient = appointment?.patient;
+
                             const startSlot =
+                                slot?.slot_timestamp ||
                                 appointment?.doctor_slots?.slot_timestamp ||
                                 appointment?.slot_timestamp;
                             const endSlot =
+                                slot?.slot_end_timestamp ||
                                 appointment?.doctor_slots?.slot_end_timestamp ||
                                 appointment?.slot_end_timestamp;
 
-                            let time = "N/A";
-                            if (startSlot && endSlot) {
-                                time = `${format(new Date(startSlot), "hh:mm a")} - ${format(new Date(endSlot), "hh:mm a")}`;
-                            } else if (startSlot) {
-                                time = format(new Date(startSlot), "hh:mm a");
+                            let time = slot?.formatted_time || "N/A";
+                            if (!slot?.formatted_time) {
+                                if (startSlot && endSlot) {
+                                    time = `${format(new Date(startSlot), "hh:mm a")} - ${format(new Date(endSlot), "hh:mm a")}`;
+                                } else if (startSlot) {
+                                    time = format(
+                                        new Date(startSlot),
+                                        "hh:mm a",
+                                    );
+                                }
                             }
+
+                            const slotDate = startSlot
+                                ? format(new Date(startSlot), "MMM d, yyyy")
+                                : null;
+
                             const patientName =
+                                patient?.name ||
                                 appointment?.patient_name ||
+                                (appointment?.patients?.first_name ||
+                                appointment?.patients?.last_name
+                                    ? `${appointment?.patients?.first_name || ""} ${appointment?.patients?.last_name || ""}`.trim()
+                                    : null) ||
                                 `${appointment?.first_name || ""} ${appointment?.last_name || ""}`.trim() ||
                                 "N/A";
-                            const patientId = appointment?.patients?.user_id
-                                ? `PT-${appointment.patients.user_id.toString().padStart(4, "0")}`
-                                : "N/A";
+                            const patientId =
+                                patient?.patient_code ||
+                                appointment?.patients?.patient_code ||
+                                appointment?.patient_code ||
+                                "N/A";
                             const dob =
+                                patient?.date_of_birth ||
                                 appointment?.patients?.date_of_birth ||
                                 appointment?.date_of_birth;
                             const age = dob
                                 ? differenceInYears(new Date(), new Date(dob))
                                 : "N/A";
                             const gender =
-                                appointment?.patients?.gender || "N/A";
+                                patient?.gender ||
+                                appointment?.patients?.gender ||
+                                "N/A";
                             const contactEmail =
+                                patient?.email ||
                                 appointment?.email ||
                                 appointment?.patients?.email ||
                                 "N/A";
                             const contactNumber =
-                                appointment?.patients?.phone_number || "N/A";
+                                patient?.phone_number ||
+                                appointment?.patients?.phone_number ||
+                                "N/A";
                             const tokenNumber =
                                 appointment?.token_number
                                     ?.toString()
@@ -168,6 +197,11 @@ export function AppointmentsListView({
                                                 <Clock className="h-[14px] w-[14px] text-muted-foreground" />
                                                 {time}
                                             </div>
+                                            {slotDate && (
+                                                <div className="text-[12px] text-muted-foreground">
+                                                    {slotDate}
+                                                </div>
+                                            )}
                                             <div>
                                                 <Badge
                                                     variant="outline"
