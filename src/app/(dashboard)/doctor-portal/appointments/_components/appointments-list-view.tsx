@@ -7,6 +7,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, differenceInYears } from "date-fns";
@@ -73,19 +74,19 @@ export function AppointmentsListView({
             <Table className="min-w-[1000px] xl:min-w-full">
                 <TableHeader className="bg-blue-50/50 hover:bg-blue-50/50">
                     <TableRow className="border-b-border/60">
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm pl-6 w-[20%]">
+                        <TableHead className="font-bold text-foreground h-[52px] text-[14.5px] pl-8 w-[20%]">
                             Time Schedule
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm w-[20%]">
+                        <TableHead className="font-bold text-foreground h-[52px] text-[14.5px] w-[20%]">
                             Patient name
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm w-[15%]">
+                        <TableHead className="font-bold text-foreground h-[52px] text-[14.5px] w-[15%]">
                             Age/ Gender
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm w-[25%]">
+                        <TableHead className="font-bold text-foreground h-[52px] text-[14.5px] w-[25%]">
                             Contact
                         </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm pr-6 w-[20%]">
+                        <TableHead className="font-bold text-foreground h-[52px] text-[14.5px] pr-6 w-[20%]">
                             Status
                         </TableHead>
                     </TableRow>
@@ -189,23 +190,23 @@ export function AppointmentsListView({
                             return (
                                 <TableRow
                                     key={`list-${appointment?.appointment_id || index}-${index}`}
-                                    className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30 h-[88px]"
+                                    className="border-b-border/50 bg-background hover:bg-muted/40 even:bg-muted/20 transition-colors h-[100px]"
                                 >
-                                    <TableCell className="py-4 pl-6 align-top">
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex items-center gap-1.5 text-[14px] font-medium text-foreground/90">
-                                                <Clock className="h-[14px] w-[14px] text-muted-foreground" />
+                                    <TableCell className="py-5 pl-8 align-top">
+                                        <div className="flex flex-col gap-2.5">
+                                            <div className="flex items-center gap-2 text-[14px] font-semibold text-foreground/90 bg-muted/50 w-fit px-2.5 py-1 rounded-md border border-border/50">
+                                                <Clock className="h-[14px] w-[14px] text-blue-500" />
                                                 {time}
                                             </div>
                                             {slotDate && (
-                                                <div className="text-[12px] text-muted-foreground">
+                                                <div className="text-[13px] text-muted-foreground font-medium pl-1">
                                                     {slotDate}
                                                 </div>
                                             )}
-                                            <div>
+                                            <div className="pl-1">
                                                 <Badge
                                                     variant="outline"
-                                                    className="font-bold text-[12px] rounded-[4px] px-2 py-0.5 border-none shadow-sm gap-1 bg-background"
+                                                    className="font-bold text-[11px] uppercase tracking-wider rounded-[6px] px-2 py-0.5 border-border shadow-sm gap-1 bg-background"
                                                 >
                                                     TKN{" "}
                                                     <span className="text-emerald-500">
@@ -215,42 +216,66 @@ export function AppointmentsListView({
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4 align-top">
-                                        <div>
-                                            <div className="font-medium text-[14px] text-foreground/90">
-                                                {patientName}
+                                    <TableCell className="py-5 align-top">
+                                        <div className="flex items-start gap-3.5 pt-0.5">
+                                            <Avatar className="h-10 w-10 border border-border/60 shadow-sm">
+                                                <AvatarFallback className="bg-primary/10 text-primary font-bold text-[13px]">
+                                                    {patientName !== "N/A"
+                                                        ? patientName
+                                                              .split(" ")
+                                                              .map(
+                                                                  (n: string) =>
+                                                                      n[0],
+                                                              )
+                                                              .filter(Boolean)
+                                                              .join("")
+                                                              .substring(0, 2)
+                                                              .toUpperCase()
+                                                        : "PT"}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="font-bold text-[14.5px] text-foreground/90">
+                                                    {patientName}
+                                                </div>
+                                                <div className="text-[13px] text-muted-foreground font-medium">
+                                                    {patientId}
+                                                </div>
                                             </div>
-                                            <div className="text-[13px] text-muted-foreground mt-0.5">
-                                                {patientId}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-5 text-[14px] font-medium text-foreground/80 capitalize align-top">
+                                        <div className="pt-2">
+                                            {age === "N/A" && gender === "N/A"
+                                                ? "N/A"
+                                                : `${age} / ${gender}`}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-5 align-top">
+                                        <div className="flex flex-col gap-1 pt-1.5">
+                                            <div className="text-[14px] font-semibold text-foreground/90">
+                                                {contactNumber}
+                                            </div>
+                                            <div
+                                                className="text-[13px] text-muted-foreground font-medium max-w-[150px] truncate"
+                                                title={contactEmail}
+                                            >
+                                                {contactEmail}
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 capitalize align-top">
-                                        {age === "N/A" && gender === "N/A"
-                                            ? "N/A"
-                                            : `${age}/${gender}`}
-                                    </TableCell>
-                                    <TableCell className="py-4 align-top">
-                                        <div className="text-[14px] font-medium text-foreground/90">
-                                            {contactNumber}
+                                    <TableCell className="py-5 pr-6 align-top">
+                                        <div className="pt-1.5">
+                                            <Badge
+                                                variant="secondary"
+                                                className={cn(
+                                                    "font-bold text-[11.5px] px-3 py-1 rounded-md shadow-sm border border-black/5 dark:border-white/5",
+                                                    statusConfig.className,
+                                                )}
+                                            >
+                                                {statusConfig.label}
+                                            </Badge>
                                         </div>
-                                        <div
-                                            className="text-[13px] text-muted-foreground mt-0.5 max-w-[150px] truncate"
-                                            title={contactEmail}
-                                        >
-                                            {contactEmail}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-4 pr-6 align-top">
-                                        <Badge
-                                            variant="secondary"
-                                            className={cn(
-                                                "font-semibold text-[11px] px-2.5 py-0.5 rounded-[4px]",
-                                                statusConfig.className,
-                                            )}
-                                        >
-                                            {statusConfig.label}
-                                        </Badge>
                                     </TableCell>
                                 </TableRow>
                             );

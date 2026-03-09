@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
     CANCEL_APPOINTMENT: '/appointments/:id/cancel',
     COMPLETE_APPOINTMENT: '/appointments/:id/complete',
     APPOINTMENT_STATUS: '/appointments/:id/status',
+    CONSULTATION_HISTORY: '/appointments/consultation-history',
 
     // QUEUES:
     QUEUE_STATE: '/queues/:clinicId/:doctorId/:date',
