@@ -28,10 +28,11 @@ export default function DoctorPortalLayout({
                     <div className="flex items-center gap-3">
                         <Image
                             src="/images/docwo-logo2.svg"
-                            alt="Docwo"
+                            alt="Docwo Logo"
                             width={36}
                             height={36}
                             className="w-9 h-9 bg-white rounded-xl p-1.5 object-contain"
+                            priority
                         />
                         <div>
                             <h1 className="text-white font-bold text-[18px] tracking-wide uppercase leading-tight">

@@ -11,9 +11,10 @@ function Header() {
                     <Link href="/">
                         <Image
                             src="/images/logo.svg"
-                            alt="Logo"
+                            alt="Docwo Logo"
                             width={50}
                             height={50}
+                            priority
                         />
                     </Link>
                 </h1>

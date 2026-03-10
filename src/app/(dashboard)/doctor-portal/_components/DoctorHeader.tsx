@@ -30,7 +30,7 @@ export default function DoctorHeader() {
         : "";
     const primaryClinic = user?.doctor_clinics?.[0];
     const clinicName = primaryClinic?.name;
-     
+
     const clinicLogo =
         primaryClinic?.images?.find((img: any) => img.image_type === "logo")
             ?.url || primaryClinic?.images?.[0]?.url;
@@ -60,7 +60,7 @@ export default function DoctorHeader() {
                     </span>
                 </div>
 
-                <div className="flex flex-col items-center justify-center text-center flex-shrink-0 max-w-[50%] md:max-w-[40%]">
+                <div className="flex flex-col items-center justify-center text-center shrink-0 max-w-[50%] md:max-w-[40%]">
                     <h1 className="font-bold text-lg md:text-xl text-gray-900 leading-tight truncate w-full">
                         {title}
                     </h1>

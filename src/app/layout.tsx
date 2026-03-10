@@ -13,11 +13,18 @@ const inter = Inter({
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://docwo-web-rose.vercel.app"),
-    title: "Docwo | Empowering Healthcare Connectivity",
+    title: "Docwo | Empowering Healthcare Connectivity & Appointment Booking",
     description:
-        "Docwo connects patients with top doctors. Book appointments easily, track tokens in real-time, and manage your health journey with our modern medical platform.",
+        "Docwo connects patients with top specialists. Book doctor appointments easily, track tokens in real-time, and manage your healthcare journey with our modern platform.",
+    keywords: [
+        "healthcare",
+        "doctor appointment",
+        "medical platform",
+        "token tracking",
+        "Docwo",
+    ],
     openGraph: {
-        title: "Docwo | Modern Appointment Booking",
+        title: "Docwo | Modern Appointment Booking & Healthcare Management",
         description:
             "Find top doctors and book appointments seamlessly. Real-time token tracking and professional healthcare management.",
         url: "https://docwo-web-rose.vercel.app/",
@@ -27,7 +34,7 @@ export const metadata: Metadata = {
                 url: "/og-image.png",
                 width: 1200,
                 height: 630,
-                alt: "Docwo - Modern Healthcare Platform",
+                alt: "Docwo - Modern Healthcare Platform for Doctors and Patients",
             },
         ],
         locale: "en_US",
@@ -35,9 +42,9 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Docwo | Healthcare Made Simple",
+        title: "Docwo | Healthcare Made Simple & Fast",
         description:
-            "Instantly book doctors and track your health journey. Modern, fast, and patient-centric.",
+            "Instantly book doctors and track your health journey. Modern, fast, and patient-centric healthcare platform.",
         images: ["/og-image.png"],
     },
 };

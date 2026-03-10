@@ -36,12 +36,12 @@ export default function Hero() {
             initial="hidden"
             animate="visible"
         >
-            <motion.h2
+            <motion.h1
                 className="text-3xl md:text-5xl font-bold font-headline mb-10 text-foreground"
                 variants={itemVariants}
             >
                 Find Your Doctor, Book with Ease
-            </motion.h2>
+            </motion.h1>
             <motion.p
                 className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10"
                 variants={itemVariants}

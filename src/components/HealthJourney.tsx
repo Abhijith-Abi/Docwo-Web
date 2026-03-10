@@ -60,8 +60,12 @@ const itemVariants = {
 
 export default function HealthJourney() {
     return (
-        <section className="w-full max-w-7xl px-4 md:px-8 lg:px-12 pb-10">
+        <section
+            className="w-full max-w-7xl px-4 md:px-8 lg:px-12 pb-10"
+            aria-labelledby="journey-title"
+        >
             <motion.h2
+                id="journey-title"
                 initial={{ opacity: 0, y: -20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -90,6 +94,7 @@ export default function HealthJourney() {
                                 <step.icon
                                     className="h-10 w-10 text-[#1F7A53] mb-1"
                                     strokeWidth={2}
+                                    aria-hidden="true"
                                 />
                                 <CardTitle className="text-lg font-bold text-center text-gray-900">
                                     {step.title}
