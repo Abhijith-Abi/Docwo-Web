@@ -110,7 +110,9 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
                     </h1>
                     {/* Date Header matching the screenshot */}
                     <h2 className="text-[15px] font-semibold text-muted-foreground mt-1">
-                        Monday, Aug 06, 2025
+                        {scheduleId === "Today"
+                            ? "Monday, Aug 06, 2025"
+                            : scheduleId}
                     </h2>
                 </div>
 

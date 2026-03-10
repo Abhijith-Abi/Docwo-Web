@@ -220,7 +220,9 @@ export function UpcomingSessionCard({
                 <Button
                     variant="outline"
                     className="h-9 px-6 text-[14px] font-medium border-orange-400 text-foreground hover:bg-orange-50 hover:text-orange-600 transition-colors rounded-[4px]"
-                    onClick={() => onViewSlots?.(session)}
+                    onClick={() =>
+                        router.push(`/doctor-portal/schedule/slots/months`)
+                    }
                 >
                     Slots
                 </Button>
