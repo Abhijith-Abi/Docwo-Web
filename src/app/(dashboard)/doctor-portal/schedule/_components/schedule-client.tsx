@@ -20,29 +20,7 @@ import {
 import { format } from "date-fns";
 import { DataErrorState } from "@/components/ui/data-state-view";
 import { ConsultationHistorySkeleton } from "./schedule-skeletons";
-
-// ─── Mock Data ─────────────────────────────────────────────────────────────
-
-const MOCK_UPCOMING_SESSIONS = [
-    {
-        id: "session-1",
-        date: new Date().toISOString(),
-        start_time: "09:00 AM",
-        end_time: "01:00 PM",
-        total_patients: 40,
-        booked_patients: 32,
-        status: "ongoing",
-    },
-    {
-        id: "session-2",
-        date: new Date(Date.now() + 86400000).toISOString(),
-        start_time: "02:00 PM",
-        end_time: "06:00 PM",
-        total_patients: 30,
-        booked_patients: 15,
-        status: "active",
-    },
-];
+import { useGetUpcomingSessions } from "@/hooks/api/useGetUpcomingSessions";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ScheduleClient() {
@@ -71,6 +49,12 @@ export function ScheduleClient() {
         filters.status !== "all"
             ? (filters.status as ConsultationHistoryStatus)
             : undefined;
+
+    const {
+        data: upcomingSessionsData,
+        isLoading: isUpcomingLoading,
+        isError: isUpcomingError,
+    } = useGetUpcomingSessions(doctorId);
 
     const queryDate = filters.date
         ? format(filters.date, "yyyy-MM-dd")
@@ -135,18 +119,14 @@ export function ScheduleClient() {
 
             {/* ── Upcoming Sessions ────────────────────────────────────────── */}
             <UpcomingSessionsSection
-                sessions={MOCK_UPCOMING_SESSIONS}
-                isLoading={false}
-                isError={false}
-                onViewSlots={(s) => console.log("slots:", s?.id)}
-                onEdit={(s) => console.log("edit:", s?.id)}
+                sessions={upcomingSessionsData?.data || []}
+                isLoading={isUpcomingLoading}
+                isError={isUpcomingError}
             />
 
             <Separator className="bg-border/50" />
 
-            {/* ── Consultation History ──────────────────────────────────────── */}
             <section className="flex flex-col gap-5">
-                {/* Toolbar (search + filter toggle) */}
                 <div className="bg-background border border-border/80 rounded-[12px] p-4 sm:p-5 shadow-sm">
                     <ConsultationToolbar
                         searchQuery={searchQuery}
@@ -158,7 +138,6 @@ export function ScheduleClient() {
                         onExport={() => console.log("Export triggered")}
                     />
 
-                    {/* Expandable filter panel */}
                     {showFilters && (
                         <div className="mt-5 animate-in fade-in slide-in-from-top-2">
                             <ConsultationFilters
@@ -169,7 +148,6 @@ export function ScheduleClient() {
                     )}
                 </div>
 
-                {/* Table or Grid */}
                 {isHistoryError ? (
                     <DataErrorState
                         title="Failed to load consultation history"

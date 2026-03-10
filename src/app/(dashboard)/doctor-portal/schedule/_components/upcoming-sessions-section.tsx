@@ -18,8 +18,6 @@ export function UpcomingSessionsSection({
     sessions,
     isLoading,
     isError,
-    onViewSlots,
-    onEdit,
 }: UpcomingSessionsSectionProps) {
     return (
         <section className="flex flex-col gap-4">
@@ -58,8 +56,6 @@ export function UpcomingSessionsSection({
                         <UpcomingSessionCard
                             key={session?.schedule_id || session?.id || index}
                             session={session}
-                            onViewSlots={onViewSlots}
-                            onEdit={onEdit}
                         />
                     ))}
                 </div>

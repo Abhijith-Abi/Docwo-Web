@@ -31,10 +31,12 @@ export const API_ENDPOINTS = {
     DOCTOR_APPOINTMENTS: '/doctors/:id/appointments',
     DOCTOR_WEEKLY_OVERVIEW: '/doctors/:id/dashboard/weekly-overview',
     DOCTOR_CALENDAR_QUICK_VIEW: '/doctors/:id/dashboard/calendar-quick-view',
+    DOCTOR_UPCOMING_SESSIONS: '/doctors/:id/dashboard/upcoming-sessions',
     DOCTOR_SEARCH: '/doctors/search',
     DOCTOR_BULK_UPLOAD: '/doctors/bulk-upload',
     DOCTOR_CHANGE_PASSWORD: '/doctors/:id/change-password',
     DOCTOR_RESET_PASSWORD: '/doctors/:id/reset-password',
+    DOCTOR_PATIENTS: '/doctors/:clinicId/patients',
 
     // STAFF:
     STAFF: '/staff',

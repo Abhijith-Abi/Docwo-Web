@@ -87,8 +87,81 @@ export function useGetConsultationHistory(params?: ConsultationHistoryParams) {
             const endpoint = `${API_ENDPOINTS.CONSULTATION_HISTORY}?${searchParams.toString()}`;
             const response = await getApiData(endpoint);
 
+            const mappedData = (response?.data ?? []).map((session: any) => {
+                const appointments = session.appointments || [];
+                const patients_seen = appointments.filter(
+                    (a: any) => a.status === "completed"
+                ).length;
+                const total_appointments = appointments.length;
+
+                // Sort appointments by start time
+                const sortedAppointments = [...appointments].sort(
+                    (a: any, b: any) => {
+                        const parseTime = (timeStr: string) => {
+                            if (!timeStr) return 0;
+                            const match = timeStr.match(/(\d+):(\d+)\s+(AM|PM)/i);
+                            if (!match) return 0;
+                            let h = parseInt(match[1], 10);
+                            const m = parseInt(match[2], 10);
+                            const modifier = match[3].toUpperCase();
+                            if (h === 12 && modifier === "AM") h = 0;
+                            if (modifier === "PM" && h < 12) h += 12;
+                            return h * 60 + m;
+                        };
+                        const startA = a.formatted_time
+                            ? parseTime(a.formatted_time.split(" - ")[0])
+                            : 0;
+                        const startB = b.formatted_time
+                            ? parseTime(b.formatted_time.split(" - ")[0])
+                            : 0;
+                        return startA - startB;
+                    }
+                );
+
+                let schedule_time = "—";
+                if (sortedAppointments.length > 0) {
+                    const firstApt = sortedAppointments[0];
+                    const lastApt =
+                        sortedAppointments[sortedAppointments.length - 1];
+                    const startTime = firstApt.formatted_time
+                        ? firstApt.formatted_time.split(" - ")[0]
+                        : "";
+                    const endTime = lastApt.formatted_time
+                        ? lastApt.formatted_time.split(" - ")[1] ||
+                          lastApt.formatted_time.split(" - ")[0]
+                        : "";
+                    if (startTime && endTime && startTime !== endTime) {
+                        schedule_time = `${startTime} - ${endTime}`;
+                    } else if (startTime) {
+                        schedule_time = startTime;
+                    }
+                }
+
+                let sessionStatus = "completed";
+                if (
+                    appointments.some(
+                        (a: any) =>
+                            a.status === "pending" ||
+                            a.status === "confirmed" ||
+                            a.status === "ongoing"
+                    )
+                ) {
+                    sessionStatus = "ongoing";
+                }
+
+                return {
+                    ...session,
+                    appointments: sortedAppointments,
+                    date: session.session_date,
+                    schedule_time,
+                    patients_seen,
+                    total_appointments,
+                    status: sessionStatus,
+                };
+            });
+
             return {
-                data: response?.data ?? [],
+                data: mappedData,
                 pagination: response?.pagination || null,
             };
         },

@@ -94,19 +94,17 @@ export function ConsultationHistoryCard({
         apt?.slot_end_timestamp;
 
     // ── Date ────────────────────────────────
-    let dateStr = apt?.date;
+    let dateStr = apt?.booking_timestamp || apt?.appointment_date || apt?.date;
     let date = "—";
     if (dateStr) {
         date = format(new Date(dateStr), "MMM d, yyyy");
     } else if (startSlot) {
         date = format(new Date(startSlot), "MMM d, yyyy");
-    } else if (apt?.appointment_date) {
-        date = format(new Date(apt.appointment_date), "MMM d, yyyy");
     }
 
     // ── Time range ──────────────────────────
     let time =
-        apt?.schedule_time || slot?.formatted_time || apt?.formatted_time || "";
+        apt?.formatted_time || apt?.schedule_time || slot?.formatted_time || "";
     if (!time && startSlot && endSlot) {
         time = `${format(new Date(startSlot), "hh:mm a")} - ${format(new Date(endSlot), "hh:mm a")}`;
     } else if (!time && startSlot) {
@@ -115,7 +113,8 @@ export function ConsultationHistoryCard({
     if (!time) time = "—";
 
     // ── Patients seen ───────────────────────
-    const patientsSeen = apt?.patients_seen ?? apt?.total_patients ?? "—";
+    const patientsSeen =
+        apt?.patient_name ?? apt?.patients_seen ?? apt?.total_patients ?? "—";
     const totalVisitsCount = apt?.total_appointments ?? "—";
 
     // ── Status ──────────────────────────────

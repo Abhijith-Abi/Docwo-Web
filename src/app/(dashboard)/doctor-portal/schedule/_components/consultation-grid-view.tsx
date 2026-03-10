@@ -49,13 +49,15 @@ export function ConsultationGridView({
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-6 pt-2">
-                    {appointments.map((apt, index) => (
-                        <ConsultationHistoryCard
-                            key={`grid-ch-${apt?.appointment_id || index}-${index}`}
-                            appointment={apt}
-                            onViewDetails={onViewDetails}
-                        />
-                    ))}
+                    {appointments?.[0]?.appointments?.map(
+                        (apt: any, index: number) => (
+                            <ConsultationHistoryCard
+                                key={`grid-ch-${apt?.appointment_id || index}-${index}`}
+                                appointment={apt}
+                                onViewDetails={onViewDetails}
+                            />
+                        ),
+                    )}
                 </div>
             )}
 

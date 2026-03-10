@@ -95,7 +95,11 @@ export default function DoctorSidebar({ className }: { className?: string }) {
             <nav className="flex-1 overflow-y-auto w-full no-scrollbar min-h-0">
                 <ul className="flex flex-col gap-2 w-full">
                     {mainNavItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive =
+                            item.href === "/doctor-portal"
+                                ? pathname === item.href
+                                : pathname === item.href ||
+                                  pathname.startsWith(`${item.href}/`);
                         return (
                             <li key={item.name} className="relative">
                                 <Link
@@ -140,7 +144,11 @@ export default function DoctorSidebar({ className }: { className?: string }) {
             <div className="mt-auto pt-6 border-t border-white/10 mx-6 w-[calc(100%-3rem)]">
                 <ul className="flex flex-col gap-2 w-full -ml-2">
                     {bottomNavItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive =
+                            item.href === "/doctor-portal"
+                                ? pathname === item.href
+                                : pathname === item.href ||
+                                  pathname.startsWith(`${item.href}/`);
                         return (
                             <li key={item.name} className="relative">
                                 <Link

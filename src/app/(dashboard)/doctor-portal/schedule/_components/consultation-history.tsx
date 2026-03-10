@@ -94,13 +94,10 @@ const getStatusConfig = (status: string) => {
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface ConsultationHistoryTableProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    appointments: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    appointments: any;
     pagination?: any;
     currentPage: number;
     onPageChange: (page: number) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onViewDetails?: (appointment: any) => void;
     totalCount: number;
 }
@@ -116,14 +113,12 @@ export function ConsultationHistoryTable({
 }: ConsultationHistoryTableProps) {
     return (
         <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-            {/* Row count */}
             <div className="flex items-center justify-between pl-1">
                 <span className="text-[15px] font-semibold text-foreground">
                     Consultation History ({totalCount})
                 </span>
             </div>
 
-            {/* Table */}
             <div className="rounded-[10px] border border-border/60 bg-card overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <Table className="min-w-[800px] xl:min-w-full">
@@ -173,149 +168,142 @@ export function ConsultationHistoryTable({
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                appointments.map((apt, index) => {
-                                    // ── Slot timestamps ─────────────────────
-                                    const slot = apt?.slot;
-                                    const startSlot =
-                                        slot?.slot_timestamp ||
-                                        apt?.doctor_slots?.slot_timestamp ||
-                                        apt?.slot_timestamp;
-                                    const endSlot =
-                                        slot?.slot_end_timestamp ||
-                                        apt?.doctor_slots?.slot_end_timestamp ||
-                                        apt?.slot_end_timestamp;
+                                appointments?.[0]?.appointments?.map(
+                                    (apt: any, index: number) => {
+                                        const slot = apt?.slot;
+                                        const startSlot =
+                                            slot?.slot_timestamp ||
+                                            apt?.doctor_slots?.slot_timestamp ||
+                                            apt?.slot_timestamp;
+                                        const endSlot =
+                                            slot?.slot_end_timestamp ||
+                                            apt?.doctor_slots
+                                                ?.slot_end_timestamp ||
+                                            apt?.slot_end_timestamp;
 
-                                    // ── Date ────────────────────────────────
-                                    let dateStr = apt?.date;
-                                    let date = "—";
-                                    if (dateStr) {
-                                        date = format(
-                                            new Date(dateStr),
-                                            "MMM d, yyyy",
-                                        );
-                                    } else if (startSlot) {
-                                        date = format(
-                                            new Date(startSlot),
-                                            "MMM d, yyyy",
-                                        );
-                                    } else if (apt?.appointment_date) {
-                                        date = format(
-                                            new Date(apt.appointment_date),
-                                            "MMM d, yyyy",
-                                        );
-                                    }
+                                        let dateStr =
+                                            apt?.booking_timestamp ||
+                                            apt?.appointment_date ||
+                                            apt?.date;
+                                        let date = "—";
+                                        if (dateStr) {
+                                            date = format(
+                                                new Date(dateStr),
+                                                "MMM d, yyyy",
+                                            );
+                                        } else if (startSlot) {
+                                            date = format(
+                                                new Date(startSlot),
+                                                "MMM d, yyyy",
+                                            );
+                                        }
 
-                                    // ── Time range ──────────────────────────
-                                    let time =
-                                        apt?.schedule_time ||
-                                        slot?.formatted_time ||
-                                        apt?.formatted_time ||
-                                        "";
-                                    if (!time && startSlot && endSlot) {
-                                        time = `${format(new Date(startSlot), "hh:mm a")} - ${format(new Date(endSlot), "hh:mm a")}`;
-                                    } else if (!time && startSlot) {
-                                        time = format(
-                                            new Date(startSlot),
-                                            "hh:mm a",
-                                        );
-                                    }
-                                    if (!time) time = "—";
+                                        let time =
+                                            apt?.formatted_time ||
+                                            apt?.schedule_time ||
+                                            slot?.formatted_time ||
+                                            "";
+                                        if (!time && startSlot && endSlot) {
+                                            time = `${format(new Date(startSlot), "hh:mm a")} - ${format(new Date(endSlot), "hh:mm a")}`;
+                                        } else if (!time && startSlot) {
+                                            time = format(
+                                                new Date(startSlot),
+                                                "hh:mm a",
+                                            );
+                                        }
+                                        if (!time) time = "—";
 
-                                    // ── Patients seen ───────────────────────
-                                    const patientsSeen =
-                                        apt?.patients_seen ??
-                                        apt?.total_patients ??
-                                        "—";
+                                        const patientsSeen =
+                                            apt?.patient_name ??
+                                            apt?.patients_seen ??
+                                            apt?.total_patients ??
+                                            "—";
 
-                                    // ── Status ──────────────────────────────
-                                    const status = apt?.status || "pending";
-                                    const cfg = getStatusConfig(status);
+                                        const status = apt?.status || "pending";
+                                        const cfg = getStatusConfig(status);
 
-                                    return (
-                                        <TableRow
-                                            key={`ch-${apt?.appointment_id || index}-${index}`}
-                                            className="border-b-border/50 bg-background hover:bg-muted/40 even:bg-muted/20 transition-colors h-[88px]"
-                                        >
-                                            {/* Date */}
-                                            <TableCell className="py-5 pl-8 align-top">
-                                                <div className="flex flex-col gap-1 pt-0.5">
-                                                    <span className="text-[14.5px] font-semibold text-foreground/90">
-                                                        {date}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
+                                        return (
+                                            <TableRow
+                                                key={`ch-${apt?.appointment_id || index}-${index}`}
+                                                className="border-b-border/50 bg-background hover:bg-muted/40 even:bg-muted/20 transition-colors h-[88px]"
+                                            >
+                                                <TableCell className="py-5 pl-8 align-top">
+                                                    <div className="flex flex-col gap-1 pt-0.5">
+                                                        <span className="text-[14.5px] font-semibold text-foreground/90">
+                                                            {date}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
 
-                                            {/* Schedule Time */}
-                                            <TableCell className="py-5 align-top">
-                                                <div className="flex items-center gap-2 text-[14.5px] font-semibold text-foreground/90 bg-muted/50 w-fit px-3 py-1.5 rounded-md border border-border/50">
-                                                    <Clock className="h-[14px] w-[14px] text-blue-500 shrink-0" />
-                                                    {time}
-                                                </div>
-                                            </TableCell>
+                                                <TableCell className="py-5 align-top">
+                                                    <div className="flex items-center gap-2 text-[14.5px] font-semibold text-foreground/90 bg-muted/50 w-fit px-3 py-1.5 rounded-md border border-border/50">
+                                                        <Clock className="h-[14px] w-[14px] text-blue-500 shrink-0" />
+                                                        {time}
+                                                    </div>
+                                                </TableCell>
 
-                                            {/* Patients Seen */}
-                                            <TableCell className="py-5 text-[15px] font-semibold text-foreground/90 align-top text-center">
-                                                <div className="pt-1.5">
-                                                    {patientsSeen}
-                                                </div>
-                                            </TableCell>
+                                                <TableCell className="py-5 text-[15px] font-semibold text-foreground/90 align-top text-center">
+                                                    <div className="pt-1.5">
+                                                        {patientsSeen}
+                                                    </div>
+                                                </TableCell>
 
-                                            {/* Status */}
-                                            <TableCell className="py-5 align-top">
-                                                <div className="flex items-center pt-1.5">
-                                                    {!cfg.icon && (
-                                                        <span
+                                                <TableCell className="py-5 align-top">
+                                                    <div className="flex items-center pt-1.5">
+                                                        {!cfg.icon && (
+                                                            <span
+                                                                className={cn(
+                                                                    "h-2 w-2 rounded-full shrink-0 mr-2",
+                                                                    cfg.dotClass,
+                                                                )}
+                                                            />
+                                                        )}
+                                                        <Badge
+                                                            variant="secondary"
                                                             className={cn(
-                                                                "h-2 w-2 rounded-full shrink-0 mr-2",
-                                                                cfg.dotClass,
+                                                                "font-bold text-[11.5px] rounded-full shadow-sm border-none gap-2 flex items-center w-fit",
+                                                                !cfg.icon &&
+                                                                    "px-3 py-1",
+                                                                cfg.className,
                                                             )}
-                                                        />
-                                                    )}
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className={cn(
-                                                            "font-bold text-[11.5px] rounded-full shadow-sm border-none gap-2 flex items-center w-fit",
-                                                            !cfg.icon &&
-                                                                "px-3 py-1",
-                                                            cfg.className,
-                                                        )}
-                                                    >
-                                                        {cfg.icon && (
-                                                            <div>
-                                                                {cfg.icon}
-                                                            </div>
-                                                        )}
-                                                        {cfg.label}
-                                                    </Badge>
-                                                </div>
-                                            </TableCell>
+                                                        >
+                                                            {cfg.icon && (
+                                                                <div>
+                                                                    {cfg.icon}
+                                                                </div>
+                                                            )}
+                                                            {cfg.label}
+                                                        </Badge>
+                                                    </div>
+                                                </TableCell>
 
-                                            {/* Action */}
-                                            <TableCell className="py-5 pr-8 align-top">
-                                                <div className="pt-0.5">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="h-8 text-[12.5px] font-semibold px-3 shadow-sm border-border/60 gap-1.5"
-                                                        onClick={() =>
-                                                            onViewDetails?.(apt)
-                                                        }
-                                                    >
-                                                        <ExternalLink className="h-3.5 w-3.5" />
-                                                        View Details
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })
+                                                <TableCell className="py-5 pr-8 align-top">
+                                                    <div className="pt-0.5">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-8 text-[12.5px] font-semibold px-3 shadow-sm border-border/60 gap-1.5"
+                                                            onClick={() =>
+                                                                onViewDetails?.(
+                                                                    apt,
+                                                                )
+                                                            }
+                                                        >
+                                                            <ExternalLink className="h-3.5 w-3.5" />
+                                                            View Details
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    },
+                                )
                             )}
                         </TableBody>
                     </Table>
                 </div>
             </div>
 
-            {/* Pagination */}
             {pagination && pagination.totalPages > 1 && (
                 <div className="pt-2">
                     <SharedPagination
