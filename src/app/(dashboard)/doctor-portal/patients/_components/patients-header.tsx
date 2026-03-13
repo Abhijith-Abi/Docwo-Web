@@ -20,13 +20,6 @@ export function PatientsHeader() {
                     <RefreshCw className="h-4 w-4" />
                 </Button>
                 <Button
-                    variant="outline"
-                    className="h-9 gap-2 rounded-md shrink-0 border-input shadow-sm"
-                >
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Add Patient</span>
-                </Button>
-                <Button
                     variant="default"
                     className="h-9 gap-2 rounded-md shrink-0 shadow-sm"
                 >

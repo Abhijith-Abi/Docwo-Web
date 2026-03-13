@@ -7,8 +7,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MessageSquarePlus, UserX } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { UserX } from "lucide-react";
 import { Patient } from "./data";
 
 export function PatientsListView({
@@ -62,12 +61,6 @@ export function PatientsListView({
                         </TableHead>
                         <TableHead className="font-bold text-foreground h-[52px] text-sm">
                             No. of Visit
-                        </TableHead>
-                        <TableHead className="font-bold text-foreground h-[52px] text-sm">
-                            Doctor
-                        </TableHead>
-                        <TableHead className="font-bold text-foreground text-center h-[52px] text-[13px] tracking-tight">
-                            Add Note
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -147,21 +140,6 @@ export function PatientsListView({
                                 </TableCell>
                                 <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
                                     {patient.noOfVisit}
-                                </TableCell>
-                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
-                                    {patient.doctor}
-                                </TableCell>
-                                <TableCell className="py-3.5 text-center align-top">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-foreground/70 hover:text-foreground"
-                                    >
-                                        <MessageSquarePlus
-                                            className="h-[18px] w-[18px]"
-                                            strokeWidth={2}
-                                        />
-                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))

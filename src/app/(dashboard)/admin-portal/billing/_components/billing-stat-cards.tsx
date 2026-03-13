@@ -165,7 +165,7 @@ export function BillingStatCards({ clinicId }: { clinicId?: string }) {
             <BillingStatCard
                 title="Todays Payment Received"
                 value={formatCurrency(
-                    data?.monthlyPaymentReceived?.amount ?? "0",
+                    data?.todaysPaymentReceived?.amount ?? "0",
                 )}
                 trend={data?.todaysPaymentReceived?.percentage ?? "0%"}
                 trendSuffix="from yesterday"

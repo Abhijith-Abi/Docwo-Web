@@ -207,35 +207,6 @@ export default function SessionsClient() {
     return (
         <div className="space-y-8 pb-10">
             {/* Header / Sub-header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                <Tabs defaultValue="today" className="w-fit">
-                    <TabsList className="bg-gray-100/50 p-1">
-                        <TabsTrigger
-                            value="today"
-                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                        >
-                            Today's Tokens
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="history"
-                            className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                        >
-                            Previous History
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-
-                <div className="flex items-center gap-6 text-sm font-medium text-gray-600">
-                    <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-emerald-600" />
-                        <span>Tue, 09 July 2025</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-emerald-600" />
-                        <span>9.00 AM - 5.00 PM</span>
-                    </div>
-                </div>
-            </div>
 
             {/* Session Overview */}
             <section className="space-y-4">
