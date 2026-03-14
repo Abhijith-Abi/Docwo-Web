@@ -3,10 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight } from "lucide-react";
 
 const stats = [
-    { label: "Completed", value: "12", color: "text-blue-600" },
-    { label: "Reported", value: "8", color: "text-orange-600" },
-    { label: "Upcoming", value: "24", color: "text-emerald-600" },
-    { label: "Skiped", value: "4", color: "text-red-600" },
+    { label: "Completed", value: "12", color: "text-blue-600 dark:text-blue-400" },
+    { label: "Reported", value: "8", color: "text-orange-600 dark:text-orange-400" },
+    { label: "Upcoming", value: "24", color: "text-primary" },
+    { label: "Skipped", value: "4", color: "text-destructive" },
 ];
 
 export default function SessionStats() {
@@ -15,16 +15,16 @@ export default function SessionStats() {
             {stats.map((stat) => (
                 <Card
                     key={stat.label}
-                    className="border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                    className="border-border/80 shadow-sm hover:shadow-md transition-shadow rounded-lg"
                 >
                     <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                            <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                                 {stat.label}
                             </span>
-                            <ArrowUpRight className="w-5 h-5 text-gray-400" />
+                            <ArrowUpRight className="w-5 h-5 text-muted-foreground/50" />
                         </div>
-                        <div className={`text-4xl font-bold ${stat.color}`}>
+                        <div className={`text-4xl font-bold ${stat.color} tracking-tight`}>
                             {stat.value}
                         </div>
                     </CardContent>

@@ -7,6 +7,9 @@ interface PaginationParams {
     limit?: number;
     search?: string;
     status?: string;
+    gender?: string;
+    age?: string;
+    doctor?: string;
     date?: string;
     startDate?: string;
     endDate?: string;
@@ -21,10 +24,10 @@ interface DoctorAppointmentsResponse {
 }
 
 export function useGetDoctorAppointments(doctorId?: string, params?: PaginationParams) {
-    const { page = 1, limit = 10, search, status, date, startDate, endDate, time } = params || {};
+    const { page = 1, limit = 10, search, status, gender, age, doctor, date, startDate, endDate, time } = params || {};
 
     return useQuery<DoctorAppointmentsResponse>({
-        queryKey: ["doctor-appointments", doctorId, page, limit, search, status, date, startDate, endDate, time],
+        queryKey: ["doctor-appointments", doctorId, page, limit, search, status, gender, age, doctor, date, startDate, endDate, time],
         queryFn: async () => {
             if (!doctorId) return { data: [], pagination: null };
             
@@ -35,6 +38,9 @@ export function useGetDoctorAppointments(doctorId?: string, params?: PaginationP
 
             if (search) searchParams.append("search", search);
             if (status && status !== "all") searchParams.append("status", status);
+            if (gender && gender !== "all") searchParams.append("gender", gender);
+            if (age && age !== "all") searchParams.append("age", age);
+            if (doctor && doctor !== "all") searchParams.append("doctor", doctor);
             if (date) searchParams.append("date", date);
             if (startDate) searchParams.append("startDate", startDate);
             if (endDate) searchParams.append("endDate", endDate);

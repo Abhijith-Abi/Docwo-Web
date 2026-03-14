@@ -20,38 +20,38 @@ function getStatusConfig(status: string) {
         case "ongoing":
             return {
                 label: "Ongoing",
-                dotClass: "bg-green-500",
-                badgeClass: "bg-[#a7f3d0] text-[#059669]",
+                dotClass: "bg-emerald-500",
+                badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
             };
         case "active":
             return {
                 label: "Active",
-                dotClass: "bg-green-500",
-                badgeClass: "bg-blue-100 text-blue-700",
+                dotClass: "bg-blue-500",
+                badgeClass: "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
             };
         case "completed":
             return {
                 label: "Completed",
-                dotClass: "bg-gray-400",
-                badgeClass: "bg-gray-100 text-gray-600",
+                dotClass: "bg-muted-foreground/40",
+                badgeClass: "bg-muted text-muted-foreground dark:bg-muted/20",
             };
         case "cancelled":
             return {
                 label: "Cancelled",
-                dotClass: "bg-red-500",
-                badgeClass: "bg-red-100 text-red-700",
+                dotClass: "bg-destructive",
+                badgeClass: "bg-destructive/10 text-destructive",
             };
         case "scheduled":
             return {
                 label: "Scheduled",
-                dotClass: "bg-blue-500",
-                badgeClass: "bg-blue-100 text-blue-700",
+                dotClass: "bg-primary",
+                badgeClass: "bg-primary/10 text-primary",
             };
         default:
             return {
                 label: status || "Active",
-                dotClass: "bg-green-500",
-                badgeClass: "bg-blue-100 text-blue-700",
+                dotClass: "bg-primary",
+                badgeClass: "bg-primary/10 text-primary",
             };
     }
 }
@@ -116,21 +116,21 @@ export function UpcomingSessionCard({
     const isTokens = session?.total_tokens !== undefined;
 
     return (
-        <div className="bg-card border border-border/60 rounded-[4px] p-5 shadow-sm flex flex-col gap-4 animate-in fade-in duration-300">
+        <div className="bg-card border border-border/80 rounded-lg p-5 shadow-sm flex flex-col gap-4 animate-in fade-in duration-300">
             {/* Header: Day + Edit */}
             <div className="flex items-start justify-between">
                 <div>
-                    <h3 className="text-[18px] font-medium text-foreground tracking-tight leading-tight flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight leading-tight flex items-center gap-2">
                         {formattedDay}
                     </h3>
-                    <p className="text-[14px] text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                         {formattedDate}
                     </p>
                 </div>
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground -mt-1 -mr-1"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground -mt-1 -mr-1 rounded-md"
                     onClick={() => {
                         let url = `/doctor-portal/schedule/slots/${formattedDay}`;
                         if (sessionDate) {
@@ -148,20 +148,20 @@ export function UpcomingSessionCard({
             </div>
 
             {/* Time & Patients */}
-            <div className="flex flex-col gap-2.5 mt-1">
-                <div className="flex items-center gap-3 text-[14px] text-foreground/90">
+            <div className="flex flex-col gap-3 mt-1">
+                <div className="flex items-center gap-3 text-sm text-foreground/90">
                     <Clock
                         className="h-4 w-4 shrink-0 text-muted-foreground"
-                        strokeWidth={1.5}
+                        strokeWidth={2}
                     />
                     <span>
                         {startTime} - {endTime}
                     </span>
                 </div>
-                <div className="flex items-center gap-3 text-[14px] text-foreground/90">
+                <div className="flex items-center gap-3 text-sm text-foreground/90">
                     <Users
                         className="h-4 w-4 shrink-0 text-muted-foreground"
-                        strokeWidth={1.5}
+                        strokeWidth={2}
                     />
                     <span>
                         {bookedPatients}/{totalPatients}{" "}
@@ -171,17 +171,17 @@ export function UpcomingSessionCard({
             </div>
 
             {/* Progress */}
-            <div className="flex flex-col gap-1.5 mt-2">
+            <div className="flex flex-col gap-2 mt-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-muted-foreground font-medium">
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                         Bookings
                     </span>
                     <span
                         className={cn(
-                            "text-[12px] font-semibold",
+                            "text-xs font-bold",
                             bookingPercentage >= 80
-                                ? "text-emerald-500"
-                                : "text-blue-500",
+                                ? "text-emerald-600 dark:text-emerald-400"
+                                : "text-primary",
                         )}
                     >
                         {bookingPercentage}%
@@ -189,43 +189,35 @@ export function UpcomingSessionCard({
                 </div>
                 <Progress
                     value={bookingPercentage}
-                    className={cn(
-                        "h-2 rounded-full bg-muted/50",
-                        bookingPercentage >= 80
-                            ? "[&>div]:bg-emerald-500"
-                            : "[&>div]:bg-blue-500",
-                    )}
+                    className="h-1.5 rounded-full bg-muted"
                 />
             </div>
 
             {/* Footer: Status + Slots */}
-            <div className="flex items-center justify-between pt-3 mt-1 border-t border-transparent">
-                <div className="flex items-center gap-2">
-                    <div className="relative flex h-3.5 w-3.5 items-center justify-center">
+            <div className="flex items-center justify-between pt-4 mt-1 border-t border-border/50">
+                <div className="flex items-center gap-2.5">
+                    <div className="relative flex h-2 w-2 items-center justify-center">
                         <span
                             className={cn(
-                                "absolute inline-flex h-full w-full rounded-full opacity-20",
-                                bookingPercentage >= 80
-                                    ? "bg-emerald-500"
-                                    : "bg-blue-500",
+                                "absolute inline-flex h-full w-full rounded-full opacity-30 animate-ping",
+                                statusConfig.dotClass,
                             )}
                         />
                         <span
                             className={cn(
                                 "relative inline-flex rounded-full h-2 w-2",
-                                bookingPercentage >= 80
-                                    ? "bg-emerald-500"
-                                    : "bg-blue-500",
+                                statusConfig.dotClass,
                             )}
                         />
                     </div>
-                    <span className="text-[14px] font-medium text-foreground">
+                    <span className="text-sm font-semibold text-foreground">
                         {statusConfig.label}
                     </span>
                 </div>
                 <Button
                     variant="outline"
-                    className="h-9 px-6 text-[14px] font-medium border-orange-400 text-foreground hover:bg-orange-50 hover:text-orange-600 transition-colors rounded-[4px]"
+                    size="sm"
+                    className="h-8 px-4 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5 hover:text-primary transition-colors rounded-md"
                     onClick={() => {
                         let url = `/doctor-portal/schedule/slots/months`;
                         if (sessionDate) {
@@ -238,7 +230,7 @@ export function UpcomingSessionCard({
                         router.push(url);
                     }}
                 >
-                    Slots
+                    Manage Slots
                 </Button>
             </div>
         </div>
