@@ -17,6 +17,7 @@ export function useUpdateDoctorSlot() {
         }: {
             slotId: string;
             data: UpdateDoctorSlotData;
+            skipInvalidate?: boolean;
         }) => {
             const path = API_ENDPOINTS.UPDATE_DOCTOR_SLOT.replace(
                 ":slotId",
@@ -25,9 +26,10 @@ export function useUpdateDoctorSlot() {
             const response = await patchApiData(path, data);
             return response;
         },
-        onSuccess: () => {
-            // Optional: invalidate queries if needed, though we'll likely handle the success per slot in the UI
-            queryClient.invalidateQueries({ queryKey: ["doctor-slots"] });
+        onSuccess: (_data, variables) => {
+            if (!variables.skipInvalidate) {
+                queryClient.invalidateQueries({ queryKey: ["doctor-slots"] });
+            }
         },
     });
 }

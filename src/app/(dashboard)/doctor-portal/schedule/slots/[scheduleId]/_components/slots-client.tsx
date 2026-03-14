@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorSlots } from "@/hooks/api/useGetDoctorSlots";
 import { useEffect } from "react";
@@ -52,6 +53,8 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
         new Set(),
     );
     const [isSaving, setIsSaving] = useState(false);
+    const [saveProgress, setSaveProgress] = useState({ current: 0, total: 0 });
+    const queryClient = useQueryClient();
 
     const updateSlotMutation = useUpdateDoctorSlot();
 
@@ -138,30 +141,47 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
                 );
             });
 
-            if (changedSlots.length === 0) {
+            const totalChanges = changedSlots.length;
+            if (totalChanges === 0) {
                 toast.info("No changes to save.");
                 setIsSaving(false);
                 return;
             }
 
-            const updatePromises = changedSlots.map((slot) => {
-                return updateSlotMutation.mutateAsync({
-                    slotId: slot.slot_id?.toString() || "",
-                    data: {
-                        is_available: slot.status_label === "Active",
-                        total_tokens: slot.total_tokens,
-                    },
-                });
-            });
+            setSaveProgress({ current: 0, total: totalChanges });
 
-            const results = await Promise.allSettled(updatePromises);
+            const results = [];
+            for (let i = 0; i < changedSlots.length; i++) {
+                const slot = changedSlots[i];
+                try {
+                    const result = await updateSlotMutation.mutateAsync({
+                        slotId: slot.slot_id?.toString() || "",
+                        data: {
+                            is_available: slot.status_label === "Active",
+                            total_tokens: slot.total_tokens,
+                        },
+                        skipInvalidate: true,
+                    });
+                    results.push({ status: "fulfilled", value: result });
+                } catch (error) {
+                    results.push({ status: "rejected", reason: error });
+                }
+                setSaveProgress((prev) => ({ ...prev, current: i + 1 }));
+            }
+
+            // Manually invalidate only once at the end
+            queryClient.invalidateQueries({ queryKey: ["doctor-slots"] });
 
             const rejected = results.filter(
-                (r): r is PromiseRejectedResult => r.status === "rejected",
+                (r): r is { status: "rejected"; reason: unknown } =>
+                    r.status === "rejected",
             );
 
             if (rejected.length > 0) {
-                const firstError = rejected[0].reason;
+                const firstError = rejected[0].reason as {
+                    message?: string;
+                    data?: { message?: string };
+                };
                 const errorMessage =
                     firstError?.message ||
                     firstError?.data?.message ||
@@ -189,7 +209,45 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
     };
 
     return (
-        <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300">
+        <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300 relative">
+            {/* Progress Overlay */}
+            {isSaving && saveProgress.total > 0 && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
+                    <div className="bg-card w-[320px] p-6 shadow-2xl border border-primary/20 rounded-xl animate-in zoom-in-95 duration-200">
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="relative flex items-center justify-center">
+                                <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                                <span className="absolute text-[10px] font-bold text-primary">
+                                    {Math.round(
+                                        (saveProgress.current /
+                                            saveProgress.total) *
+                                            100,
+                                    )}
+                                    %
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-foreground">
+                                    Updating Slots
+                                </h3>
+                                <p className="text-xs text-muted-foreground font-medium">
+                                    Processed {saveProgress.current} of{" "}
+                                    {saveProgress.total} slots...
+                                </p>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden mt-2">
+                                <div
+                                    className="bg-primary h-full transition-all duration-300 ease-out"
+                                    style={{
+                                        width: `${(saveProgress.current / saveProgress.total) * 100}%`,
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <Button
                     variant="outline"
