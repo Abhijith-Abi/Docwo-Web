@@ -141,8 +141,8 @@ export default function DoctorSidebar({ className }: { className?: string }) {
             </nav>
 
             {/* Bottom Actions */}
-            <div className="mt-auto pt-6 border-t border-white/10 mx-6 w-[calc(100%-3rem)]">
-                <ul className="flex flex-col gap-2 w-full -ml-2">
+            <div className="mt-auto pt-6 border-t border-white/10 w-full">
+                <ul className="flex flex-col gap-2 w-full">
                     {bottomNavItems.map((item) => {
                         const isActive =
                             item.href === "/doctor-portal"

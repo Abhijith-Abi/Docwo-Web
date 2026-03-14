@@ -34,10 +34,10 @@ export function PatientsGridView({
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-6 gap-y-6 pt-2 animate-in fade-in duration-300">
             {patients.map((patient, index) => (
                 <PatientCard
-                    key={`grid-${patient.id}-${index}`}
+                    key={`grid-${patient.patient_id}-${index}`}
                     patient={patient}
-                    isSelected={selectedPatients.includes(patient.id)}
-                    onSelect={(checked) => onSelectPatient(patient.id, checked)}
+                    isSelected={selectedPatients.includes(patient.patient_id)}
+                    onSelect={(checked) => onSelectPatient(patient.patient_id, checked)}
                 />
             ))}
         </div>

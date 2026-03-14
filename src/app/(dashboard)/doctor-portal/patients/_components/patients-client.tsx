@@ -81,7 +81,7 @@ export function PatientsClient() {
     const handleSelectAll = useCallback(
         (checked: boolean, allPatients: any[]) => {
             if (checked) {
-                setSelectedPatients(allPatients.map((p) => p.id));
+                setSelectedPatients(allPatients.map((p) => p.patient_id));
             } else {
                 setSelectedPatients([]);
             }

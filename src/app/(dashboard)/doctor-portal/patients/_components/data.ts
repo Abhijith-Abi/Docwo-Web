@@ -1,13 +1,18 @@
 export interface Patient {
-    id: string;
-    name: string;
-    initials: string;
-    age: string;
-    gender: string;
-    bloodGroup: string;
-    lastVisit: string;
-    doctor: string;
+    patient_id: string;
+    patient_code: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
     email: string;
-    phone: string;
-    noOfVisit: number;
+    date_of_birth: string;
+    gender: string;
+    blood_group: string;
+    city: string;
+    state: string;
+    visit_count: number;
+    last_visit_at: string;
+    // UI helper fields (if needed for rendering)
+    initials?: string;
 }

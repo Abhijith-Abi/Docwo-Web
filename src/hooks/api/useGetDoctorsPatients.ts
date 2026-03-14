@@ -39,31 +39,8 @@ export function useGetDoctorsPatients(clinicId?: string, params?: PaginationPara
             const endpoint = `${API_ENDPOINTS.DOCTOR_PATIENTS.replace(":clinicId", clinicId)}?${searchParams.toString()}`;
             const response = await getApiData(endpoint);
             
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const patients = (response?.data ?? []).map((p: any) => {
-                const birthDate = new Date(p.date_of_birth);
-                const age = p.date_of_birth ? Math.abs(new Date(Date.now() - birthDate.getTime()).getUTCFullYear() - 1970).toString() : "-";
-                
-                const lastVisitDate = p.last_visit_date ? new Date(p.last_visit_date) : null;
-                const formattedLastVisit = lastVisitDate ? `${lastVisitDate.getDate().toString().padStart(2, '0')}-${(lastVisitDate.getMonth() + 1).toString().padStart(2, '0')}-${lastVisitDate.getFullYear()}` : "-";
-
-                return {
-                    id: p.patient_code || p.patient_id,
-                    name: `${p.first_name || ""} ${p.last_name || ""}`.trim(),
-                    initials: `${p.first_name?.[0] || ""}${p.last_name?.[0] || ""}`.toUpperCase(),
-                    age: age,
-                    gender: p.gender === "male" ? "M" : p.gender === "female" ? "F" : "O",
-                    bloodGroup: p.blood_group || "-",
-                    lastVisit: formattedLastVisit,
-                    doctor: p.doctor || "Unassigned",
-                    email: p.email || "-",
-                    phone: p.phone_number || "-",
-                    noOfVisit: p.no_of_visits || 0
-                };
-            });
-
             return {
-                data: patients,
+                data: response?.data || [],
                 pagination: response?.pagination || null
             };
         },

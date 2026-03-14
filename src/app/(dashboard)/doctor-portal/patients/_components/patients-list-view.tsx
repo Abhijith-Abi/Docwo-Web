@@ -89,60 +89,74 @@ export function PatientsListView({
                             </TableCell>
                         </TableRow>
                     ) : (
-                        patients.map((patient, index) => (
-                            <TableRow
-                                key={`list-${patient.id}-${index}`}
-                                className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30"
-                            >
-                                <TableCell className="p-0 text-center align-top">
-                                    <div className="px-4 pt-5 pb-3 h-full flex justify-center">
-                                        <Checkbox
-                                            aria-label={`Select patient ${patient.name}`}
-                                            className="rounded-[4px] border-muted-foreground/40 data-[state=checked]:bg-primary h-4 w-4"
-                                            checked={selectedPatients.includes(
-                                                patient.id,
-                                            )}
-                                            onCheckedChange={(checked) =>
-                                                onSelectPatient(
-                                                    patient.id,
-                                                    !!checked,
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-4 align-top">
-                                    <div>
-                                        <div className="font-medium text-[14px] text-foreground/90">
-                                            {patient.name}
+                        patients.map((patient, index) => {
+                            const fullName = `${patient.first_name || ""} ${patient.last_name || ""}`.trim();
+                            const age = patient.date_of_birth 
+                                ? Math.floor((new Date().getTime() - new Date(patient.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+                                : "N/A";
+                            const formattedLastVisit = patient.last_visit_at
+                                ? new Date(patient.last_visit_at).toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                  })
+                                : "No visit yet";
+
+                            return (
+                                <TableRow
+                                    key={`list-${patient.patient_id}-${index}`}
+                                    className="border-b-border/50 bg-background hover:bg-background even:bg-muted/30 even:hover:bg-muted/30"
+                                >
+                                    <TableCell className="p-0 text-center align-top">
+                                        <div className="px-4 pt-5 pb-3 h-full flex justify-center">
+                                            <Checkbox
+                                                aria-label={`Select patient ${fullName}`}
+                                                className="rounded-[4px] border-muted-foreground/40 data-[state=checked]:bg-primary h-4 w-4"
+                                                checked={selectedPatients.includes(
+                                                    patient.patient_id,
+                                                )}
+                                                onCheckedChange={(checked) =>
+                                                    onSelectPatient(
+                                                        patient.patient_id,
+                                                        !!checked,
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-4 align-top">
+                                        <div>
+                                            <div className="font-medium text-[14px] text-foreground/90">
+                                                {fullName}
+                                            </div>
+                                            <div className="text-[13px] text-muted-foreground mt-0.5">
+                                                {patient.patient_code}
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top capitalize">
+                                        {age}/{patient.gender}
+                                    </TableCell>
+                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
+                                        {patient.blood_group}
+                                    </TableCell>
+                                    <TableCell className="py-4 align-top">
+                                        <div className="text-[14px] font-medium text-foreground/90">
+                                            {patient.phone_number}
                                         </div>
                                         <div className="text-[13px] text-muted-foreground mt-0.5">
-                                            {patient.id}
+                                            {patient.email}
                                         </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
-                                    {patient.age}/{patient.gender}
-                                </TableCell>
-                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
-                                    {patient.bloodGroup}
-                                </TableCell>
-                                <TableCell className="py-4 align-top">
-                                    <div className="text-[14px] font-medium text-foreground/90">
-                                        {patient.phone}
-                                    </div>
-                                    <div className="text-[13px] text-muted-foreground mt-0.5">
-                                        {patient.email}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
-                                    {patient.lastVisit}
-                                </TableCell>
-                                <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
-                                    {patient.noOfVisit}
-                                </TableCell>
-                            </TableRow>
-                        ))
+                                    </TableCell>
+                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
+                                        {formattedLastVisit}
+                                    </TableCell>
+                                    <TableCell className="py-4 text-[14px] font-medium text-foreground/80 align-top">
+                                        {patient.visit_count || 0}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })
                     )}
                 </TableBody>
             </Table>

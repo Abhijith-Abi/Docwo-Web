@@ -3,16 +3,30 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Patient } from "./data";
 
 export function PatientCard({
     patient,
     isSelected,
     onSelect,
 }: {
-    patient: any;
+    patient: Patient;
     isSelected: boolean;
     onSelect: (checked: boolean) => void;
 }) {
+    const fullName = `${patient.first_name || ""} ${patient.last_name || ""}`.trim();
+    const initials = `${patient.first_name?.[0] || ""}${patient.last_name?.[0] || ""}`.toUpperCase();
+    const age = patient.date_of_birth 
+        ? Math.floor((new Date().getTime() - new Date(patient.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+        : "N/A";
+    const formattedLastVisit = patient.last_visit_at
+        ? new Date(patient.last_visit_at).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+          })
+        : "No visit yet";
+
     return (
         <Card className="rounded-[10px] shadow-sm border border-border/80">
             <CardContent className="p-5">
@@ -26,15 +40,15 @@ export function PatientCard({
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 font-bold bg-muted/60 rounded-[8px]">
                             <AvatarFallback className="rounded-[8px] bg-muted/70 text-foreground text-[15px]">
-                                {patient.initials}
+                                {initials}
                             </AvatarFallback>
                         </Avatar>
                         <div>
                             <h3 className="text-[15px] font-semibold tracking-tight text-foreground">
-                                {patient.name}
+                                {fullName}
                             </h3>
                             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                                {patient.id}
+                                {patient.patient_code}
                             </p>
                         </div>
                     </div>
@@ -45,8 +59,8 @@ export function PatientCard({
                         <span className="text-muted-foreground/90 font-medium text-[12px]">
                             Age/Gender
                         </span>
-                        <span className="font-semibold text-foreground text-[12px]">
-                            {patient.age}/{patient.gender}
+                        <span className="font-semibold text-foreground text-[12px] capitalize">
+                            {age}/{patient.gender}
                         </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -54,7 +68,7 @@ export function PatientCard({
                             Blood Group
                         </span>
                         <span className="font-semibold text-foreground text-[12px]">
-                            {patient.bloodGroup}
+                            {patient.blood_group}
                         </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -62,15 +76,23 @@ export function PatientCard({
                             Last Visit
                         </span>
                         <span className="font-semibold text-foreground text-[12px]">
-                            {patient.lastVisit}
+                            {formattedLastVisit}
                         </span>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-muted-foreground/90 font-medium text-[12px]">
-                            Doctor
+                            Visit Count
                         </span>
                         <span className="font-semibold text-foreground text-[12px]">
-                            {patient.doctor}
+                            {patient.visit_count || 0}
+                        </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground/90 font-medium text-[12px]">
+                            Location
+                        </span>
+                        <span className="font-semibold text-foreground text-[12px] truncate max-w-[120px]">
+                            {patient.city}, {patient.state}
                         </span>
                     </div>
                 </div>
@@ -88,7 +110,7 @@ export function PatientCard({
                         className="h-[36px] shrink-0 gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-semibold rounded-md border-border/80 shadow-none px-2 sm:px-2.5 text-foreground/80 hover:text-foreground hover:bg-muted/40"
                     >
                         <Phone className="h-3.5 w-3.5 shrink-0 text-foreground/70" />
-                        <span>{patient.phone}</span>
+                        <span>{patient.phone_number}</span>
                     </Button>
                 </div>
             </CardContent>
