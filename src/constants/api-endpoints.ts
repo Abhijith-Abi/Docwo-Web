@@ -32,6 +32,8 @@ export const API_ENDPOINTS = {
     DOCTOR_WEEKLY_OVERVIEW: '/doctors/:id/dashboard/weekly-overview',
     DOCTOR_CALENDAR_QUICK_VIEW: '/doctors/:id/dashboard/calendar-quick-view',
     DOCTOR_UPCOMING_SESSIONS: '/doctors/:id/dashboard/upcoming-sessions',
+    DOCTOR_DASHBOARD_SLOTS: '/doctors/:id/dashboard/slots',
+    UPDATE_DOCTOR_SLOT: '/doctors/slots/:slotId',
     DOCTOR_SEARCH: '/doctors/search',
     DOCTOR_BULK_UPLOAD: '/doctors/bulk-upload',
     DOCTOR_CHANGE_PASSWORD: '/doctors/:id/change-password',

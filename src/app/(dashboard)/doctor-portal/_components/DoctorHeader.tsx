@@ -40,21 +40,12 @@ export default function DoctorHeader() {
         <header className="sticky top-0 z-50 bg-[#F8F9FA] pt-4 md:rounded-tl-[2.5rem]">
             <div className="flex items-center justify-between px-2 md:px-8 h-16 max-w-7xl mx-auto pb-4 gap-2 md:gap-4 truncate">
                 <div className="flex flex-1 items-center w-full min-w-0 pr-2 md:pr-4">
-                    <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center shrink-0">
-                        {clinicLogo ? (
-                            <Image
-                                src={clinicLogo}
-                                alt="Clinic Logo"
-                                width={36}
-                                height={36}
-                                className="w-9 h-9 bg-white rounded-xl p-1.5 object-contain"
-                            />
-                        ) : (
-                            <span className="font-bold text-gray-500 text-xs">
-                                {clinicName?.charAt(0) || "C"}
-                            </span>
-                        )}
-                    </div>
+                    <Avatar className="h-10 w-10 border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0 mr-1">
+                        <AvatarImage src={clinicLogo} />
+                        <AvatarFallback className="bg-gray-400 text-white pattern-dots h-full w-full opacity-60">
+                            {clinicName?.charAt(0) || "C"}
+                        </AvatarFallback>
+                    </Avatar>
                     <span className="font-semibold text-sm md:text-base whitespace-nowrap hidden lg:inline-block">
                         {clinicName || "Clinic Name"}
                     </span>
@@ -81,8 +72,10 @@ export default function DoctorHeader() {
                         )}
                     </div>
                     <Avatar className="h-10 w-10 border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0">
-                        <AvatarImage src="/images/doctor-avatar.png" />
-                        <AvatarFallback className="bg-gray-400 text-white pattern-dots h-full w-full opacity-60"></AvatarFallback>
+                        <AvatarImage src={user?.doctor_profile?.image} />
+                        <AvatarFallback className="bg-gray-400 text-white pattern-dots h-full w-full opacity-60">
+                            {doctorName?.charAt(0) || "D"}
+                        </AvatarFallback>
                     </Avatar>
                 </div>
             </div>

@@ -11,6 +11,7 @@ import {
     Plus,
     Minus,
     Search,
+    Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -25,33 +26,63 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/auth-store";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { format } from "date-fns";
+import { DoctorSlot, useGetDoctorSlots } from "@/hooks/api/useGetDoctorSlots";
+import { useUpdateDoctorSlot } from "@/hooks/api/useUpdateDoctorSlot";
 
 interface SlotsClientProps {
     scheduleId: string;
 }
 
-const dummySlots = Array.from({ length: 20 }).map((_, i) => ({
-    id: `slot-${i}`,
-    timeRange: "09:00AM - 9:20 AM",
-    totalBookings: 4,
-    currentBooked: 2,
-    status: "Active" as "Active" | "Inactive",
-}));
+const initialSlots: DoctorSlot[] = [];
 
 export function MonthsClient({ scheduleId }: SlotsClientProps) {
     const router = useRouter();
-    const [slots, setSlots] = useState(dummySlots);
+    const searchParams = useSearchParams();
+    const dateParam = searchParams.get("date");
+    const { user } = useAuthStore();
+
+    const doctorId = user?.doctor_profile?.doctor_id;
+    const clinicId = user?.doctor_clinics?.[0]?.clinic_id;
+
+    let resolvedDate = dateParam || scheduleId;
+    if (resolvedDate && resolvedDate.toLowerCase() === "today") {
+        resolvedDate = format(new Date(), "yyyy-MM-dd");
+    }
+
+    const { data: slotsData, isLoading } = useGetDoctorSlots(
+        doctorId,
+        clinicId,
+        resolvedDate,
+    );
+
+    const [slots, setSlots] = useState<DoctorSlot[]>(initialSlots);
     const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string>>(
         new Set(),
     );
+    const [isSaving, setIsSaving] = useState(false);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+    const updateSlotMutation = useUpdateDoctorSlot();
+
+    useEffect(() => {
+        if (slotsData?.data && Array.isArray(slotsData.data)) {
+            // eslint-disable-next-line
+            setSlots(slotsData.data);
+        }
+    }, [slotsData]);
 
     const handleIncrement = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
-                slot.id === id
-                    ? { ...slot, totalBookings: slot.totalBookings + 1 }
+                slot.slot_id === id
+                    ? { ...slot, total_tokens: slot.total_tokens + 1 }
                     : slot,
             ),
         );
@@ -61,8 +92,8 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
-                slot.id === id && slot.totalBookings > 0
-                    ? { ...slot, totalBookings: slot.totalBookings - 1 }
+                slot.slot_id === id && slot.total_tokens > 0
+                    ? { ...slot, total_tokens: slot.total_tokens - 1 }
                     : slot,
             ),
         );
@@ -84,8 +115,8 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         if (selectedSlotIds.size === 0) return;
         setSlots((prev) =>
             prev.map((slot) =>
-                selectedSlotIds.has(slot.id)
-                    ? { ...slot, status: "Active" }
+                selectedSlotIds.has(slot.slot_id)
+                    ? { ...slot, status_label: "Active" }
                     : slot,
             ),
         );
@@ -96,18 +127,128 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         if (selectedSlotIds.size === 0) return;
         setSlots((prev) =>
             prev.map((slot) =>
-                selectedSlotIds.has(slot.id)
-                    ? { ...slot, status: "Inactive" }
+                selectedSlotIds.has(slot.slot_id)
+                    ? { ...slot, status_label: "Inactive" }
                     : slot,
             ),
         );
         setSelectedSlotIds(new Set());
     };
 
+    const handleBulkTokenChange = (value: number) => {
+        if (value < 0) return;
+        setSlots((prev) =>
+            prev.map((slot) => ({
+                ...slot,
+                total_tokens: value,
+            })),
+        );
+    };
+
+    const handleSaveChanges = async () => {
+        if (!slotsData?.data) return;
+        setIsSaving(true);
+
+        try {
+            const changedSlots = slots.filter((currentSlot) => {
+                const originalSlot = slotsData.data.find(
+                    (s: DoctorSlot) => s.slot_id === currentSlot.slot_id,
+                );
+                if (!originalSlot) return false;
+
+                return (
+                    currentSlot.total_tokens !== originalSlot.total_tokens ||
+                    currentSlot.status_label !== originalSlot.status_label
+                );
+            });
+
+            if (changedSlots.length === 0) {
+                toast.info("No changes to save.");
+                setIsSaving(false);
+                return;
+            }
+
+            const updatePromises = changedSlots.map((slot) => {
+                return updateSlotMutation.mutateAsync({
+                    slotId: slot.slot_id?.toString() || "",
+                    data: {
+                        is_available: slot.status_label === "Active",
+                        total_tokens: slot.total_tokens,
+                    },
+                });
+            });
+
+            const results = await Promise.allSettled(updatePromises);
+
+            const rejected = results.filter(
+                (r): r is PromiseRejectedResult => r.status === "rejected",
+            );
+
+            if (rejected.length > 0) {
+                const firstError = rejected[0].reason;
+                const errorMessage =
+                    firstError?.message ||
+                    firstError?.data?.message ||
+                    "Failed to update slots. Please try again.";
+
+                if (rejected.length === results.length) {
+                    toast.error(errorMessage);
+                } else {
+                    toast.error(`Partial success. ${errorMessage}`);
+                }
+            } else {
+                toast.success("Slots updated successfully.");
+            }
+        } catch (error: unknown) {
+            console.error("Error updating slots:", error);
+            const err = error as Record<string, unknown>;
+            const errorMessage =
+                (err?.message as string) ||
+                ((err?.data as Record<string, unknown>)?.message as string) ||
+                "Failed to update slots. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const earliestSlot =
+        slots.length > 0
+            ? slots.reduce((prev, curr) =>
+                  new Date(prev.slot_timestamp) < new Date(curr.slot_timestamp)
+                      ? prev
+                      : curr,
+              )
+            : null;
+    const latestSlot =
+        slots.length > 0
+            ? slots.reduce((prev, curr) =>
+                  new Date(prev.slot_end_timestamp) >
+                  new Date(curr.slot_end_timestamp)
+                      ? prev
+                      : curr,
+              )
+            : null;
+
+    const overallStartTime = earliestSlot?.slot_timestamp
+        ? format(new Date(earliestSlot.slot_timestamp), "hh:mm a")
+        : "—";
+    const overallEndTime = latestSlot?.slot_end_timestamp
+        ? format(new Date(latestSlot.slot_end_timestamp), "hh:mm a")
+        : "—";
+
+    const totalBooked = slots.reduce(
+        (acc, curr) => acc + (curr.booked_tokens || 0),
+        0,
+    );
+    const totalTokens = slots.reduce(
+        (acc, curr) => acc + (curr.total_tokens || 0),
+        0,
+    );
+
     return (
         <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300">
-            {/* Header Area */}
-            <div className="flex flex-col gap-6 mb-8">
+            <div className="flex flex-col gap-6 mb-2">
                 <div className="flex items-center justify-between">
                     <Button
                         variant="outline"
@@ -118,8 +259,17 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                         <span>Back</span>
                     </Button>
 
-                    <Button className="h-9 px-6 bg-[#0E8A63] hover:bg-[#0E8A63]/90 text-white gap-2 font-medium">
-                        Save Changes
+                    <Button
+                        className="h-9 px-6 bg-[#0E8A63] hover:bg-[#0E8A63]/90 text-white gap-2 font-medium"
+                        onClick={handleSaveChanges}
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Save className="w-4 h-4" />
+                        )}
+                        {isSaving ? "Saving..." : "Save Changes"}
                     </Button>
                 </div>
 
@@ -129,8 +279,11 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                             <Calendar className="h-6 w-6 text-foreground/70" />
                         </div>
                         <h1 className="text-xl font-bold text-foreground tracking-tight">
-                            {scheduleId === "Today"
-                                ? "Wednesday, Aug 11, 2025"
+                            {resolvedDate
+                                ? format(
+                                      new Date(resolvedDate),
+                                      "EEEE, MMM dd, yyyy",
+                                  )
                                 : scheduleId}
                         </h1>
                     </div>
@@ -141,7 +294,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                                 Start time :
                             </span>
                             <span className="font-bold text-foreground">
-                                09:00 AM
+                                {overallStartTime}
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -149,16 +302,16 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                                 End time :
                             </span>
                             <span className="font-bold text-foreground">
-                                05:00 PM
+                                {overallEndTime}
                             </span>
                         </div>
                         <div className="col-span-1 lg:col-span-2">
                             <div className="flex items-center gap-2">
                                 <span className="text-muted-foreground font-semibold">
-                                    Total Booking: Count /
+                                    Total Bookings :
                                 </span>
                                 <span className="font-bold text-foreground">
-                                    80
+                                    {totalBooked} / {totalTokens}
                                 </span>
                             </div>
                         </div>
@@ -176,10 +329,10 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                             Slot duration
                         </Label>
                         <Select defaultValue="15">
-                            <SelectTrigger className="w-full h-11 bg-muted/20 border-border/40">
+                            <SelectTrigger className="w-full h-10 bg-muted/20 border-border/40">
                                 <SelectValue placeholder="Select duration" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent position="popper" sideOffset={4}>
                                 <SelectItem value="10">10 minutes</SelectItem>
                                 <SelectItem value="15">15 minutes</SelectItem>
                                 <SelectItem value="20">20 minutes</SelectItem>
@@ -194,13 +347,46 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                         </Label>
                         <div className="relative">
                             <Input
-                                type="number"
-                                defaultValue={4}
-                                className="h-11 bg-muted/20 border-border/40 pr-10 pl-3 font-medium"
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                value={slots[0]?.total_tokens || ""}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(
+                                        /[^0-9]/g,
+                                        "",
+                                    );
+                                    handleBulkTokenChange(
+                                        val === "" ? 0 : parseInt(val, 10),
+                                    );
+                                }}
+                                className="h-10 bg-muted/20 border-border/40 pr-10 pl-3 font-medium"
                             />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center -gap-1">
-                                <ChevronLeft className="h-3 w-3 rotate-90 text-muted-foreground cursor-pointer hover:text-foreground" />
-                                <ChevronLeft className="h-3 w-3 -rotate-90 text-muted-foreground cursor-pointer hover:text-foreground" />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center -space-y-1.5 pt-0.5 pointer-events-none">
+                                <div
+                                    className="pointer-events-auto"
+                                    onClick={() =>
+                                        handleBulkTokenChange(
+                                            (slots[0]?.total_tokens || 0) + 1,
+                                        )
+                                    }
+                                >
+                                    <ChevronLeft className="h-3 w-3 rotate-90 text-muted-foreground cursor-pointer hover:text-foreground" />
+                                </div>
+                                <div
+                                    className="pointer-events-auto"
+                                    onClick={() =>
+                                        handleBulkTokenChange(
+                                            Math.max(
+                                                0,
+                                                (slots[0]?.total_tokens || 0) -
+                                                    1,
+                                            ),
+                                        )
+                                    }
+                                >
+                                    <ChevronLeft className="h-3 w-3 -rotate-90 text-muted-foreground cursor-pointer hover:text-foreground" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,35 +396,37 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
             {/* Slots Grid Container */}
             <div className="bg-background border border-border/60 rounded-[12px] w-full flex-1 flex flex-col shadow-sm overflow-hidden">
                 <div className="p-4 sm:p-6 flex-1 flex flex-col">
-                    <div className="flex items-center justify-end mb-6 gap-3">
-                        <Button
-                            variant={
-                                viewMode === "grid" ? "secondary" : "ghost"
-                            }
-                            size="icon"
-                            className={cn(
-                                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground",
-                                viewMode === "grid" &&
-                                    "bg-muted/60 text-foreground",
-                            )}
-                            onClick={() => setViewMode("grid")}
-                        >
-                            <Grid className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={
-                                viewMode === "list" ? "secondary" : "ghost"
-                            }
-                            size="icon"
-                            className={cn(
-                                "h-8 w-8 p-0 text-muted-foreground hover:text-foreground",
-                                viewMode === "list" &&
-                                    "bg-muted/60 text-foreground",
-                            )}
-                            onClick={() => setViewMode("list")}
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
+                    <div className="flex items-center justify-end mb-6">
+                        <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border/50">
+                            <Button
+                                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                                size="sm"
+                                className={cn(
+                                    "h-8 px-3 gap-2",
+                                    viewMode === "grid" && "shadow-sm bg-background",
+                                )}
+                                onClick={() => setViewMode("grid")}
+                            >
+                                <Grid className="h-4 w-4" />
+                                <span className="hidden sm:inline-block text-xs font-medium">
+                                    Grid
+                                </span>
+                            </Button>
+                            <Button
+                                variant={viewMode === "list" ? "secondary" : "ghost"}
+                                size="sm"
+                                className={cn(
+                                    "h-8 px-3 gap-2",
+                                    viewMode === "list" && "shadow-sm bg-background",
+                                )}
+                                onClick={() => setViewMode("list")}
+                            >
+                                <List className="h-4 w-4" />
+                                <span className="hidden sm:inline-block text-xs font-medium">
+                                    List
+                                </span>
+                            </Button>
+                        </div>
                     </div>
 
                     <div
@@ -249,119 +437,188 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                                 : "grid-cols-1",
                         )}
                     >
-                        {slots.map((slot) => {
-                            const isSelected = selectedSlotIds.has(slot.id);
-
-                            return (
+                        {isLoading ? (
+                            Array.from({ length: 8 }).map((_, i) => (
                                 <div
-                                    key={slot.id}
-                                    onClick={() => toggleSlotSelection(slot.id)}
+                                    key={i}
                                     className={cn(
-                                        "flex border rounded-xl cursor-pointer transition-all duration-200 select-none",
+                                        "flex border rounded-xl p-4 gap-4 border-border/50",
                                         viewMode === "grid"
-                                            ? "flex-col items-center justify-center p-5 pt-7"
-                                            : "flex-col sm:flex-row sm:items-center justify-between p-4 gap-4",
-                                        isSelected
-                                            ? "border-primary bg-primary/5 shadow-sm"
-                                            : "border-border/50 bg-card hover:border-border/80 hover:bg-muted/10",
+                                            ? "flex-col items-center justify-center py-5 h-[160px]"
+                                            : "flex-col sm:flex-row sm:items-center justify-between h-[80px]",
                                     )}
                                 >
-                                    <div
-                                        className={cn(
-                                            "font-bold text-foreground tracking-tight",
-                                            viewMode === "grid"
-                                                ? "text-[15px] mb-5 text-center"
-                                                : "text-[15px]",
-                                        )}
-                                    >
-                                        {slot.timeRange}
-                                    </div>
-
+                                    <Skeleton className="h-5 w-32" />
                                     <div
                                         className={cn(
                                             "flex",
                                             viewMode === "list"
                                                 ? "items-center flex-1 justify-between sm:justify-end gap-6 sm:gap-12"
-                                                : "flex-col items-center w-full",
+                                                : "flex-col items-center w-full gap-3 mt-4",
                                         )}
                                     >
-                                        {/* Custom increment/decrement style pill */}
-                                        <div
-                                            className={cn(
-                                                "flex items-center justify-between border border-border/40 rounded-full py-0.5 bg-background shadow-xs",
-                                                viewMode === "grid"
-                                                    ? "w-[80px] mb-3 mx-auto px-2"
-                                                    : "w-[86px] px-3",
-                                            )}
-                                        >
-                                            <div
-                                                onClick={(e) =>
-                                                    handleDecrement(e, slot.id)
-                                                }
-                                                className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors"
-                                            >
-                                                <Minus
-                                                    className="h-2.5 w-2.5 text-muted-foreground"
-                                                    strokeWidth={3}
-                                                />
-                                            </div>
-                                            <span className="text-[13px] font-bold text-foreground select-none">
-                                                {slot.totalBookings}
-                                            </span>
-                                            <div
-                                                onClick={(e) =>
-                                                    handleIncrement(e, slot.id)
-                                                }
-                                                className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors"
-                                            >
-                                                <Plus
-                                                    className="h-2.5 w-2.5 text-muted-foreground"
-                                                    strokeWidth={3}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            className={cn(
-                                                "text-muted-foreground font-medium flex items-center",
-                                                viewMode === "grid"
-                                                    ? "text-[11px] mb-1.5 justify-center w-full text-center gap-1"
-                                                    : "text-[12px] w-[120px] justify-start",
-                                            )}
-                                        >
-                                            Booked
-                                            {viewMode === "grid"
-                                                ? " :"
-                                                : ":"}{" "}
-                                            {slot.currentBooked}/
-                                            {slot.totalBookings}
-                                        </div>
-
-                                        <div
-                                            className={cn(
-                                                "font-bold",
-                                                viewMode === "grid"
-                                                    ? "text-[12px] text-center"
-                                                    : "text-[13px] w-[70px] text-right",
-                                                slot.status === "Active"
-                                                    ? "text-[#059669]"
-                                                    : "text-red-500",
-                                            )}
-                                        >
-                                            {slot.status}
-                                        </div>
+                                        <Skeleton className="h-8 w-[86px] rounded-full" />
+                                        <Skeleton className="h-4 w-20" />
+                                        <Skeleton className="h-4 w-16" />
                                     </div>
                                 </div>
-                            );
-                        })}
+                            ))
+                        ) : slots.length === 0 ? (
+                            <div className="col-span-full py-16 flex flex-col items-center justify-center text-center">
+                                <div className="bg-muted/50 rounded-full p-4 mb-4">
+                                    <List className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-foreground">
+                                    No slots available
+                                </h3>
+                                <p className="text-muted-foreground max-w-sm mt-1">
+                                    There are no slots scheduled for this date.
+                                    You might need to generate time slots first.
+                                </p>
+                            </div>
+                        ) : (
+                            slots.map((slot) => {
+                                const isSelected = selectedSlotIds.has(
+                                    slot.slot_id,
+                                );
+
+                                // Format the time range
+                                const startTime = slot.slot_timestamp
+                                    ? format(
+                                          new Date(slot.slot_timestamp),
+                                          "hh:mm a",
+                                      )
+                                    : "";
+                                const endTime = slot.slot_end_timestamp
+                                    ? format(
+                                          new Date(slot.slot_end_timestamp),
+                                          "hh:mm a",
+                                      )
+                                    : "";
+                                const timeRange = `${startTime} - ${endTime}`;
+
+                                return (
+                                    <div
+                                        key={slot.slot_id}
+                                        onClick={() =>
+                                            toggleSlotSelection(slot.slot_id)
+                                        }
+                                        className={cn(
+                                            "flex border rounded-xl cursor-pointer transition-all duration-200 select-none",
+                                            viewMode === "grid"
+                                                ? "flex-col items-center justify-center p-5 pt-7"
+                                                : "flex-col sm:flex-row sm:items-center justify-between p-4 gap-4",
+                                            isSelected
+                                                ? "border-primary bg-primary/5 shadow-sm"
+                                                : "border-border/50 bg-card hover:border-border/80 hover:bg-muted/10",
+                                        )}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "font-bold text-foreground tracking-tight",
+                                                viewMode === "grid"
+                                                    ? "text-[15px] mb-5 text-center"
+                                                    : "text-[15px]",
+                                            )}
+                                        >
+                                            {timeRange}
+                                        </div>
+
+                                        <div
+                                            className={cn(
+                                                "flex",
+                                                viewMode === "list"
+                                                    ? "items-center flex-1 justify-between sm:justify-end gap-6 sm:gap-12"
+                                                    : "flex-col items-center w-full",
+                                            )}
+                                        >
+                                            {/* Custom increment/decrement style pill */}
+                                            <div
+                                                className={cn(
+                                                    "flex items-center justify-between border border-border/40 rounded-full py-0.5 bg-background shadow-xs",
+                                                    viewMode === "grid"
+                                                        ? "w-[80px] mb-3 mx-auto px-2"
+                                                        : "w-[86px] px-3",
+                                                )}
+                                            >
+                                                <div
+                                                    onClick={(e) =>
+                                                        handleDecrement(
+                                                            e,
+                                                            slot.slot_id,
+                                                        )
+                                                    }
+                                                    className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors"
+                                                >
+                                                    <Minus
+                                                        className="h-2.5 w-2.5 text-muted-foreground"
+                                                        strokeWidth={3}
+                                                    />
+                                                </div>
+                                                <span className="text-[13px] font-bold text-foreground select-none">
+                                                    {slot.total_tokens}
+                                                </span>
+                                                <div
+                                                    onClick={(e) =>
+                                                        handleIncrement(
+                                                            e,
+                                                            slot.slot_id,
+                                                        )
+                                                    }
+                                                    className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-muted/50 transition-colors"
+                                                >
+                                                    <Plus
+                                                        className="h-2.5 w-2.5 text-muted-foreground"
+                                                        strokeWidth={3}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                className={cn(
+                                                    "text-muted-foreground font-medium flex items-center",
+                                                    viewMode === "grid"
+                                                        ? "text-[11px] mb-1.5 justify-center w-full text-center gap-1"
+                                                        : "text-[12px] w-[120px] justify-start",
+                                                )}
+                                            >
+                                                Booked
+                                                {viewMode === "grid"
+                                                    ? " :"
+                                                    : ":"}{" "}
+                                                {slot.booked_tokens}/
+                                                {slot.total_tokens}
+                                            </div>
+
+                                            <div
+                                                className={cn(
+                                                    "font-bold",
+                                                    viewMode === "grid"
+                                                        ? "text-[12px] text-center"
+                                                        : "text-[13px] w-[70px] text-right",
+                                                    slot.status_label ===
+                                                        "Active"
+                                                        ? "text-[#059669]"
+                                                        : slot.status_label ===
+                                                            "Ongoing"
+                                                          ? "text-blue-500"
+                                                          : "text-red-500",
+                                                )}
+                                            >
+                                                {slot.status_label}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 </div>
 
-                {/* Footer Buttons */}
-                <div className="px-6 py-4 flex items-center justify-end gap-3 border-t border-border/40 bg-card/10">
+                <div className="flex items-center justify-end gap-3 p-2">
                     <Button
                         variant="outline"
-                        className="border-orange-400 text-orange-600 hover:bg-orange-50 hover:text-orange-700 rounded-[4px] px-8 h-9 font-medium"
+                        className="border-green-600 text-foreground hover:bg-green-50 hover:text-green-700 rounded-[4px] px-6 h-9 font-medium"
                         onClick={handleMarkActive}
                         disabled={selectedSlotIds.size === 0}
                     >
@@ -369,7 +626,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                     </Button>
                     <Button
                         variant="outline"
-                        className="border-[#0E8A63] text-[#0E8A63] hover:bg-emerald-50 hover:text-[#0E8A63] rounded-[4px] px-8 h-9 font-medium"
+                        className="border-orange-500 text-foreground hover:bg-orange-50 hover:text-orange-600 rounded-[4px] px-6 h-9 font-medium"
                         onClick={handleMarkInactive}
                         disabled={selectedSlotIds.size === 0}
                     >

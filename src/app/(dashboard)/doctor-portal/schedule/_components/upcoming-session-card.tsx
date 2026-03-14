@@ -132,9 +132,15 @@ export function UpcomingSessionCard({
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-foreground -mt-1 -mr-1"
                     onClick={() => {
-                        router.push(
-                            `/doctor-portal/schedule/slots/${formattedDay}`,
-                        );
+                        let url = `/doctor-portal/schedule/slots/${formattedDay}`;
+                        if (sessionDate) {
+                            const dateStr = format(new Date(sessionDate), "yyyy-MM-dd");
+                            url += `?date=${dateStr}`;
+                        } else if (isToday) {
+                            const dateStr = format(new Date(), "yyyy-MM-dd");
+                            url += `?date=${dateStr}`;
+                        }
+                        router.push(url);
                     }}
                 >
                     <Pencil className="h-4 w-4" />
@@ -220,9 +226,17 @@ export function UpcomingSessionCard({
                 <Button
                     variant="outline"
                     className="h-9 px-6 text-[14px] font-medium border-orange-400 text-foreground hover:bg-orange-50 hover:text-orange-600 transition-colors rounded-[4px]"
-                    onClick={() =>
-                        router.push(`/doctor-portal/schedule/slots/months`)
-                    }
+                    onClick={() => {
+                        let url = `/doctor-portal/schedule/slots/months`;
+                        if (sessionDate) {
+                            const dateStr = format(new Date(sessionDate), "yyyy-MM-dd");
+                            url += `?date=${dateStr}`;
+                        } else if (isToday) {
+                            const dateStr = format(new Date(), "yyyy-MM-dd");
+                            url += `?date=${dateStr}`;
+                        }
+                        router.push(url);
+                    }}
                 >
                     Slots
                 </Button>
