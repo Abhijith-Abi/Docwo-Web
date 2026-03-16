@@ -1,11 +1,12 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Activity } from "lucide-react";
+import { Activity, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataErrorState } from "@/components/ui/data-state-view";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorWeeklyOverview } from "@/hooks/api/useGetDoctorWeeklyOverview";
+import { Button } from "@/components/ui/button";
 
 const DAYS_ORDER = [
     "Monday",
@@ -30,7 +31,8 @@ export default function WeeklyOverview() {
     const user = useAuthStore((state) => state.user);
     const doctorId = user?.doctor_profile?.doctor_id;
 
-    const { data, isLoading, isError } = useGetDoctorWeeklyOverview(doctorId);
+    const { data, isLoading, isError, refetch, isFetching } =
+        useGetDoctorWeeklyOverview(doctorId);
 
     if (isLoading) {
         return (
@@ -102,6 +104,17 @@ export default function WeeklyOverview() {
                         Weekly Overview
                     </h2>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md text-gray-500"
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                >
+                    <RefreshCw
+                        className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                    />
+                </Button>
             </div>
 
             <div className="flex justify-around mb-8">

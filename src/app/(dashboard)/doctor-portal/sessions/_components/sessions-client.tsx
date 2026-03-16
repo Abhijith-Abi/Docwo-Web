@@ -6,15 +6,17 @@ import AppointmentCarousel from "./appointment-cards";
 import TotalBookingsListView from "./total-bookings-table";
 import { TotalBookingsGridView } from "./total-bookings-grid-view";
 import { TotalBookingsToolbar } from "./total-bookings-toolbar";
-import { TotalBookingsFilters, SessionsFiltersType } from "./total-bookings-filters";
+import {
+    TotalBookingsFilters,
+    SessionsFiltersType,
+} from "./total-bookings-filters";
 import { SharedPagination } from "@/components/customize-components/shared-pagination";
 import { useAuthStore } from "@/store/auth-store";
+import { useGetDoctorQueue } from "@/hooks/api/useGetDoctorQueue";
 import { useGetDoctorAppointments } from "@/hooks/api/useGetDoctorAppointments";
 import { format } from "date-fns";
 import { UpcomingSessionsSkeleton } from "../../schedule/_components/schedule-skeletons";
 import { DataErrorState } from "@/components/ui/data-state-view";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock } from "lucide-react";
 
 export default function SessionsClient() {
     const [view, setView] = useState<"list" | "grid">("list");
@@ -25,16 +27,26 @@ export default function SessionsClient() {
         status: "all",
         gender: "all",
         age: "all",
-        date: undefined,
+        date: new Date(), // Default to today for queue
     });
 
     const user = useAuthStore((state) => state.user);
     const doctorId = user?.doctor_profile?.doctor_id;
+    const clinicId = user?.doctor_clinics?.[0]?.clinic_id;
+    const selectedDate = filters.date ? format(filters.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
 
+    // Fetch live queue data
+    const {
+        data: queueData,
+        isLoading: isQueueLoading,
+        isError: isQueueError,
+    } = useGetDoctorQueue(clinicId, doctorId, selectedDate);
+
+    // Fetch (legacy/searchable) appointments
     const {
         data: appointmentsResponse,
-        isLoading,
-        isError,
+        isLoading: isAppointmentsLoading,
+        isError: isAppointmentsError,
     } = useGetDoctorAppointments(doctorId, {
         page: currentPage,
         limit: 10,
@@ -42,11 +54,20 @@ export default function SessionsClient() {
         status: filters.status,
         gender: filters.gender,
         age: filters.age,
-        date: filters.date ? format(filters.date, "yyyy-MM-dd") : undefined,
+        date: selectedDate,
     });
+
+    const isLoading = isQueueLoading || isAppointmentsLoading;
+    const isError = isQueueError || isAppointmentsError;
 
     const bookings = appointmentsResponse?.data || [];
     const pagination = appointmentsResponse?.pagination;
+
+    // Derive current and next patients from queue logic
+    const queue = queueData?.queue || [];
+    const currentPatient = queue.find(p => p.token_status?.toLowerCase() === "consulting") || null;
+    const nextPatient = queue.find(p => p.token_status?.toLowerCase() === "waiting") || null;
+    const remainingQueue = queue.filter(p => p !== currentPatient && p !== nextPatient);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleFilterChange = (key: keyof SessionsFiltersType, value: any) => {
@@ -54,7 +75,7 @@ export default function SessionsClient() {
         setCurrentPage(1);
     };
 
-    const totalBookingsCount = pagination?.totalResults || 0;
+    const totalBookingsCount = pagination?.totalResults || queueData?.sessionStatus?.totalScheduled || 0;
 
     return (
         <div className="space-y-8 pb-10">
@@ -65,7 +86,12 @@ export default function SessionsClient() {
                 <h2 className="text-xl font-bold text-foreground tracking-tight">
                     Session Overview
                 </h2>
-                <SessionStats />
+                <SessionStats 
+                    completed={queueData?.sessionStatus?.patientsSeenToday}
+                    upcoming={queue.length}
+                    skipped={0}
+                    total={queueData?.sessionStatus?.totalScheduled}
+                />
             </section>
 
             {/* Appointment Status / Carousel */}
@@ -73,7 +99,11 @@ export default function SessionsClient() {
                 <h2 className="text-xl font-bold text-foreground tracking-tight">
                     Appointment Status
                 </h2>
-                <AppointmentCarousel />
+                <AppointmentCarousel 
+                    currentPatient={currentPatient}
+                    nextPatient={nextPatient}
+                    remainingQueue={remainingQueue}
+                />
             </section>
 
             {/* Total Bookings Section */}

@@ -2,14 +2,37 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight } from "lucide-react";
 
-const stats = [
-    { label: "Completed", value: "12", color: "text-blue-600 dark:text-blue-400" },
-    { label: "Reported", value: "8", color: "text-orange-600 dark:text-orange-400" },
-    { label: "Upcoming", value: "24", color: "text-primary" },
-    { label: "Skipped", value: "4", color: "text-destructive" },
-];
+export interface SessionStatsProps {
+    completed?: number;
+    upcoming?: number;
+    skipped?: number;
+    total?: number;
+}
 
-export default function SessionStats() {
+export default function SessionStats({
+    completed = 0,
+    upcoming = 0,
+    skipped = 0,
+}: SessionStatsProps) {
+    const stats = [
+        {
+            label: "Completed",
+            value: completed.toString(),
+            color: "text-blue-600 dark:text-blue-400",
+        },
+        {
+            label: "Remaining",
+            value: upcoming.toString(),
+            color: "text-orange-600 dark:text-orange-400",
+        },
+        {
+            label: "Upcoming",
+            value: (completed + upcoming + skipped).toString(),
+            color: "text-primary",
+        },
+        { label: "Skipped", value: skipped.toString(), color: "text-destructive" },
+    ];
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat) => (
@@ -24,7 +47,9 @@ export default function SessionStats() {
                             </span>
                             <ArrowUpRight className="w-5 h-5 text-muted-foreground/50" />
                         </div>
-                        <div className={`text-4xl font-bold ${stat.color} tracking-tight`}>
+                        <div
+                            className={`text-4xl font-bold ${stat.color} tracking-tight`}
+                        >
                             {stat.value}
                         </div>
                     </CardContent>

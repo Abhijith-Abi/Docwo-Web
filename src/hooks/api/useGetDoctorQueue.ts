@@ -5,8 +5,8 @@ import { API_ENDPOINTS } from "@/constants/api-endpoints";
 export interface QueuePatient {
     appointment_id: string;
     token_number: number;
-    status: string;
-    patient_name?: string;
+    token_status: string;
+    patient_name: string;
     patient?: {
         name?: string;
         date_of_birth?: string;
@@ -17,26 +17,28 @@ export interface QueuePatient {
         slot_timestamp?: string;
         slot_end_timestamp?: string;
     };
-    doctor_slots?: {
-        slot_timestamp?: string;
-        slot_end_timestamp?: string;
-    };
-    slot_timestamp?: string;
-    slot_end_timestamp?: string;
-    date_of_birth?: string;
-    gender?: string;
+}
+
+export interface SessionStatus {
+    isActive: boolean;
+    sessionStartTime: string | null;
+    plannedEndTime: string | null;
+    patientsSeenToday: number;
+    totalScheduled: number;
+}
+
+export interface BreakStatus {
+    isOnBreak: boolean;
+    breakStartTime: string | null;
+    expectedEndTime: string | null;
+    reason: string | null;
+    message: string | null;
 }
 
 export interface QueueState {
-    clinicId: string;
-    doctorId: string;
-    date: string;
-    currentQueue: QueuePatient[];
-    currentPatient: QueuePatient | null;
-    nextPatient: QueuePatient | null;
-    totalInQueue: number;
-    totalExpected: number;
-    totalCompleted: number;
+    queue: QueuePatient[];
+    sessionStatus: SessionStatus;
+    breakStatus: BreakStatus;
 }
 
 export function useGetDoctorQueue(

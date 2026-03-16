@@ -132,14 +132,25 @@ export function UpcomingSessionCard({
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-foreground -mt-1 -mr-1 rounded-md"
                     onClick={() => {
+                        const scheduleId = session?.schedule_id || session?.id;
                         let url = `/doctor-portal/schedule/slots/${formattedDay}`;
+                        const params = new URLSearchParams();
+                        
                         if (sessionDate) {
-                            const dateStr = format(new Date(sessionDate), "yyyy-MM-dd");
-                            url += `?date=${dateStr}`;
+                            params.set("date", format(new Date(sessionDate), "yyyy-MM-dd"));
                         } else if (isToday) {
-                            const dateStr = format(new Date(), "yyyy-MM-dd");
-                            url += `?date=${dateStr}`;
+                            params.set("date", format(new Date(), "yyyy-MM-dd"));
                         }
+                        
+                        if (scheduleId) {
+                            params.set("scheduleId", scheduleId.toString());
+                        }
+
+                        const queryString = params.toString();
+                        if (queryString) {
+                            url += `?${queryString}`;
+                        }
+                        
                         router.push(url);
                     }}
                 >
@@ -219,14 +230,25 @@ export function UpcomingSessionCard({
                     size="sm"
                     className="h-8 px-4 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5 hover:text-primary transition-colors rounded-md"
                     onClick={() => {
+                        const scheduleId = session?.schedule_id || session?.id;
                         let url = `/doctor-portal/schedule/slots/months`;
+                        const params = new URLSearchParams();
+                        
                         if (sessionDate) {
-                            const dateStr = format(new Date(sessionDate), "yyyy-MM-dd");
-                            url += `?date=${dateStr}`;
+                            params.set("date", format(new Date(sessionDate), "yyyy-MM-dd"));
                         } else if (isToday) {
-                            const dateStr = format(new Date(), "yyyy-MM-dd");
-                            url += `?date=${dateStr}`;
+                            params.set("date", format(new Date(), "yyyy-MM-dd"));
                         }
+                        
+                        if (scheduleId) {
+                            params.set("scheduleId", scheduleId.toString());
+                        }
+
+                        const queryString = params.toString();
+                        if (queryString) {
+                            url += `?${queryString}`;
+                        }
+                        
                         router.push(url);
                     }}
                 >

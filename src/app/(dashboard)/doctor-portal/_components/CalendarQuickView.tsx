@@ -1,17 +1,18 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Calendar } from "lucide-react";
+import { Calendar, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataErrorState } from "@/components/ui/data-state-view";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorCalendarQuickView } from "@/hooks/api/useGetDoctorCalendarQuickView";
+import { Button } from "@/components/ui/button";
 
 export default function CalendarQuickView() {
     const user = useAuthStore((state) => state.user);
     const doctorId = user?.doctor_profile?.doctor_id;
 
-    const { data, isLoading, isError } =
+    const { data, isLoading, isError, refetch, isFetching } =
         useGetDoctorCalendarQuickView(doctorId);
 
     if (isLoading) {
@@ -51,11 +52,24 @@ export default function CalendarQuickView() {
 
     return (
         <Card className="w-full bg-white flex flex-col p-6 shadow-sm border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-                <Calendar className="w-5 h-5 text-yellow-600" />
-                <h2 className="text-yellow-600 font-semibold text-lg">
-                    Calendar Quick View
-                </h2>
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-yellow-600" />
+                    <h2 className="text-yellow-600 font-semibold text-lg">
+                        Calendar Quick View
+                    </h2>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md text-gray-500"
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                >
+                    <RefreshCw
+                        className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                    />
+                </Button>
             </div>
 
             <div className="flex flex-col gap-3">

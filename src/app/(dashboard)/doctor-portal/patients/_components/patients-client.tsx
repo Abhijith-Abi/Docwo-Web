@@ -107,6 +107,8 @@ export function PatientsClient() {
         data: { data: patients = [], pagination = null } = {},
         isLoading,
         isError,
+        refetch,
+        isFetching,
     } = useGetDoctorsPatients(
         user?.clinic_assignments?.[0]?.clinic_id ||
             user?.doctor_clinics?.[0]?.clinic_id,
@@ -128,7 +130,7 @@ export function PatientsClient() {
 
     return (
         <div className="flex-1 space-y-7 animate-in fade-in duration-500">
-            <PatientsHeader />
+            <PatientsHeader onRefresh={refetch} isRefreshing={isFetching} />
 
             <div className="bg-background border border-border/80 rounded-[12px] p-4 sm:p-5 shadow-sm">
                 <PatientsToolbar

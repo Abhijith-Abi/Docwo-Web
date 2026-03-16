@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { Clock, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorQueue } from "@/hooks/api/useGetDoctorQueue";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +11,7 @@ import {
     DataEmptyState,
 } from "@/components/ui/data-state-view";
 import { format, differenceInYears } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 export default function NextAppointment() {
     const user = useAuthStore((state) => state.user);
@@ -20,16 +21,16 @@ export default function NextAppointment() {
 
     console.log(doctorId, clinicId, user, "---");
 
-    const { data, isLoading, isError } = useGetDoctorQueue(
+    const { data, isLoading, isError, refetch, isFetching } = useGetDoctorQueue(
         clinicId,
         doctorId,
         today,
     );
 
-    const nextPatient = data?.nextPatient ?? (data?.currentQueue?.[0] || null);
+    const nextPatient = data?.queue?.[0] || null;
 
-    const totalInQueue = data?.totalInQueue ?? 0;
-    const totalExpected = data?.totalExpected ?? 0;
+    const totalInQueue = data?.queue?.length ?? 0;
+    const totalExpected = data?.sessionStatus?.totalScheduled ?? 0;
 
     const circumference = 2 * Math.PI * 56;
     const progress =
@@ -38,9 +39,9 @@ export default function NextAppointment() {
     const patientData = nextPatient?.patient ?? {};
     const patientName =
         patientData?.name || nextPatient?.patient_name || "No next patient";
-    const dob = patientData?.date_of_birth || nextPatient?.date_of_birth;
+    const dob = patientData?.date_of_birth;
     const age = dob ? differenceInYears(new Date(), new Date(dob)) : null;
-    const gender = patientData?.gender || nextPatient?.gender || null;
+    const gender = patientData?.gender || null;
     const ageGender =
         age !== null && gender
             ? `${age} / ${gender}`
@@ -48,14 +49,8 @@ export default function NextAppointment() {
               ? `${age}`
               : (gender ?? null);
 
-    const startSlot =
-        nextPatient?.slot?.slot_timestamp ||
-        nextPatient?.doctor_slots?.slot_timestamp ||
-        nextPatient?.slot_timestamp;
-    const endSlot =
-        nextPatient?.slot?.slot_end_timestamp ||
-        nextPatient?.doctor_slots?.slot_end_timestamp ||
-        nextPatient?.slot_end_timestamp;
+    const startSlot = nextPatient?.slot?.slot_timestamp;
+    const endSlot = nextPatient?.slot?.slot_end_timestamp;
 
     const timeSchedule =
         startSlot && endSlot
@@ -93,11 +88,24 @@ export default function NextAppointment() {
     if (isError) {
         return (
             <Card className="w-full bg-white flex flex-col p-6 shadow-sm border-gray-200">
-                <div className="flex items-center gap-2 mb-4">
-                    <Clock className="w-5 h-5 text-blue-500" />
-                    <h2 className="text-blue-500 font-semibold text-lg">
-                        Next Appointment
-                    </h2>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-blue-500" />
+                        <h2 className="text-blue-500 font-semibold text-lg">
+                            Next Appointment
+                        </h2>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-md text-gray-500"
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                    >
+                        <RefreshCw
+                            className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                        />
+                    </Button>
                 </div>
                 <DataErrorState
                     title="Failed to load queue"
@@ -109,11 +117,24 @@ export default function NextAppointment() {
 
     return (
         <Card className="w-full bg-white flex flex-col p-6 shadow-sm border-gray-200">
-            <div className="flex items-center gap-2 mb-6">
-                <Clock className="w-5 h-5 text-blue-500" />
-                <h2 className="text-blue-500 font-semibold text-lg">
-                    Next Appointment
-                </h2>
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-blue-500" />
+                    <h2 className="text-blue-500 font-semibold text-lg">
+                        Next Appointment
+                    </h2>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md text-gray-500"
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                >
+                    <RefreshCw
+                        className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                    />
+                </Button>
             </div>
 
             <div className="flex flex-col items-center justify-center mb-6">

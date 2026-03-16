@@ -1,7 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Download, Plus, RefreshCw } from "lucide-react";
 
-export function PatientsHeader() {
+interface PatientsHeaderProps {
+    onRefresh?: () => void;
+    isRefreshing?: boolean;
+}
+
+export function PatientsHeader({
+    onRefresh,
+    isRefreshing,
+}: PatientsHeaderProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -16,8 +24,12 @@ export function PatientsHeader() {
                     size="icon"
                     className="h-9 w-9 rounded-md shrink-0"
                     aria-label="Refresh"
+                    onClick={onRefresh}
+                    disabled={isRefreshing}
                 >
-                    <RefreshCw className="h-4 w-4" />
+                    <RefreshCw
+                        className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                    />
                 </Button>
                 <Button
                     variant="default"
