@@ -1,15 +1,12 @@
 "use client";
 
-import React from "react";
 import { Card } from "@/components/ui/card";
 import { Clock, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorQueue } from "@/hooks/api/useGetDoctorQueue";
+import { useQueueSocket } from "@/hooks/useQueueSocket";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-    DataErrorState,
-    DataEmptyState,
-} from "@/components/ui/data-state-view";
+import { DataErrorState } from "@/components/ui/data-state-view";
 import { format, differenceInYears } from "date-fns";
 import { Button } from "@/components/ui/button";
 
@@ -19,17 +16,18 @@ export default function NextAppointment() {
     const clinicId = user?.doctor_clinics?.[0]?.clinic_id;
     const today = format(new Date(), "yyyy-MM-dd");
 
-    console.log(doctorId, clinicId, user, "---");
-
     const { data, isLoading, isError, refetch, isFetching } = useGetDoctorQueue(
         clinicId,
         doctorId,
         today,
     );
 
-    const nextPatient = data?.queue?.[0] || null;
+    useQueueSocket({ clinicId, doctorId, date: today });
 
-    const totalInQueue = data?.queue?.length ?? 0;
+    const queue = Array.isArray(data?.queue) ? data.queue : [];
+    const nextPatient = queue[0] || null;
+
+    const totalInQueue = queue.length;
     const totalExpected = data?.sessionStatus?.totalScheduled ?? 0;
 
     const circumference = 2 * Math.PI * 56;
@@ -39,6 +37,8 @@ export default function NextAppointment() {
     const patientData = nextPatient?.patient ?? {};
     const patientName =
         patientData?.name || nextPatient?.patient_name || "No next patient";
+    const tokenNumber = nextPatient?.token_number || "";
+    const tokenStatus = nextPatient?.token_status || "";
     const dob = patientData?.date_of_birth;
     const age = dob ? differenceInYears(new Date(), new Date(dob)) : null;
     const gender = patientData?.gender || null;
@@ -49,15 +49,7 @@ export default function NextAppointment() {
               ? `${age}`
               : (gender ?? null);
 
-    const startSlot = nextPatient?.slot?.slot_timestamp;
-    const endSlot = nextPatient?.slot?.slot_end_timestamp;
-
-    const timeSchedule =
-        startSlot && endSlot
-            ? `${format(new Date(startSlot), "hh:mm a")} to ${format(new Date(endSlot), "hh:mm a")}`
-            : startSlot
-              ? format(new Date(startSlot), "hh:mm a")
-              : null;
+    const upcomingQueue = queue.slice(1, 4);
 
     if (isLoading) {
         return (
@@ -92,7 +84,7 @@ export default function NextAppointment() {
                     <div className="flex items-center gap-2">
                         <Clock className="w-5 h-5 text-blue-500" />
                         <h2 className="text-blue-500 font-semibold text-lg">
-                            Next Appointment
+                            Current Appointment
                         </h2>
                     </div>
                     <Button
@@ -116,12 +108,12 @@ export default function NextAppointment() {
     }
 
     return (
-        <Card className="w-full bg-white flex flex-col p-6 shadow-sm border-gray-200">
+        <Card className="w-full bg-white flex flex-col p-5 shadow-sm border-gray-200">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-500" />
+                    <Clock className="w-4 h-4 text-blue-500" />
                     <h2 className="text-blue-500 font-semibold text-lg">
-                        Next Appointment
+                        Current Appointment
                     </h2>
                 </div>
                 <Button
@@ -137,9 +129,8 @@ export default function NextAppointment() {
                 </Button>
             </div>
 
-            <div className="flex flex-col items-center justify-center mb-6">
+            <div className="flex flex-col items-center justify-center mb-1">
                 <div className="relative w-32 h-32 flex items-center justify-center">
-                    {/* Background Circle */}
                     <svg className="absolute inset-0 w-full h-full transform -rotate-90">
                         <circle
                             cx="64"
@@ -164,45 +155,113 @@ export default function NextAppointment() {
                             strokeLinecap="round"
                         />
                     </svg>
-                    <div className="flex flex-col items-center justify-center z-10 bg-white rounded-full w-[88px] h-[88px] shadow-sm">
-                        <span className="text-3xl font-bold text-gray-900 border-none outline-none">
-                            {totalInQueue}
+                    <div
+                        className={`flex flex-col items-center justify-center z-10 rounded-full w-[96px] h-[96px] shadow-lg relative transition-all duration-500 ${tokenStatus === "in_consult" ? "bg-blue-600 text-white animate-pulse-bg" : "bg-white text-gray-900"}`}
+                    >
+                        {tokenStatus === "in_consult" && (
+                            <>
+                                <div
+                                    className="absolute inset-0 rounded-full bg-blue-500/50 animate-pulse-ring ring-4 ring-blue-400/30"
+                                    style={{ animationDelay: "0s" }}
+                                />
+                                <div
+                                    className="absolute inset-0 rounded-full bg-blue-500/50 animate-pulse-ring ring-4 ring-blue-400/30"
+                                    style={{ animationDelay: "1s" }}
+                                />
+                                <div
+                                    className="absolute inset-0 rounded-full bg-blue-500/50 animate-pulse-ring ring-4 ring-blue-400/30"
+                                    style={{ animationDelay: "2s" }}
+                                />
+                            </>
+                        )}
+                        <span
+                            className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 z-10 ${tokenStatus === "in_consult" ? "text-blue-100" : "text-gray-400"}`}
+                        >
+                            Token
                         </span>
-                        <span className="text-[10px] text-gray-400 leading-tight">
-                            in queue
+                        <span className="text-4xl font-black border-none outline-none z-10 leading-none drop-shadow-sm">
+                            {nextPatient?.token_number}
                         </span>
+                        <div
+                            className={`mt-1.5 flex items-center gap-1 px-2.5 py-0.5 rounded-full z-10 ${tokenStatus === "in_consult" ? "bg-white/20 backdrop-blur-sm border border-white/30" : "bg-gray-100 border border-gray-200"}`}
+                        >
+                            <span
+                                className={`text-[9px] font-bold uppercase tracking-wider leading-tight ${tokenStatus === "in_consult" ? "text-white" : "text-gray-500"}`}
+                            >
+                                {tokenStatus === "in_consult"
+                                    ? "consulting"
+                                    : "waiting"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center mt-3 w-full">
+                    <div className="flex flex-col items-center space-y-1.5 transition-all duration-500">
+                        <div className="flex items-center gap-2 mb-0.5">
+                            <span
+                                className={`h-1 w-1 rounded-full bg-blue-500 ${tokenStatus === "in_consult" ? "animate-pulse" : ""}`}
+                            />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500/70">
+                                {tokenStatus === "in_consult"
+                                    ? "Now Consulting"
+                                    : "Next Patient"}
+                            </span>
+                            <span
+                                className={`h-1 w-1 rounded-full bg-blue-500 ${tokenStatus === "in_consult" ? "animate-pulse" : ""}`}
+                            />
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-900 tracking-tight text-center leading-tight drop-shadow-sm px-4">
+                            {patientName}
+                        </h3>
+                        {ageGender && (
+                            <div className="flex items-center gap-2 px-4 py-1 bg-blue-50/50 rounded-full border border-blue-100/50 mt-1 shadow-sm">
+                                <span className="text-[11px] font-bold text-blue-600/80 uppercase tracking-wider">
+                                    {ageGender}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
             {nextPatient ? (
-                <div className="text-center space-y-1">
-                    <h3 className="font-bold text-gray-900 text-lg">
-                        {patientName}
-                    </h3>
-                    {ageGender && (
-                        <p className="text-gray-500 text-sm capitalize">
-                            {ageGender}
-                        </p>
+                <>
+                    {upcomingQueue.length > 0 && (
+                        <div className="border-t border-gray-100 pt-2 w-full">
+                            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                                Upcoming in Queue
+                            </h4>
+                            <div className="space-y-3">
+                                {upcomingQueue.map((patient, idx) => (
+                                    <div
+                                        key={patient.appointment_id || idx}
+                                        className="flex items-center justify-between text-sm"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+                                                {(patient.token_number || 0)
+                                                    .toString()
+                                                    .padStart(2, "0")}
+                                            </span>
+                                            <span className="text-gray-700 font-medium truncate max-w-[120px]">
+                                                {patient.patient_name ||
+                                                    patient.patient?.name ||
+                                                    "Patient"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
-                    {timeSchedule && (
-                        <p className="text-gray-400 text-xs mt-2">
-                            Time Schedule : {timeSchedule}
-                        </p>
-                    )}
-                    {nextPatient.token_number && (
-                        <p className="text-gray-400 text-xs">
-                            Token :{" "}
-                            <span className="font-semibold text-emerald-500">
-                                {nextPatient.token_number
-                                    .toString()
-                                    .padStart(2, "0")}
-                            </span>
-                        </p>
-                    )}
-                </div>
+                </>
             ) : (
-                <></>
+                <div className="text-center py-4">
+                    <p className="text-gray-500 text-sm">
+                        No patients currently in queue
+                    </p>
+                </div>
             )}
         </Card>
     );

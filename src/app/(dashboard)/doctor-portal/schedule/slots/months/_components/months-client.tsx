@@ -71,7 +71,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
     );
 
     const [slots, setSlots] = useState<DoctorSlot[]>(initialSlots);
-    const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string>>(
+    const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string | number>>(
         new Set(),
     );
     const [isSaving, setIsSaving] = useState(false);
@@ -88,7 +88,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         }
     }, [slotsData]);
 
-    const handleIncrement = (e: React.MouseEvent, id: string) => {
+    const handleIncrement = (e: React.MouseEvent, id: string | number) => {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
@@ -99,7 +99,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         );
     };
 
-    const handleDecrement = (e: React.MouseEvent, id: string) => {
+    const handleDecrement = (e: React.MouseEvent, id: string | number) => {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
@@ -110,7 +110,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         );
     };
 
-    const toggleSlotSelection = (id: string) => {
+    const toggleSlotSelection = (id: string | number) => {
         setSelectedSlotIds((prev) => {
             const newSet = new Set(prev);
             if (newSet.has(id)) {
@@ -224,7 +224,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                 );
                 
                 return {
-                    slot_id: slot.slot_id,
+                    slot_id: Number(slot.slot_id),
                     is_available: slot.status_label === "Active",
                     total_tokens: slot.total_tokens,
                     slot_timestamp: slot.slot_timestamp !== originalSlot?.slot_timestamp ? slot.slot_timestamp : undefined,

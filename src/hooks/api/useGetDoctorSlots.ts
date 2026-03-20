@@ -3,7 +3,7 @@ import getApiData from "@/utils/api-fetch/get-api-data";
 import { API_ENDPOINTS } from "@/constants/api-endpoints";
 
 export interface DoctorSlot {
-    slot_id: string;
+    slot_id: string | number;
     slot_timestamp: string;
     slot_end_timestamp: string;
     total_tokens: number;

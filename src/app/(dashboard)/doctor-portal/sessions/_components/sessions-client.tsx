@@ -13,6 +13,7 @@ import {
 import { SharedPagination } from "@/components/customize-components/shared-pagination";
 import { useAuthStore } from "@/store/auth-store";
 import { useGetDoctorQueue } from "@/hooks/api/useGetDoctorQueue";
+import { useQueueSocket } from "@/hooks/useQueueSocket";
 import { useGetDoctorAppointments } from "@/hooks/api/useGetDoctorAppointments";
 import { format } from "date-fns";
 import { UpcomingSessionsSkeleton } from "../../schedule/_components/schedule-skeletons";
@@ -42,6 +43,8 @@ export default function SessionsClient() {
         isError: isQueueError,
     } = useGetDoctorQueue(clinicId, doctorId, selectedDate);
 
+    useQueueSocket({ clinicId, doctorId, date: selectedDate });
+
     // Fetch (legacy/searchable) appointments
     const {
         data: appointmentsResponse,
@@ -64,7 +67,7 @@ export default function SessionsClient() {
     const pagination = appointmentsResponse?.pagination;
 
     // Derive current and next patients from queue logic
-    const queue = queueData?.queue || [];
+    const queue = Array.isArray(queueData?.queue) ? queueData.queue : [];
     const currentPatient = queue.find(p => p.token_status?.toLowerCase() === "consulting") || null;
     const nextPatient = queue.find(p => p.token_status?.toLowerCase() === "waiting") || null;
     const remainingQueue = queue.filter(p => p !== currentPatient && p !== nextPatient);

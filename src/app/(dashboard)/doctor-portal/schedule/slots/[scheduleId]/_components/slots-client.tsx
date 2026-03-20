@@ -43,12 +43,10 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
     );
 
     const [slots, setSlots] = useState<DoctorSlot[]>(initialSlots);
-    const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string>>(
+    const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string | number>>(
         new Set(),
     );
     const [isSaving, setIsSaving] = useState(false);
-    const [saveProgress, setSaveProgress] = useState({ current: 0, total: 0 });
-    const queryClient = useQueryClient();
 
     const updateSlotsMutation = useUpdateDoctorSlotsBulk();
 
@@ -60,7 +58,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
     }, [slotsData]);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-    const handleIncrement = (e: React.MouseEvent, id: string) => {
+    const handleIncrement = (e: React.MouseEvent, id: string | number) => {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
@@ -71,7 +69,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
         );
     };
 
-    const handleDecrement = (e: React.MouseEvent, id: string) => {
+    const handleDecrement = (e: React.MouseEvent, id: string | number) => {
         e.stopPropagation();
         setSlots((prev) =>
             prev.map((slot) =>
@@ -82,7 +80,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
         );
     };
 
-    const toggleSlotSelection = (id: string) => {
+    const toggleSlotSelection = (id: string | number) => {
         setSelectedSlotIds((prev) => {
             const newSet = new Set(prev);
             if (newSet.has(id)) {
@@ -143,7 +141,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
             }
 
             const updates = changedSlots.map((slot) => ({
-                slot_id: slot.slot_id,
+                slot_id: Number(slot.slot_id),
                 is_available: slot.status_label === "Active",
                 total_tokens: slot.total_tokens,
             }));
@@ -165,44 +163,6 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
 
     return (
         <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300 relative">
-            {/* Progress Overlay */}
-            {isSaving && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
-                    <div className="bg-card w-[320px] p-6 shadow-2xl border border-primary/20 rounded-xl animate-in zoom-in-95 duration-200">
-                        <div className="flex flex-col items-center text-center gap-4">
-                            <div className="relative flex items-center justify-center">
-                                <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                                <span className="absolute text-[10px] font-bold text-primary">
-                                    {Math.round(
-                                        (saveProgress.current /
-                                            saveProgress.total) *
-                                            100,
-                                    )}
-                                    %
-                                </span>
-                            </div>
-                            <div className="space-y-1">
-                                <h3 className="font-bold text-foreground">
-                                    Updating Slots
-                                </h3>
-                                <p className="text-xs text-muted-foreground font-medium">
-                                    Processed {saveProgress.current} of{" "}
-                                    {saveProgress.total} slots...
-                                </p>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden mt-2">
-                                <div
-                                    className="bg-primary h-full transition-all duration-300 ease-out"
-                                    style={{
-                                        width: `${(saveProgress.current / saveProgress.total) * 100}%`,
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <Button
                     variant="outline"
