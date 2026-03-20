@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -31,10 +31,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth-store";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
-import { format } from "date-fns";
+import { format, addMinutes, parseISO } from "date-fns";
 import { DoctorSlot, useGetDoctorSlots } from "@/hooks/api/useGetDoctorSlots";
-import { useUpdateDoctorSlot } from "@/hooks/api/useUpdateDoctorSlot";
+import { useUpdateDoctorSlotsBulk } from "@/hooks/api/useUpdateDoctorSlotsBulk";
+import {
+    Combobox,
+    ComboboxInput,
+    ComboboxContent,
+    ComboboxList,
+    ComboboxItem,
+    ComboboxTrigger,
+} from "@/components/ui/combobox";
 
 interface SlotsClientProps {
     scheduleId: string;
@@ -70,8 +77,9 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [saveProgress, setSaveProgress] = useState({ current: 0, total: 0 });
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [slotDuration, setSlotDuration] = useState("15");
 
-    const updateSlotMutation = useUpdateDoctorSlot();
+    const updateSlotsMutation = useUpdateDoctorSlotsBulk();
 
     useEffect(() => {
         if (slotsData?.data && Array.isArray(slotsData.data)) {
@@ -148,6 +156,42 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
         );
     };
 
+    const recalculateSlotTimes = (durationMinutes: number) => {
+        if (slots.length === 0) return;
+
+        setSlots((prev) => {
+            const newSlots = [...prev];
+            // Use the first slot's start time as the anchor
+            const firstSlotStartTime = new Date(newSlots[0].slot_timestamp);
+            let currentStartTime = firstSlotStartTime;
+
+            return newSlots.map((slot) => {
+                const startTime = currentStartTime;
+                const endTime = addMinutes(startTime, durationMinutes);
+                
+                // Update currentStartTime for the next slot
+                currentStartTime = endTime;
+
+                return {
+                    ...slot,
+                    slot_timestamp: startTime.toISOString(),
+                    slot_end_timestamp: endTime.toISOString(),
+                };
+            });
+        });
+    };
+
+    const handleDurationChange = (value: string | string[] | null) => {
+        const newValue = Array.isArray(value) ? value[0] : (value || "");
+        if (newValue === slotDuration) return;
+        
+        setSlotDuration(newValue);
+        const duration = parseInt(newValue, 10);
+        if (!isNaN(duration) && duration > 0) {
+            recalculateSlotTimes(duration);
+        }
+    };
+
     const handleSaveChanges = async () => {
         if (!slotsData?.data) return;
         setIsSaving(true);
@@ -161,7 +205,9 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
 
                 return (
                     currentSlot.total_tokens !== originalSlot.total_tokens ||
-                    currentSlot.status_label !== originalSlot.status_label
+                    currentSlot.status_label !== originalSlot.status_label ||
+                    currentSlot.slot_timestamp !== originalSlot.slot_timestamp ||
+                    currentSlot.slot_end_timestamp !== originalSlot.slot_end_timestamp
                 );
             });
 
@@ -172,50 +218,22 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                 return;
             }
 
-            setSaveProgress({ current: 0, total: totalChanges });
+            const updates = changedSlots.map((slot) => {
+                const originalSlot = slotsData.data.find(
+                    (s: DoctorSlot) => s.slot_id === slot.slot_id,
+                );
+                
+                return {
+                    slot_id: slot.slot_id,
+                    is_available: slot.status_label === "Active",
+                    total_tokens: slot.total_tokens,
+                    slot_timestamp: slot.slot_timestamp !== originalSlot?.slot_timestamp ? slot.slot_timestamp : undefined,
+                    slot_end_timestamp: slot.slot_end_timestamp !== originalSlot?.slot_end_timestamp ? slot.slot_end_timestamp : undefined,
+                };
+            });
 
-            const results = [];
-            for (let i = 0; i < changedSlots.length; i++) {
-                const slot = changedSlots[i];
-                try {
-                    const result = await updateSlotMutation.mutateAsync({
-                        slotId: slot.slot_id?.toString() || "",
-                        data: {
-                            is_available: slot.status_label === "Active",
-                            total_tokens: slot.total_tokens,
-                        },
-                        skipInvalidate: true,
-                    });
-                    results.push({ status: "fulfilled", value: result });
-                } catch (error) {
-                    results.push({ status: "rejected", reason: error });
-                }
-                setSaveProgress((prev) => ({ ...prev, current: i + 1 }));
-            }
-
-            // Manually invalidate only once at the end
-            queryClient.invalidateQueries({ queryKey: ["doctor-slots"] });
-
-            const rejected = results.filter(
-                (r): r is { status: "rejected"; reason: unknown } =>
-                    r.status === "rejected",
-            );
-
-            if (rejected.length > 0) {
-                const firstError = rejected[0].reason as any;
-                const errorMessage =
-                    firstError?.message ||
-                    firstError?.data?.message ||
-                    "Failed to update slots. Please try again.";
-
-                if (rejected.length === results.length) {
-                    toast.error(errorMessage);
-                } else {
-                    toast.error(`Partial success. ${errorMessage}`);
-                }
-            } else {
-                toast.success("Slots updated successfully.");
-            }
+            await updateSlotsMutation.mutateAsync({ updates });
+            toast.success("Slots updated successfully.");
         } catch (error: unknown) {
             console.error("Error updating slots:", error);
             const err = error as Record<string, unknown>;
@@ -266,7 +284,7 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
     return (
         <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300 relative">
             {/* Progress Overlay */}
-            {isSaving && saveProgress.total > 0 && (
+            {isSaving && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
                     <Card className="w-[320px] p-6 shadow-2xl border-primary/20 animate-in zoom-in-95 duration-200">
                         <div className="flex flex-col items-center text-center gap-4">
@@ -383,17 +401,25 @@ export function MonthsClient({ scheduleId }: SlotsClientProps) {
                         <Label className="text-[13px] font-bold text-foreground">
                             Slot duration
                         </Label>
-                        <Select defaultValue="15">
-                            <SelectTrigger className="w-full h-10 bg-muted/20 border-border/40">
-                                <SelectValue placeholder="Select duration" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" sideOffset={4}>
-                                <SelectItem value="10">10 minutes</SelectItem>
-                                <SelectItem value="15">15 minutes</SelectItem>
-                                <SelectItem value="20">20 minutes</SelectItem>
-                                <SelectItem value="30">30 minutes</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Combobox 
+                            value={slotDuration} 
+                            onValueChange={handleDurationChange}
+                        >
+                            <ComboboxInput 
+                                placeholder="Select duration" 
+                                className="w-full h-10 bg-muted/20 border-border/40"
+                            />
+                            <ComboboxContent sideOffset={4}>
+                                <ComboboxList>
+                                    <ComboboxItem value="10">10 minutes</ComboboxItem>
+                                    <ComboboxItem value="15">15 minutes</ComboboxItem>
+                                    <ComboboxItem value="20">20 minutes</ComboboxItem>
+                                    <ComboboxItem value="30">30 minutes</ComboboxItem>
+                                    <ComboboxItem value="45">45 minutes</ComboboxItem>
+                                    <ComboboxItem value="60">60 minutes</ComboboxItem>
+                                </ComboboxList>
+                            </ComboboxContent>
+                        </Combobox>
                     </div>
 
                     <div className="space-y-3">

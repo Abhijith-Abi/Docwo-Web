@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const publicRoutes: string[] = ["/"];
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     return NextResponse.next();
 }
 

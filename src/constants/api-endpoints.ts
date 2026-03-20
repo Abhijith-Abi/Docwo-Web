@@ -33,7 +33,7 @@ export const API_ENDPOINTS = {
     DOCTOR_CALENDAR_QUICK_VIEW: '/doctors/:id/dashboard/calendar-quick-view',
     DOCTOR_UPCOMING_SESSIONS: '/doctors/:id/dashboard/upcoming-sessions',
     DOCTOR_DASHBOARD_SLOTS: '/doctors/:id/dashboard/slots',
-    UPDATE_DOCTOR_SLOT: '/doctors/slots/:slotId',
+    UPDATE_DOCTOR_SLOTS_BULK: '/api/v1/doctors/slots/bulk-update-by-ids',
     DOCTOR_SEARCH: '/doctors/search',
     DOCTOR_BULK_UPLOAD: '/doctors/bulk-upload',
     DOCTOR_CHANGE_PASSWORD: '/doctors/:id/change-password',

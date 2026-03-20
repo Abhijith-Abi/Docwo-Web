@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { DoctorSlot } from "@/hooks/api/useGetDoctorSlots";
-import { useUpdateDoctorSlot } from "@/hooks/api/useUpdateDoctorSlot";
+import { useUpdateDoctorSlotsBulk } from "@/hooks/api/useUpdateDoctorSlotsBulk";
 
 interface SlotsClientProps {
     scheduleId: string;
@@ -36,12 +36,6 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
         resolvedDate = format(new Date(), "yyyy-MM-dd");
     }
 
-    console.log("SlotsClient render params:", {
-        doctorId,
-        clinicId,
-        resolvedDate,
-    });
-
     const { data: slotsData, isLoading } = useGetDoctorSlots(
         doctorId,
         clinicId,
@@ -56,7 +50,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
     const [saveProgress, setSaveProgress] = useState({ current: 0, total: 0 });
     const queryClient = useQueryClient();
 
-    const updateSlotMutation = useUpdateDoctorSlot();
+    const updateSlotsMutation = useUpdateDoctorSlotsBulk();
 
     useEffect(() => {
         if (slotsData?.data && Array.isArray(slotsData.data)) {
@@ -148,53 +142,14 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
                 return;
             }
 
-            setSaveProgress({ current: 0, total: totalChanges });
+            const updates = changedSlots.map((slot) => ({
+                slot_id: slot.slot_id,
+                is_available: slot.status_label === "Active",
+                total_tokens: slot.total_tokens,
+            }));
 
-            const results = [];
-            for (let i = 0; i < changedSlots.length; i++) {
-                const slot = changedSlots[i];
-                try {
-                    const result = await updateSlotMutation.mutateAsync({
-                        slotId: slot.slot_id?.toString() || "",
-                        data: {
-                            is_available: slot.status_label === "Active",
-                            total_tokens: slot.total_tokens,
-                        },
-                        skipInvalidate: true,
-                    });
-                    results.push({ status: "fulfilled", value: result });
-                } catch (error) {
-                    results.push({ status: "rejected", reason: error });
-                }
-                setSaveProgress((prev) => ({ ...prev, current: i + 1 }));
-            }
-
-            // Manually invalidate only once at the end
-            queryClient.invalidateQueries({ queryKey: ["doctor-slots"] });
-
-            const rejected = results.filter(
-                (r): r is { status: "rejected"; reason: unknown } =>
-                    r.status === "rejected",
-            );
-
-            if (rejected.length > 0) {
-                const firstError = rejected[0].reason as {
-                    message?: string;
-                    data?: { message?: string };
-                };
-                const errorMessage =
-                    firstError?.message ||
-                    firstError?.data?.message ||
-                    "Failed to update slots. Please try again.";
-
-                if (rejected.length === results.length) {
-                    toast.error(errorMessage);
-                } else {
-                    toast.error(`Partial success. ${errorMessage}`);
-                }
-            } else {
-                toast.success("Slots updated successfully.");
-            }
+            await updateSlotsMutation.mutateAsync({ updates });
+            toast.success("Slots updated successfully.");
         } catch (error: unknown) {
             console.error("Error updating slots:", error);
             const err = error as Record<string, unknown>;
@@ -211,7 +166,7 @@ export function SlotsClient({ scheduleId }: SlotsClientProps) {
     return (
         <div className="flex-1 flex flex-col w-full h-full animate-in fade-in duration-300 relative">
             {/* Progress Overlay */}
-            {isSaving && saveProgress.total > 0 && (
+            {isSaving && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
                     <div className="bg-card w-[320px] p-6 shadow-2xl border border-primary/20 rounded-xl animate-in zoom-in-95 duration-200">
                         <div className="flex flex-col items-center text-center gap-4">
