@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { io, Socket } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth-store";
@@ -15,19 +15,19 @@ export function useQueueSocket({ clinicId, doctorId, date }: UseQueueSocketProps
     const token = useAuthStore((state) => state.token);
     const socketRef = useRef<Socket | null>(null);
 
-    useEffect(() => {
-        if (!clinicId || !doctorId || !date || !token) return;
-
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-        let serverUrl = baseUrl;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const serverUrl = useMemo(() => {
         try {
-            const url = new URL(baseUrl);
-            serverUrl = url.origin;
+            return new URL(baseUrl).origin;
         } catch (e) {
             console.error("Invalid NEXT_PUBLIC_BASE_URL:", baseUrl);
+            return baseUrl;
         }
+    }, [baseUrl]);
 
-        console.log("Connecting to Queue Socket at:", serverUrl);
+    // 1. Connection Management - Single connection for the life of the token/serverUrl
+    useEffect(() => {
+        if (!token || !serverUrl) return;
 
         const socket = io(serverUrl, {
             auth: { token },
@@ -39,34 +39,34 @@ export function useQueueSocket({ clinicId, doctorId, date }: UseQueueSocketProps
 
         socketRef.current = socket;
 
-        const roomName = `queue-clinic-${clinicId}-doctor-${doctorId}-${date}`;
-
-        socket.on("connect", () => {
-            console.log("✅ Queue Socket Connected:", socket.id);
-            console.log("📢 Joining room:", roomName);
-            socket.emit("join_queue_room", roomName);
-        });
-
         socket.on("connect_error", (error) => {
             console.error("Queue Socket connection error:", error.message);
         });
 
-        socket.on("room_joined_successfully", ({ room }) => {
-            console.log("Joined room:", room);
-        });
+        return () => {
+            if (socket) {
+                socket.off();
+                socket.disconnect();
+            }
+            socketRef.current = null;
+        };
+    }, [token, serverUrl]);
 
-        socket.on("queue_update", (payload: any) => {
-            console.log("Received queue_update payload:", payload);
-            
+    // 2. Room & Listener Management - Updates when parameters change, without reconnecting
+    useEffect(() => {
+        const socket = socketRef.current;
+        if (!socket || !clinicId || !doctorId || !date) return;
+
+        const roomName = `queue-clinic-${clinicId}-doctor-${doctorId}-${date}`;
+
+        const onQueueUpdate = (payload: any) => {
             let newQueue: QueuePatient[] = [];
             if (Array.isArray(payload)) {
                 newQueue = payload;
             } else if (payload && typeof payload === "object") {
-                // If it's an object, check if the queue is inside a 'queue' property
                 if (Array.isArray(payload.queue)) {
                     newQueue = payload.queue;
                 } else if (Object.keys(payload).length === 0) {
-                    // It's an empty object, treat as empty queue
                     newQueue = [];
                 } else {
                     console.error("Received unexpected object format for queue_update:", payload);
@@ -81,54 +81,59 @@ export function useQueueSocket({ clinicId, doctorId, date }: UseQueueSocketProps
                 ["doctor-queue", clinicId, doctorId, date],
                 (oldData) => {
                     if (!oldData) return oldData;
-                    return {
-                        ...oldData,
-                        queue: newQueue,
-                    };
+                    return { ...oldData, queue: newQueue };
                 }
             );
-        });
+        };
 
-        socket.on("doctor_break_update", (breakStatus: BreakStatus) => {
-            console.log("Received doctor_break_update:", breakStatus);
+        const onBreakUpdate = (breakStatus: BreakStatus) => {
             queryClient.setQueryData<QueueState>(
                 ["doctor-queue", clinicId, doctorId, date],
                 (oldData) => {
                     if (!oldData) return oldData;
-                    return {
-                        ...oldData,
-                        breakStatus,
-                    };
+                    return { ...oldData, breakStatus };
                 }
             );
-        });
+        };
 
-        socket.on("doctor_session_update", (sessionStatus: SessionStatus) => {
-            console.log("Received doctor_session_update:", sessionStatus);
+        const onSessionUpdate = (sessionStatus: SessionStatus) => {
             queryClient.setQueryData<QueueState>(
                 ["doctor-queue", clinicId, doctorId, date],
                 (oldData) => {
                     if (!oldData) return oldData;
-                    return {
-                        ...oldData,
-                        sessionStatus,
-                    };
+                    return { ...oldData, sessionStatus };
                 }
             );
-        });
+        };
 
-        socket.on("disconnect", (reason) => {
-            console.log("Disconnected from Queue Socket:", reason);
-        });
+        const joinRoom = () => {
+            socket.emit("join_queue_room", roomName);
+        };
+
+        // Attach listeners for this specific parameter set
+        socket.on("queue_update", onQueueUpdate);
+        socket.on("doctor_break_update", onBreakUpdate);
+        socket.on("doctor_session_update", onSessionUpdate);
+
+        // Join room logic
+        if (socket.connected) {
+            joinRoom();
+        }
+        socket.on("connect", joinRoom);
 
         return () => {
+            // Cleanup listeners and leave room
+            socket.off("queue_update", onQueueUpdate);
+            socket.off("doctor_break_update", onBreakUpdate);
+            socket.off("doctor_session_update", onSessionUpdate);
+            socket.off("connect", joinRoom);
+
             if (socket.connected) {
                 socket.emit("leave_queue_room", roomName);
             }
-            socket.disconnect();
-            socketRef.current = null;
         };
-    }, [clinicId, doctorId, date, token, queryClient]);
+    }, [clinicId, doctorId, date, queryClient, token, serverUrl]);
+
 
     return socketRef.current;
 }

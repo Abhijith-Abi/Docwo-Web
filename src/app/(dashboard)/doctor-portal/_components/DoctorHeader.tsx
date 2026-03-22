@@ -38,15 +38,15 @@ export default function DoctorHeader() {
 
     return (
         <header className="sticky top-0 z-50 bg-[#F8F9FA] pt-4 md:rounded-tl-[2.5rem]">
-            <div className="flex items-center justify-between px-2 md:px-8 h-16 max-w-7xl mx-auto pb-4 gap-2 md:gap-4 truncate">
-                <div className="flex flex-1 items-center w-full min-w-0 pr-2 md:pr-4">
-                    <Avatar className="h-10 w-10 border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0 mr-1">
+            <div className="flex items-center justify-between px-2 md:px-4 lg:px-6 h-16 max-w-[1400px] mx-auto pb-4 gap-2 md:gap-4">
+                <div className="flex flex-1 items-center min-w-0 pr-2 md:pr-4 gap-2">
+                    <Avatar className="h-10 w-10 border border-gray-200 bg-gray-100 flex items-center justify-center shrink-0">
                         <AvatarImage src={clinicLogo} />
                         <AvatarFallback className="bg-gray-400 text-white pattern-dots h-full w-full opacity-60">
                             {clinicName?.charAt(0) || "C"}
                         </AvatarFallback>
                     </Avatar>
-                    <span className="font-semibold text-sm md:text-base whitespace-nowrap hidden lg:inline-block">
+                    <span className="font-semibold text-sm leading-tight hidden lg:block line-clamp-2 max-w-[200px]">
                         {clinicName || "Clinic Name"}
                     </span>
                 </div>

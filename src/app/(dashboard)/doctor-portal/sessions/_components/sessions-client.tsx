@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SessionStats from "./session-stats";
 import AppointmentCarousel from "./appointment-cards";
 import TotalBookingsListView from "./total-bookings-table";
@@ -68,7 +68,7 @@ export default function SessionsClient() {
 
     // Derive current and next patients from queue logic
     const queue = Array.isArray(queueData?.queue) ? queueData.queue : [];
-    const currentPatient = queue.find(p => p.token_status?.toLowerCase() === "consulting") || null;
+    const currentPatient = queue.find(p => ["consulting", "in_consult"].includes(p.token_status?.toLowerCase())) || null;
     const nextPatient = queue.find(p => p.token_status?.toLowerCase() === "waiting") || null;
     const remainingQueue = queue.filter(p => p !== currentPatient && p !== nextPatient);
 
@@ -79,16 +79,24 @@ export default function SessionsClient() {
     };
 
     const totalBookingsCount = pagination?.totalResults || queueData?.sessionStatus?.totalScheduled || 0;
+    const isQueueEmpty = !currentPatient && !nextPatient && remainingQueue.length === 0;
+
+    // Scroll to top when date changes
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [selectedDate]);
 
     return (
         <div className="space-y-8 pb-10">
             {/* Header / Sub-header Section */}
 
             {/* Session Overview */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-bold text-foreground tracking-tight">
-                    Session Overview
-                </h2>
+            <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-foreground tracking-tight">
+                        Session Overview
+                    </h2>
+                </div>
                 <SessionStats 
                     completed={queueData?.sessionStatus?.patientsSeenToday}
                     upcoming={queue.length}
@@ -98,16 +106,23 @@ export default function SessionsClient() {
             </section>
 
             {/* Appointment Status / Carousel */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-bold text-foreground tracking-tight">
-                    Appointment Status
-                </h2>
-                <AppointmentCarousel 
-                    currentPatient={currentPatient}
-                    nextPatient={nextPatient}
-                    remainingQueue={remainingQueue}
-                />
-            </section>
+            {!isLoading && !isQueueEmpty && (
+                <section className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-foreground tracking-tight">
+                            Appointment Status
+                        </h2>
+                    </div>
+                    <AppointmentCarousel 
+                        currentPatient={currentPatient}
+                        nextPatient={nextPatient}
+                        remainingQueue={remainingQueue}
+                        doctorId={doctorId}
+                        clinicId={clinicId}
+                        date={selectedDate}
+                    />
+                </section>
+            )}
 
             {/* Total Bookings Section */}
             <section className="space-y-6">

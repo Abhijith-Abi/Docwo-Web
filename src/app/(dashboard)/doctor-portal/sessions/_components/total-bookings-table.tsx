@@ -17,6 +17,12 @@ import { format, differenceInYears } from "date-fns";
 
 const getStatusConfig = (status: string) => {
     switch (status?.toLowerCase()) {
+        case "in_consult":
+        case "consulting":
+            return {
+                label: "In Consult",
+                className: "bg-primary text-primary-foreground shadow-sm shadow-primary/20 animate-pulse-bg border-none",
+            };
         case "completed":
             return {
                 label: "Completed",

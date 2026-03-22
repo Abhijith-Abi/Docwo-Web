@@ -135,7 +135,7 @@ export function ScheduleClient() {
                         onToggleFilters={() => setShowFilters((v) => !v)}
                         view={view}
                         onViewChange={setView}
-                        onExport={() => console.log("Export triggered")}
+                        onExport={() => {}}
                     />
 
                     {showFilters && (
@@ -162,9 +162,7 @@ export function ScheduleClient() {
                         currentPage={historyPage}
                         onPageChange={handlePageChange}
                         totalCount={totalCount}
-                        onViewDetails={(apt) =>
-                            console.log("details:", apt?.date)
-                        }
+                        onViewDetails={(apt) => {}}
                     />
                 ) : (
                     <ConsultationGridView
@@ -173,9 +171,7 @@ export function ScheduleClient() {
                         currentPage={historyPage}
                         onPageChange={handlePageChange}
                         totalCount={totalCount}
-                        onViewDetails={(apt) =>
-                            console.log("details:", apt?.date)
-                        }
+                        onViewDetails={(apt) => {}}
                     />
                 )}
             </section>

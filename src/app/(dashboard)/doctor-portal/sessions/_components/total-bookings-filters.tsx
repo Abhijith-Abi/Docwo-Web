@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import {
     Select,
     SelectContent,
@@ -35,55 +36,59 @@ export function TotalBookingsFilters({
     filters,
     onFilterChange,
 }: TotalBookingsFiltersProps) {
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-top-2 fade-in duration-300">
             {/* Date Filter */}
             <div className="flex flex-col gap-2.5">
                 <Label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Date</Label>
-                <div className="relative">
-                    <Popover>
+                <div className="relative group">
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
                                 className={cn(
-                                    "w-full h-10 justify-between shadow-sm font-semibold border-border/80 hover:bg-muted/50 transition-all rounded-md",
-                                    filters.date
-                                        ? "text-foreground pr-8"
-                                        : "text-muted-foreground/70",
+                                    "w-full h-10 justify-between gap-2 shadow-sm font-semibold border-border/80 hover:bg-muted/50 transition-all rounded-md px-3",
+                                    !filters.date && "text-muted-foreground/70",
                                 )}
                             >
-                                <span className="truncate flex-1 text-left">
-                                    {filters.date
-                                        ? format(filters.date, "PPP")
-                                        : "Select Date"}
-                                </span>
-                                <CalendarIcon className="h-4 w-4 opacity-40 shrink-0 ml-2 text-primary" strokeWidth={2.5} />
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    <CalendarIcon className="h-4 w-4 opacity-60 shrink-0 text-primary" strokeWidth={2.5} />
+                                    <span className="truncate text-left text-sm">
+                                        {filters.date
+                                            ? format(filters.date, "PPP")
+                                            : "Select Date"}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                    {filters.date && (
+                                        <div
+                                            className="p-1 hover:bg-muted rounded-md transition-colors cursor-pointer text-muted-foreground hover:text-foreground"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onFilterChange("date", undefined);
+                                            }}
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </div>
+                                    )}
+                                </div>
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="p-0 rounded-xl shadow-xl border-border/50" align="start">
+                        <PopoverContent className="w-auto p-0 rounded-xl shadow-xl border-border/50" align="start">
                             <Calendar
                                 mode="single"
                                 selected={filters.date}
-                                onSelect={(date) =>
-                                    onFilterChange("date", date)
-                                }
+                                onSelect={(date) => {
+                                    onFilterChange("date", date);
+                                    setIsCalendarOpen(false);
+                                }}
                                 initialFocus
                                 className="rounded-xl"
                             />
                         </PopoverContent>
                     </Popover>
-                    {filters.date && (
-                        <div
-                            className="absolute right-9 top-1/2 -translate-y-1/2 p-1.5 cursor-pointer hover:bg-muted rounded-md z-10 text-muted-foreground hover:text-foreground transition-all"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                onFilterChange("date", undefined);
-                            }}
-                        >
-                            <X className="h-3.5 w-3.5" />
-                        </div>
-                    )}
                 </div>
             </div>
 

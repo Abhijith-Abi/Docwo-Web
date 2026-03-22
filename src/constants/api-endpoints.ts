@@ -70,6 +70,8 @@ export const API_ENDPOINTS = {
 
     // QUEUES:
     QUEUE_STATE: '/queues/:clinicId/:doctorId/:date',
+    ADVANCE_QUEUE: '/queues/advance',
+    SKIP_QUEUE: '/queues/skip',
 
     // AVAILABILITY:
     AVAILABILITY: '/availability',
