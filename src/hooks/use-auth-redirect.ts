@@ -9,10 +9,8 @@ export const useAuthRedirect = () => {
     const { user, token } = useAuthStore();
     const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
-    const isAdmin =
-        (user?.roles?.includes("admin") ||
-            user?.roles?.includes("clinic_staff")) ??
-        false;
+    const isAdmin = user?.roles?.includes("admin") ?? false;
+    const isClinicStaff = user?.roles?.includes("clinic_staff") ?? false;
     const isStaff = user?.roles?.includes("staff") ?? false;
     const isDoctor = user?.roles?.includes("doctor") ?? false;
 
@@ -20,14 +18,24 @@ export const useAuthRedirect = () => {
         if (hasHydrated && token) {
             const path = isAdmin
                 ? "/admin-portal"
-                : isStaff
+                : isClinicStaff
                   ? "/staff-portal"
-                  : isDoctor
-                    ? "/doctor-portal"
-                    : "/unauthorized";
+                  : isStaff
+                    ? "/staff-portal"
+                    : isDoctor
+                      ? "/doctor-portal"
+                      : "/unauthorized";
             router.replace(path);
         }
-    }, [token, isAdmin, isStaff, isDoctor, router, hasHydrated]);
+    }, [token, isAdmin, isClinicStaff, isStaff, isDoctor, router, hasHydrated]);
 
-    return { isAdmin, isStaff, isDoctor, user, token, hasHydrated };
+    return {
+        isAdmin,
+        isClinicStaff,
+        isStaff,
+        isDoctor,
+        user,
+        token,
+        hasHydrated,
+    };
 };

@@ -25,7 +25,11 @@ export default async function getApiData(endpoint: string) {
 
         if (response.status === 401 && refreshToken) {
             try {
-                await refreshTokenIfNeeded(accessToken || "", refreshToken, true);
+                await refreshTokenIfNeeded(
+                    accessToken || "",
+                    refreshToken,
+                    true,
+                );
                 const newAccessToken = useAuthStore.getState().token;
 
                 if (newAccessToken) {
@@ -52,7 +56,12 @@ export default async function getApiData(endpoint: string) {
             const text = await response.text();
             return text ? JSON.parse(text) : {};
         } else {
-            throw new Error(response.status.toString());
+            const text = await response.text();
+            const errorData = text ? JSON.parse(text) : {};
+            const error = new Error(response.status.toString());
+            (error as any).status = response.status;
+            (error as any).data = errorData;
+            throw error;
         }
     } catch (error) {
         throw error;

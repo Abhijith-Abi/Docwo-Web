@@ -20,5 +20,10 @@ export function useGetProfile() {
         },
         enabled: !!token,
         staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: (failureCount, error) => {
+            const err = error as any;
+            if (err?.status === 403) return false;
+            return failureCount < 3;
+        },
     });
 }
